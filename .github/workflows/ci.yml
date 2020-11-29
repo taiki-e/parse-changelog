@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - staging
+  schedule:
+    - cron: '0 1 * * *'
+
+env:
+  CARGO_INCREMENTAL: 0
+  RUSTFLAGS: -D warnings
+  RUST_BACKTRACE: 1
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        rust:
+          # This is the minimum supported Rust version of this crate.
+          # When updating this, the reminder to update the minimum supported Rust version in README.md.
+          - 1.45.2
+          - stable
+          - beta
+        include:
+          - os: ubuntu-latest
+            rust: nightly
+          - os: macos-latest
+            rust: nightly
+          - os: windows-latest
+            rust: nightly
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: taiki-e/github-actions/install-rust@main
+        with:
+          toolchain: ${{ matrix.rust }}
+      - run: cargo install cargo-hack
+      - run: cargo test
+      - run: cargo hack check --all --feature-powerset --no-dev-deps --lib
+      - if: startsWith(matrix.rust, 'nightly') && !startsWith(matrix.os, 'windows')
+        run: bash scripts/check-minimal-versions.sh
+
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: taiki-e/github-actions/install-rust@main
+        with:
+          component: clippy
+      - run: cargo clippy --all --all-features --all-targets
+
+  rustfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: taiki-e/github-actions/install-rust@main
+        with:
+          component: rustfmt
+      - run: cargo fmt --all -- --check
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: shellcheck **/*.sh
+
+  # These jobs don't actually test anything, but they're used to tell bors the
+  # build completed, as there is no practical way to detect when a workflow is
+  # successful listening to webhooks only.
+  #
+  # ALL THE PREVIOUS JOBS NEEDS TO BE ADDED TO THE `needs` SECTION OF THIS JOB!
+
+  ci-success:
+    name: ci
+    if: github.event_name == 'push' && success()
+    needs:
+      - test
+      - clippy
+      - rustfmt
+      - shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark the job as a success
+        run: exit 0
+  ci-failure:
+    name: ci
+    if: github.event_name == 'push' && !success()
+    needs:
+      - test
+      - clippy
+      - rustfmt
+      - shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark the job as a failure
+        run: exit 1
