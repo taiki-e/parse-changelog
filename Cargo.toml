@@ -18,6 +18,10 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [workspace]
 
+[[bin]]
+name = "parse-changelog"
+required-features = ["default"]
+
 [features]
 # When using this crate as a library, disable default features.
 default = ["structopt"]
