@@ -3,7 +3,7 @@
 mod auxiliary;
 
 use auxiliary::{assert_eq, trim};
-use parse_changelog::parse;
+use parse_changelog::{parse, Parser};
 
 #[test]
 fn success() {
@@ -190,4 +190,16 @@ fn rust() {
 fn pin_project() {
     let changelog = parse(include_str!("fixtures/pin-project.md")).unwrap();
     assert_eq(include_str!("fixtures/pin-project-1.0.0.md").trim_end(), &changelog["1.0.0"].notes);
+}
+
+#[test]
+fn cargo() {
+    let changelog = Parser::new()
+        .prefix_format("Cargo ")
+        .unwrap()
+        .version_format(r"^\d+\.\d+")
+        .unwrap()
+        .parse(include_str!("fixtures/cargo.md"))
+        .unwrap();
+    assert_eq(include_str!("fixtures/cargo-1.50.md").trim_end(), &changelog["1.50"].notes);
 }

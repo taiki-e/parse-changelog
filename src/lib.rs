@@ -2,8 +2,10 @@
 //!
 //! # Format
 //!
-//! By default, this crate is intended to support most markdown-based
-//! changelogs that have the title of each release starts with the version.
+//! By default, this crate is intended to support markdown-based changelogs
+//! that have the title of each release starts with the version format based on
+//! [Semantic Versioning][semver]. (e.g., [Keep a Changelog][keepachangelog]'s
+//! changelog format.)
 //!
 //! ### Headings
 //!
@@ -54,7 +56,7 @@
 //! ## Version 0.1.0
 //! ```
 //!
-//! By default only "v", "Version " and "Release " are allowed as prefix and
+//! By default only "v", "Version " and "Release " are allowed as prefixes and
 //! can be customized using the [`Parser::prefix_format`] method.
 //!
 //! You can freely include characters after the version (this crate

@@ -20,23 +20,18 @@ To use this crate as a library, add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
+# When using this crate as a library, we recommend disabling the default feature
+# due to the default feature enables CLI-related dependencies.
 parse-changelog = { version = "0.1", default-features = false }
 ```
-
-When using this crate as a library, we recommend disabling the default feature
-due to the default feature enables CLI-related dependencies.
 
 *Compiler support: requires rustc 1.45+*
 
 ## Examples (as a command line tool)
 
-Usage:
+`parse-changelog` command parses changelog and returns a release note for the specified version.
 
-```console
-$ parse-changelog --help
-parse-changelog
-Parses changelog and returns a release note for the specified version
-
+```text
 USAGE:
     parse-changelog <PATH> [VERSION]
 
@@ -52,14 +47,25 @@ ARGS:
     <VERSION>    Specify version (by default, select the latest release)
 ```
 
-Gets release note for Rust 1.46.0:
+An example of getting [Rust's release notes](https://github.com/rust-lang/rust/blob/master/RELEASES.md):
 
-```console
-$ curl -sSf https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md > rust-releases.md
-$ parse-changelog rust-releases.md 1.46.0
+```sh
+curl -sSf https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md > rust-releases.md
+parse-changelog rust-releases.md 1.46.0
 ```
 
-[*Output of the above command.*](tests/fixtures/rust-1.46.0.md)
+[*output of the above command.*](tests/fixtures/rust-1.46.0.md)
+
+In [Cargo's changelog](https://github.com/rust-lang/cargo/blob/master/CHANGELOG.md), the title starts with "Cargo ", and the patch version is omitted. This is a format `parse-changelog` don't support by default, so use `--prefix` and `--version-format` to specify a custom format. For example:
+
+```sh
+curl -sSf https://raw.githubusercontent.com/rust-lang/cargo/master/CHANGELOG.md > cargo-changelog.md
+parse-changelog --prefix 'Cargo ' --version-format '^\d+\.\d+' cargo-changelog.md 1.50
+```
+
+[*output of the above command.*](tests/fixtures/cargo-1.50.md)
+
+`--prefix` is the same as [`Parser::prefix_format`] and `--version-format` is the same as [`Parser::version_format`]. See documentation of those methods for more information.
 
 ## Examples (as a library)
 
@@ -98,10 +104,14 @@ assert_eq!(
 );
 ```
 
+See [documentation](https://docs.rs/parse-changelog) for more information on `parse-changelog` as a library.
+
 ## Format
 
-By default, this crate is intended to support most markdown-based
-changelogs that have the title of each release starts with the version.
+By default, this crate is intended to support markdown-based changelogs
+that have the title of each release starts with the version format based on
+[Semantic Versioning][semver]. (e.g., [Keep a Changelog][keepachangelog]'s
+changelog format.)
 
 ### Headings
 
@@ -152,8 +162,9 @@ You can also include characters before the version as prefix. For example:
 ## Version 0.1.0
 ```
 
-By default only "v", "Version " and "Release " are allowed as prefix and
-can be customized using the [`Parser::prefix_format`] method.
+By default only "v", "Version " and "Release " are allowed as prefixes and
+can be customized using the [`Parser::prefix_format`] method
+(`--prefix-format` option if command line).
 
 You can freely include characters after the version (this crate
 does not parse it). For example:
@@ -175,7 +186,8 @@ This is parsed using the following regular expression:
 ^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?
 ```
 
-To customize the version format, use the [`Parser::version_format`] method (library), or use `--version-format` option ().
+To customize the version format, use the [`Parser::version_format`] method
+(`--version-format` option if command line).
 
 [`Parser::prefix_format`]: https://docs.rs/parse-changelog/0.1/parse_changelog/struct.Parser.html#method.prefix_format
 [`Parser::version_format`]: https://docs.rs/parse-changelog/0.1/parse_changelog/struct.Parser.html#method.version_format
