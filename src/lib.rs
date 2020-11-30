@@ -152,13 +152,16 @@
 #![warn(missing_debug_implementations, missing_docs)]
 #![warn(clippy::all, clippy::default_trait_access)]
 
-use anyhow::bail;
+mod error;
+
 use indexmap::IndexMap;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::{iter::Peekable, mem, str::Lines};
 
-type Result<T, E = anyhow::Error> = std::result::Result<T, E>;
+pub use error::Error;
+
+type Result<T, E = Error> = std::result::Result<T, E>;
 
 type Releases<'a> = IndexMap<&'a str, Release<'a>>;
 
@@ -251,9 +254,9 @@ impl Parser {
     ///
     /// Returns an error if any of the following:
     ///
-    /// - The specified version format is not valid regular expression or
-    ///   supported by [regex] crate.
-    /// - The specified version format is empty or contains only
+    /// - The specified format is not a valid regular expression or supported by
+    ///   [regex] crate.
+    /// - The specified format is empty or contains only
     ///   [whitespace](char::is_whitespace).
     ///
     /// [`parse`]: Self::parse
@@ -262,7 +265,7 @@ impl Parser {
     /// [semver]: https://semver.org/spec/v2.0.0.html
     pub fn version_format(&mut self, version_format: &str) -> Result<&mut Self> {
         if version_format.trim().is_empty() {
-            bail!("empty or whitespace version format");
+            return Err(Error::Format("empty or whitespace version format".into()));
         }
         self.version = Some(Regex::new(version_format)?);
         Ok(self)
@@ -293,9 +296,9 @@ impl Parser {
     ///
     /// Returns an error if any of the following:
     ///
-    /// - The specified prefix format is not valid regular expression or
-    ///   supported by [regex] crate.
-    /// - The specified prefix format is empty or contains only
+    /// - The specified format is not a valid regular expression or supported by
+    ///   [regex] crate.
+    /// - The specified format is empty or contains only
     ///   [whitespace](char::is_whitespace).
     ///
     /// [`parse`]: Self::parse
@@ -303,7 +306,7 @@ impl Parser {
     /// [regex]: https://docs.rs/regex
     pub fn prefix_format(&mut self, prefix_format: &str) -> Result<&mut Self> {
         if prefix_format.trim().is_empty() {
-            bail!("empty or whitespace prefix format");
+            return Err(Error::Format("empty or whitespace version format".into()));
         }
         self.prefix = Some(Regex::new(prefix_format)?);
         Ok(self)
@@ -328,8 +331,8 @@ impl Parser {
     ///
     /// - There are multiple release notes for one version.
     /// - No release was found. This usually means that the changelog isn't
-    ///   written in the supported format, or that the specified version format
-    ///   is wrong if you specify your own version format.
+    ///   written in the supported format, or that the specified format is wrong
+    ///   if you specify your own format.
     pub fn parse<'a>(&self, text: &'a str) -> Result<Releases<'a>> {
         parse_inner(self, text)
     }
@@ -349,7 +352,7 @@ fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Releases<'a>> {
             cur_release.notes.pop();
         }
         if let Some(release) = map.insert(cur_release.version, cur_release) {
-            bail!("multiple release notes for '{}'", release.version);
+            return Err(Error::Parse(format!("multiple release notes for '{}'", release.version)));
         }
         Ok(())
     };
@@ -458,7 +461,7 @@ fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Releases<'a>> {
     }
 
     if map.is_empty() {
-        bail!("no release was found");
+        return Err(Error::Parse("no release was found".into()));
     }
 
     Ok(map)
