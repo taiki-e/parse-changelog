@@ -22,7 +22,7 @@ To use this crate as a library, add this to your `Cargo.toml`:
 [dependencies]
 # When using this crate as a library, we recommend disabling the default feature
 # due to the default feature enables CLI-related dependencies.
-parse-changelog = { version = "0.1", default-features = false }
+parse-changelog = { version = "0.2", default-features = false }
 ```
 
 *Compiler support: requires rustc 1.45+*
