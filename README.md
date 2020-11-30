@@ -47,9 +47,7 @@ ARGS:
     <VERSION>    Specify version (by default, select the latest release)
 ```
 
-### Examples
-
-An example of getting [Rust's release notes](https://github.com/rust-lang/rust/blob/master/RELEASES.md):
+### Example: Getting [Rust's release notes](https://github.com/rust-lang/rust/blob/master/RELEASES.md)
 
 ```sh
 curl -sSf https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md > rust-releases.md
@@ -57,6 +55,8 @@ parse-changelog rust-releases.md 1.46.0
 ```
 
 [*output of the above command.*](tests/fixtures/rust-1.46.0.md)
+
+### Example: Getting [Cargo's changelog](https://github.com/rust-lang/cargo/blob/master/CHANGELOG.md)
 
 In [Cargo's changelog](https://github.com/rust-lang/cargo/blob/master/CHANGELOG.md), the title starts with "Cargo ", and the patch version is omitted. This is a format `parse-changelog` don't support by default, so use `--prefix` and `--version-format` to specify a custom format. For example:
 
@@ -68,6 +68,18 @@ parse-changelog --prefix 'Cargo ' --version-format '^\d+\.\d+' cargo-changelog.m
 [*output of the above command.*](tests/fixtures/cargo-1.50.md)
 
 `--prefix` is the same as [`Parser::prefix_format`] and `--version-format` is the same as [`Parser::version_format`]. See documentation of those methods for more information.
+
+### Example: Create a new GitHub release
+
+With [GitHub CLI](https://cli.github.com/manual/gh_release_create):
+
+```sh
+tag=...
+version=...
+
+notes=$(parse-changelog CHANGELOG.md "$version")
+gh release create "$tag" --title "$version" --notes "$notes" --draft
+```
 
 ## Examples (as a library)
 
