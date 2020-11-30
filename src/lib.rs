@@ -1,86 +1,5 @@
 //! Parses a release note for the specified version from a changelog.
 //!
-//! # Format
-//!
-//! By default, this crate is intended to support markdown-based changelogs
-//! that have the title of each release starts with the version format based on
-//! [Semantic Versioning][semver]. (e.g., [Keep a Changelog][keepachangelog]'s
-//! changelog format.)
-//!
-//! ### Headings
-//!
-//! The heading for each release must be Atx-style (1-6 `#`) or
-//! Setext-style (`=` or `-` in a line under text), and the heading levels
-//! must match with other releases.
-//!
-//! Atx-style headings:
-//!
-//! ```markdown
-//! # 0.1.0
-//! ```
-//!
-//! ```markdown
-//! ## 0.1.0
-//! ```
-//!
-//! Setext-style headings:
-//!
-//! ```markdown
-//! 0.1.0
-//! =====
-//! ```
-//!
-//! ```markdown
-//! 0.1.0
-//! -----
-//! ```
-//!
-//! ### Titles
-//!
-//! The title of each release must start with a text or a link text (text with `[` and `]`)
-//! that starts with a valid version format. For example:
-//!
-//! ```markdown
-//! # [0.2.0]
-//!
-//! description...
-//!
-//! # 0.1.0
-//!
-//! description...
-//! ```
-//!
-//! You can also include characters before the version as prefix. For example:
-//!
-//! ```markdown
-//! ## Version 0.1.0
-//! ```
-//!
-//! By default only "v", "Version " and "Release " are allowed as prefixes and
-//! can be customized using the [`Parser::prefix_format`] method.
-//!
-//! You can freely include characters after the version (this crate
-//! does not parse it). For example:
-//!
-//! ```markdown
-//! # v0.1.0 - 2020-01-01
-//! ```
-//!
-//! ### Versions
-//!
-//! The default version format is
-//! `MAJOR.MINOR.PATCH(-PRE_RELEASE)?(+BUILD_METADATA)?`, and is
-//! based on [Semantic Versioning][semver]. (Pre-release version and build
-//! metadata are optional.)
-//!
-//! This is parsed using the following regular expression:
-//!
-//! ```text
-//! ^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?
-//! ```
-//!
-//! To customize the version format, use the [`Parser::version_format`] method.
-//!
 //! # Examples
 //!
 //! ```rust
@@ -141,6 +60,89 @@
 //! assert_eq!(releases_b["0.1.0"].title, "v0.1.0 - 2020-02-01");
 //! assert_eq!(releases_b["0.1.0"].notes, "Initial release");
 //! ```
+//!
+//! # Format
+//!
+//! By default, this crate is intended to support markdown-based changelogs
+//! that have the title of each release starts with the version format based on
+//! [Semantic Versioning][semver]. (e.g., [Keep a Changelog][keepachangelog]'s
+//! changelog format.)
+//!
+//! ### Headings
+//!
+//! The heading for each release must be Atx-style (1-6 `#`) or
+//! Setext-style (`=` or `-` in a line under text), and the heading levels
+//! must match with other releases.
+//!
+//! Atx-style headings:
+//!
+//! ```markdown
+//! # 0.1.0
+//! ```
+//!
+//! ```markdown
+//! ## 0.1.0
+//! ```
+//!
+//! Setext-style headings:
+//!
+//! ```markdown
+//! 0.1.0
+//! =====
+//! ```
+//!
+//! ```markdown
+//! 0.1.0
+//! -----
+//! ```
+//!
+//! ### Titles
+//!
+//! The title of each release must start with a text or a link text (text with `[` and `]`)
+//! that starts with a valid version format. For example:
+//!
+//! ```markdown
+//! # [0.2.0]
+//!
+//! description...
+//!
+//! # 0.1.0
+//!
+//! description...
+//! ```
+//!
+//! You can also include characters before the version as prefix.
+//!
+//! ```text
+//! ## Version 0.1.0
+//!    ^^^^^^^^
+//! ```
+//!
+//! By default only "v", "Version " and "Release " are allowed as prefixes and
+//! can be customized using the [`Parser::prefix_format`] method.
+//!
+//! You can freely include characters after the version (this crate
+//! does not parse it).
+//!
+//! ```text
+//! # 0.1.0 - 2020-01-01
+//!        ^^^^^^^^^^^^^
+//! ```
+//!
+//! ### Versions
+//!
+//! The default version format is
+//! `MAJOR.MINOR.PATCH(-PRE_RELEASE)?(+BUILD_METADATA)?`, and is
+//! based on [Semantic Versioning][semver]. (Pre-release version and build
+//! metadata are optional.)
+//!
+//! This is parsed using the following regular expression:
+//!
+//! ```text
+//! ^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?
+//! ```
+//!
+//! To customize the version format, use the [`Parser::version_format`] method.
 //!
 //! [keepachangelog]: https://keepachangelog.com/en/1.0.0
 //! [semver]: https://semver.org/spec/v2.0.0.html

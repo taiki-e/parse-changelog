@@ -27,7 +27,7 @@ parse-changelog = { version = "0.1", default-features = false }
 
 *Compiler support: requires rustc 1.45+*
 
-## Examples (as a command line tool)
+## Usage (as a command line tool)
 
 `parse-changelog` command parses changelog and returns a release note for the specified version.
 
@@ -46,6 +46,8 @@ ARGS:
     <PATH>       Path to the changelog file
     <VERSION>    Specify version (by default, select the latest release)
 ```
+
+### Examples
 
 An example of getting [Rust's release notes](https://github.com/rust-lang/rust/blob/master/RELEASES.md):
 
@@ -156,10 +158,11 @@ description...
 description...
 ```
 
-You can also include characters before the version as prefix. For example:
+You can also include characters before the version as prefix.
 
-```markdown
+```text
 ## Version 0.1.0
+   ^^^^^^^^
 ```
 
 By default only "v", "Version " and "Release " are allowed as prefixes and
@@ -167,10 +170,11 @@ can be customized using the [`Parser::prefix_format`] method
 (`--prefix-format` option if command line).
 
 You can freely include characters after the version (this crate
-does not parse it). For example:
+does not parse it).
 
-```markdown
-# v0.1.0 - 2020-01-01
+```text
+# 0.1.0 - 2020-01-01
+       ^^^^^^^^^^^^^
 ```
 
 ### Versions
