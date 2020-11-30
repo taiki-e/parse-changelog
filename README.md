@@ -33,9 +33,10 @@ parse-changelog = { version = "0.1", default-features = false }
 
 ```text
 USAGE:
-    parse-changelog <PATH> [VERSION]
+    parse-changelog [OPTIONS] <PATH> [VERSION]
 
 OPTIONS:
+    -t, --title                       Returns title instead of notes
         --version-format <PATTERN>    Specify version format
         --prefix <PATTERN>            Alias for --prefix-format
         --prefix-format <PATTERN>     Specify prefix format
@@ -43,33 +44,33 @@ OPTIONS:
     -V, --version                     Prints version information
 
 ARGS:
-    <PATH>       Path to the changelog file
+    <PATH>       Path to the changelog file (use '-' for standard input)
     <VERSION>    Specify version (by default, select the latest release)
 ```
 
-### Example: Getting [Rust's release notes](https://github.com/rust-lang/rust/blob/master/RELEASES.md)
+### Example: Get [Rust's release notes](https://github.com/rust-lang/rust/blob/master/RELEASES.md)
 
 ```sh
-curl -sSf https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md > rust-releases.md
-parse-changelog rust-releases.md 1.46.0
+curl -sSf https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md \
+  | parse-changelog - 1.46.0
 ```
 
 [*output of the above command.*](tests/fixtures/rust-1.46.0.md)
 
-### Example: Getting [Cargo's changelog](https://github.com/rust-lang/cargo/blob/master/CHANGELOG.md)
+### Example: Get [Cargo's changelog](https://github.com/rust-lang/cargo/blob/master/CHANGELOG.md)
 
 In [Cargo's changelog](https://github.com/rust-lang/cargo/blob/master/CHANGELOG.md), the title starts with "Cargo ", and the patch version is omitted. This is a format `parse-changelog` don't support by default, so use `--prefix` and `--version-format` to specify a custom format. For example:
 
 ```sh
-curl -sSf https://raw.githubusercontent.com/rust-lang/cargo/master/CHANGELOG.md > cargo-changelog.md
-parse-changelog --prefix 'Cargo ' --version-format '^\d+\.\d+' cargo-changelog.md 1.50
+curl -sSf https://raw.githubusercontent.com/rust-lang/cargo/master/CHANGELOG.md \
+  | parse-changelog --prefix 'Cargo ' --version-format '^\d+\.\d+' - 1.50
 ```
 
 [*output of the above command.*](tests/fixtures/cargo-1.50.md)
 
 `--prefix` is the same as [`Parser::prefix_format`] and `--version-format` is the same as [`Parser::version_format`]. See documentation of those methods for more information.
 
-### Example: Create a new GitHub release
+### Example: Create a new GitHub release from changelog
 
 With [GitHub CLI](https://cli.github.com/manual/gh_release_create):
 
@@ -77,8 +78,12 @@ With [GitHub CLI](https://cli.github.com/manual/gh_release_create):
 tag=...
 version=...
 
+# Get title for $version from CHANGELOG.md and remove links.
+title=$(parse-changelog CHANGELOG.md "$version" --title | sed -E 's/\[|\]//g')
+# Get notes for $version from CHANGELOG.md.
 notes=$(parse-changelog CHANGELOG.md "$version")
-gh release create "$tag" --title "$version" --notes "$notes" --draft
+# Create a new *draft* GitHub release with GitHub CLI.
+gh release create "$tag" --title "$title" --notes "$notes" --draft
 ```
 
 ## Examples (as a library)
