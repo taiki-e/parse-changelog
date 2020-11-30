@@ -4,7 +4,10 @@
 
 use anyhow::{bail, Context as _};
 use parse_changelog::Parser;
-use std::fs;
+use std::{
+    fs,
+    io::{self, Read},
+};
 use structopt::{clap::AppSettings, StructOpt};
 
 type Result<T, E = anyhow::Error> = std::result::Result<T, E>;
@@ -17,12 +20,15 @@ type Result<T, E = anyhow::Error> = std::result::Result<T, E>;
     rename_all = "kebab-case",
 )]
 struct Args {
-    /// Path to the changelog file.
+    /// Path to the changelog file (use '-' for standard input).
     #[structopt(value_name = "PATH")]
     path: String,
     /// Specify version (by default, select the latest release).
     #[structopt(value_name = "VERSION")]
     version: Option<String>,
+    /// Returns title instead of notes.
+    #[structopt(short, long)]
+    title: bool,
     /// Specify version format.
     #[structopt(long, value_name = "PATTERN")]
     version_format: Option<String>,
@@ -44,8 +50,6 @@ fn main() {
 fn try_main() -> Result<()> {
     let args = Args::from_args();
 
-    let changelog =
-        fs::read_to_string(&args.path).with_context(|| format!("failed to read {}", args.path))?;
     let mut parser = Parser::new();
     if let Some(version_format) = &args.version_format {
         parser.version_format(version_format)?;
@@ -53,15 +57,30 @@ fn try_main() -> Result<()> {
     if let Some(prefix_format) = args.prefix_format.as_ref().map_or(args.prefix.as_ref(), Some) {
         parser.prefix_format(prefix_format)?;
     }
-    let changelog = parser.parse(&changelog)?;
-    if let Some(version) = args.version.as_deref() {
+
+    let text = if args.path == "-" {
+        let mut buf = String::new();
+        let stdin = io::stdin();
+        stdin.lock().read_to_string(&mut buf).context("failed to read standard input")?;
+        buf
+    } else {
+        fs::read_to_string(&args.path).with_context(|| format!("failed to read {}", args.path))?
+    };
+
+    let changelog = parser.parse(&text)?;
+    let release = if let Some(version) = args.version.as_deref() {
         if let Some(release) = changelog.get(version) {
-            println!("{}", release.notes);
+            release
         } else {
             bail!("not found release note for '{}'", version);
         }
     } else {
-        println!("{}", changelog[0].notes);
+        &changelog[0]
+    };
+    if args.title {
+        println!("{}", release.title);
+    } else {
+        println!("{}", release.notes);
     }
 
     Ok(())
