@@ -10,8 +10,8 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ### CLI
 
-* Add `--title` option.
-* Add support for standard input.
+* [Add `--title` option.](https://github.com/taiki-e/parse-changelog/pull/1)
+* [Add support for standard input.](https://github.com/taiki-e/parse-changelog/pull/1)
 
 ### Library
 
