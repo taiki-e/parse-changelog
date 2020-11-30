@@ -7,7 +7,7 @@ license = "Apache-2.0 OR MIT"
 repository = "https://github.com/taiki-e/parse-changelog"
 documentation = "https://docs.rs/parse-changelog"
 keywords = ["changelog", "parser"]
-categories = ["command-line-utilities"]
+categories = ["command-line-utilities", "parsing", "text-processing"]
 readme = "README.md"
 description = """
 A changelog parser, written in Rust.
