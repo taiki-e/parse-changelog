@@ -19,19 +19,19 @@
 //! ";
 //!
 //! // Parse changelog.
-//! let releases = parse_changelog::parse(changelog).unwrap();
+//! let changelog = parse_changelog::parse(changelog).unwrap();
 //!
 //! // Get the latest release.
-//! assert_eq!(releases[0].version, "0.1.2");
-//! assert_eq!(releases[0].title, "0.1.2 - 2020-03-01");
-//! assert_eq!(releases[0].notes, "- Bug fixes.");
+//! assert_eq!(changelog[0].version, "0.1.2");
+//! assert_eq!(changelog[0].title, "0.1.2 - 2020-03-01");
+//! assert_eq!(changelog[0].notes, "- Bug fixes.");
 //!
 //! // Get the specified release.
-//! assert_eq!(releases["0.1.0"].title, "0.1.0 - 2020-01-01");
-//! assert_eq!(releases["0.1.0"].notes, "Initial release");
-//! assert_eq!(releases["0.1.1"].title, "0.1.1 - 2020-02-01");
+//! assert_eq!(changelog["0.1.0"].title, "0.1.0 - 2020-01-01");
+//! assert_eq!(changelog["0.1.0"].notes, "Initial release");
+//! assert_eq!(changelog["0.1.1"].title, "0.1.1 - 2020-02-01");
 //! assert_eq!(
-//!     releases["0.1.1"].notes,
+//!     changelog["0.1.1"].notes,
 //!     "- Added `Foo`.\n\
 //!      - Added `Bar`."
 //! );
@@ -49,16 +49,16 @@
 //! Initial release
 //! ";
 //!
-//! let releases_a = parse_changelog::parse(changelog_a).unwrap();
-//! let releases_b = parse_changelog::parse(changelog_b).unwrap();
-//! // Not `releases["Version 0.1.0"]`
-//! assert_eq!(releases_a["0.1.0"].version, "0.1.0");
-//! assert_eq!(releases_a["0.1.0"].title, "Version 0.1.0 - 2020-01-01");
-//! assert_eq!(releases_a["0.1.0"].notes, "Initial release");
-//! // Not `releases["v0.1.0"]`
-//! assert_eq!(releases_b["0.1.0"].version, "0.1.0");
-//! assert_eq!(releases_b["0.1.0"].title, "v0.1.0 - 2020-02-01");
-//! assert_eq!(releases_b["0.1.0"].notes, "Initial release");
+//! let changelog_a = parse_changelog::parse(changelog_a).unwrap();
+//! let changelog_b = parse_changelog::parse(changelog_b).unwrap();
+//! // Not `changelog_a["Version 0.1.0"]`
+//! assert_eq!(changelog_a["0.1.0"].version, "0.1.0");
+//! assert_eq!(changelog_a["0.1.0"].title, "Version 0.1.0 - 2020-01-01");
+//! assert_eq!(changelog_a["0.1.0"].notes, "Initial release");
+//! // Not `changelog_b["v0.1.0"]`
+//! assert_eq!(changelog_b["0.1.0"].version, "0.1.0");
+//! assert_eq!(changelog_b["0.1.0"].title, "v0.1.0 - 2020-02-01");
+//! assert_eq!(changelog_b["0.1.0"].notes, "Initial release");
 //! ```
 //!
 //! # Format
@@ -163,7 +163,18 @@ pub use error::Error;
 
 type Result<T, E = Error> = std::result::Result<T, E>;
 
-type Releases<'a> = IndexMap<&'a str, Release<'a>>;
+/// A changelog.
+///
+/// The key is a version, and the value is the release note for that version.
+///
+/// The order is the same as the order written in the original text. (e.g., if
+/// [the latest version comes first][keepachangelog], `changelog[0]` is the
+/// release note for the latest version)
+///
+/// This type is returned by [`parse`] function or [`Parser::parse`] method.
+///
+/// [keepachangelog]: https://keepachangelog.com/en/1.0.0
+pub type Changelog<'a> = IndexMap<&'a str, Release<'a>>;
 
 /// Parses release notes from the given `text`.
 ///
@@ -180,7 +191,7 @@ type Releases<'a> = IndexMap<&'a str, Release<'a>>;
 /// - There are multiple release notes for one version.
 /// - No release was found. This usually means that the changelog isn't
 ///   written in the supported format.
-pub fn parse(text: &str) -> Result<Releases<'_>> {
+pub fn parse(text: &str) -> Result<Changelog<'_>> {
     Parser::new().parse(text)
 }
 
@@ -189,12 +200,26 @@ pub fn parse(text: &str) -> Result<Releases<'_>> {
 #[non_exhaustive]
 pub struct Release<'a> {
     /// The version of this release.
+    ///
+    /// ```text
+    /// ## Version 0.1.0 -- 2020-01-01
+    ///            ^^^^^
+    /// ```
+    ///
+    /// This is the same value as the key of the [`Changelog`] type.
     pub version: &'a str,
     /// The title of this release.
-    // `.trim()`-ed
+    ///
+    /// ```text
+    /// ## Version 0.1.0 -- 2020-01-01
+    ///    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// ```
+    ///
+    /// Note that leading and trailing [whitespaces](char::is_whitespace) have been removed.
     pub title: &'a str,
     /// The descriptions of this release.
-    // not `.trim()`-ed
+    ///
+    /// Note that leading and trailing newlines have been removed.
     pub notes: String,
 }
 
@@ -333,12 +358,12 @@ impl Parser {
     /// - No release was found. This usually means that the changelog isn't
     ///   written in the supported format, or that the specified format is wrong
     ///   if you specify your own format.
-    pub fn parse<'a>(&self, text: &'a str) -> Result<Releases<'a>> {
+    pub fn parse<'a>(&self, text: &'a str) -> Result<Changelog<'a>> {
         parse_inner(self, text)
     }
 }
 
-fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Releases<'a>> {
+fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
     const LN: char = '\n';
 
     let version_format = parser.get_version_format();

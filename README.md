@@ -88,19 +88,19 @@ Initial release
 ";
 
 // Parse changelog.
-let releases = parse_changelog::parse(changelog).unwrap();
+let changelog = parse_changelog::parse(changelog).unwrap();
 
 // Get the latest release.
-assert_eq!(releases[0].version, "0.1.2");
-assert_eq!(releases[0].title, "0.1.2 - 2020-03-01");
-assert_eq!(releases[0].notes, "- Bug fixes.");
+assert_eq!(changelog[0].version, "0.1.2");
+assert_eq!(changelog[0].title, "0.1.2 - 2020-03-01");
+assert_eq!(changelog[0].notes, "- Bug fixes.");
 
 // Get the specified release.
-assert_eq!(releases["0.1.0"].title, "0.1.0 - 2020-01-01");
-assert_eq!(releases["0.1.0"].notes, "Initial release");
-assert_eq!(releases["0.1.1"].title, "0.1.1 - 2020-02-01");
+assert_eq!(changelog["0.1.0"].title, "0.1.0 - 2020-01-01");
+assert_eq!(changelog["0.1.0"].notes, "Initial release");
+assert_eq!(changelog["0.1.1"].title, "0.1.1 - 2020-02-01");
 assert_eq!(
-    releases["0.1.1"].notes,
+    changelog["0.1.1"].notes,
     "- Added `Foo`.\n\
      - Added `Bar`."
 );
