@@ -5,40 +5,56 @@ IFS=$'\n\t'
 
 PACKAGE="parse-changelog"
 
+function error {
+  if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+    echo "::error::$*"
+  else
+    echo "error: $*" >&2
+  fi
+}
+
 cd "$(cd "$(dirname "${0}")" && pwd)"/..
 
 if [[ "${GITHUB_REF:?}" != "refs/tags/"* ]]; then
-  echo "GITHUB_REF should start with 'refs/tags/'"
+  error "GITHUB_REF should start with 'refs/tags/'"
   exit 1
 fi
 tag="${GITHUB_REF#refs/tags/}"
 
-export CARGO_PROFILE_RELEASE_LTO=true
 host=$(rustc -Vv | grep host | sed 's/host: //')
+target="${1:-"${host}"}"
+cargo="cargo"
+if [[ "${host}" != "${target}" ]]; then
+  cargo="cross"
+  cargo install cross
+fi
 
-cargo build --bin "${PACKAGE}" --release
+export CARGO_PROFILE_RELEASE_LTO=true
 
-cd target/release
+$cargo build --bin "${PACKAGE}" --release --target "${target}"
+
+assets=("${PACKAGE}-${target}.tar.gz")
+cd target/"${target}"/release
 case "${OSTYPE}" in
   linux* | darwin*)
     strip "${PACKAGE}"
-    asset="${PACKAGE}-${host}.tar.gz"
-    tar czf ../../"${asset}" "${PACKAGE}"
+    tar czf ../../"${assets[0]}" "${PACKAGE}"
     ;;
   cygwin* | msys*)
-    asset="${PACKAGE}-${host}.zip"
-    7z a ../../"${asset}" "${PACKAGE}".exe
+    assets+=("${PACKAGE}-${target}.zip")
+    tar czf ../../"${assets[0]}" "${PACKAGE}".exe
+    7z a ../../"${assets[1]}" "${PACKAGE}".exe
     ;;
   *)
-    echo "unrecognized OSTYPE: ${OSTYPE}"
+    error "unrecognized OSTYPE: ${OSTYPE}"
     exit 1
     ;;
 esac
 cd ../..
 
 if [[ -z "${GITHUB_TOKEN:-}" ]]; then
-  echo "GITHUB_TOKEN not set, skipping deploy"
+  error "GITHUB_TOKEN not set, skipping deploy"
   exit 1
 else
-  gh release upload "${tag}" "${asset}" --clobber
+  gh release upload "${tag}" "${assets[@]}" --clobber
 fi

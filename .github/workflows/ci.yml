@@ -22,29 +22,36 @@ jobs:
   test:
     strategy:
       matrix:
-        rust:
+        include:
           # This is the minimum supported Rust version of this crate.
           # When updating this, the reminder to update the minimum supported Rust version in README.md.
-          - 1.45.2
-          - stable
-          - beta
-        include:
-          - os: ubuntu-latest
-            rust: nightly
-          - os: macos-latest
-            rust: nightly
-          - os: windows-latest
-            rust: nightly
+          - rust: 1.45.2
+          - rust: stable
+          - rust: beta
+          - rust: nightly
+          - rust: nightly
+            os: macos-latest
+          - rust: nightly
+            os: windows-latest
+          - rust: nightly
+            target: x86_64-unknown-linux-musl
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v2
       - uses: taiki-e/github-actions/install-rust@main
         with:
           toolchain: ${{ matrix.rust }}
-      - run: cargo install cargo-hack
-      - run: cargo test
-      - run: cargo hack check --all --feature-powerset --no-dev-deps --lib
-      - if: startsWith(matrix.rust, 'nightly') && !startsWith(matrix.os, 'windows')
+      - if: matrix.target == ''
+        run: cargo install cargo-hack
+      - if: matrix.target != ''
+        run: cargo install cross
+      - if: matrix.target != ''
+        run: cross test --target ${{ matrix.target }}
+      - if: matrix.target == ''
+        run: cargo test --all
+      - if: matrix.target == ''
+        run: cargo hack check --all --feature-powerset --no-dev-deps --lib
+      - if: startsWith(matrix.rust, 'nightly') && !startsWith(matrix.os, 'windows') && matrix.target == ''
         run: bash scripts/check-minimal-versions.sh
 
   clippy:
