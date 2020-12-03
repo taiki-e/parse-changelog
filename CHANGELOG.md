@@ -16,6 +16,10 @@ No public API changes from 0.2.1.
 
 * Distribute x86_64-unknown-linux-musl binary via GitHub Releases.
 
+### Library
+
+No public API changes from 0.2.1.
+
 ## [0.2.0] - 2020-11-30
 
 ### CLI
