@@ -180,20 +180,16 @@ fn comment() {
     assert_eq!(changelog["0.0.0"].notes, "");
 }
 
-fn add_ln(s: &str) -> String {
-    s.to_string() + "\n"
-}
-
 #[test]
 fn rust() {
     let changelog = parse(include_str!("fixtures/rust.md")).unwrap();
-    assert_diff("tests/fixtures/rust-1.46.0.md", add_ln(&changelog["1.46.0"].notes));
+    assert_diff("tests/fixtures/rust-1.46.0.md", &changelog["1.46.0"].notes);
 }
 
 #[test]
 fn pin_project() {
     let changelog = parse(include_str!("fixtures/pin-project.md")).unwrap();
-    assert_diff("tests/fixtures/pin-project-1.0.0.md", add_ln(&changelog["1.0.0"].notes));
+    assert_diff("tests/fixtures/pin-project-1.0.0.md", &changelog["1.0.0"].notes);
 }
 
 #[test]
@@ -205,5 +201,5 @@ fn cargo() {
         .unwrap()
         .parse(include_str!("fixtures/cargo.md"))
         .unwrap();
-    assert_diff("tests/fixtures/cargo-1.50.md", add_ln(&changelog["1.50"].notes));
+    assert_diff("tests/fixtures/cargo-1.50.md", &changelog["1.50"].notes);
 }
