@@ -6,15 +6,21 @@
 [![rustc](https://img.shields.io/badge/rustc-1.45+-blue.svg?style=flat-square)](https://www.rust-lang.org)
 [![build status](https://img.shields.io/github/workflow/status/taiki-e/parse-changelog/CI/master?style=flat-square)](https://github.com/taiki-e/parse-changelog/actions?query=workflow%3ACI+branch%3Amaster)
 
-A changelog parser, written in Rust.
+A simple changelog parser, written in Rust.
 
 ## Installation
+
+### CLI
 
 To use this crate as a command line tool, run the following command:
 
 ```sh
 cargo install parse-changelog
 ```
+
+Or download from [GitHub Releases](https://github.com/taiki-e/parse-changelog/releases).
+
+### Library
 
 To use this crate as a library, add this to your `Cargo.toml`:
 
@@ -27,7 +33,7 @@ parse-changelog = { version = "0.2", default-features = false }
 
 *Compiler support: requires rustc 1.45+*
 
-## Usage (as a command line tool)
+## Usage (CLI)
 
 `parse-changelog` command parses changelog and returns a release note for the specified version.
 
@@ -48,7 +54,9 @@ ARGS:
     <VERSION>    Specify version (by default, select the latest release)
 ```
 
-### Example: Get [Rust's release notes](https://github.com/rust-lang/rust/blob/master/RELEASES.md)
+### Example: Get Rust's release notes
+
+Get the release note for version 1.46.0 from [Rust's release notes](https://github.com/rust-lang/rust/blob/master/RELEASES.md):
 
 ```sh
 curl -sSf https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md \
@@ -57,7 +65,7 @@ curl -sSf https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md \
 
 [*output of the above command.*](tests/fixtures/rust-1.46.0.md)
 
-### Example: Get [Cargo's changelog](https://github.com/rust-lang/cargo/blob/master/CHANGELOG.md)
+### Example: Get Cargo's changelog
 
 In [Cargo's changelog](https://github.com/rust-lang/cargo/blob/master/CHANGELOG.md), the title starts with "Cargo ", and the patch version is omitted. This is a format `parse-changelog` don't support by default, so use `--prefix` and `--version-format` to specify a custom format. For example:
 
@@ -78,15 +86,45 @@ With [GitHub CLI](https://cli.github.com/manual/gh_release_create):
 tag=...
 version=...
 
-# Get title for $version from CHANGELOG.md and remove links.
-title=$(parse-changelog CHANGELOG.md "$version" --title | sed -E 's/\[|\]//g')
 # Get notes for $version from CHANGELOG.md.
 notes=$(parse-changelog CHANGELOG.md "$version")
-# Create a new *draft* GitHub release with GitHub CLI.
-gh release create "$tag" --title "$title" --notes "$notes" --draft
+# Create a new GitHub release with GitHub CLI.
+gh release create "$tag" --title "$version" --notes "$notes"
 ```
 
-## Examples (as a library)
+With [softprops/action-gh-release](https://github.com/softprops/action-gh-release) GitHub Action:
+
+```yaml
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install parse-changelog
+        run: cargo install parse-changelog
+      - name: Generate Changelog
+        run: |
+          # Get version from github ref (remove 'refs/tags/' and prefix 'v')
+          version="${GITHUB_REF#refs/tags/v}"
+          # Get notes for $version from CHANGELOG.md.
+          parse-changelog CHANGELOG.md "$version" > ${{ github.workflow }}-CHANGELOG.txt
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: ${{ github.workflow }}-CHANGELOG.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+## Examples (Library)
 
 ```rust
 let changelog = "\
