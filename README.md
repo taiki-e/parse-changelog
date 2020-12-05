@@ -63,7 +63,7 @@ In [Cargo's changelog](https://github.com/rust-lang/cargo/blob/master/CHANGELOG.
 
 ```sh
 curl -sSf https://raw.githubusercontent.com/rust-lang/cargo/master/CHANGELOG.md \
-  | parse-changelog --prefix 'Cargo ' --version-format '^\d+\.\d+' - 1.50
+  | parse-changelog --prefix 'Cargo ' --version-format '^\d+\.\d+$' - 1.50
 ```
 
 [*output of the above command.*](tests/fixtures/cargo-1.50.md)
@@ -196,6 +196,11 @@ does not parse it).
 
 ### Versions
 
+```text
+## v0.1.0 -- 2020-01-01
+    ^^^^^
+```
+
 The default version format is
 `MAJOR.MINOR.PATCH(-PRE_RELEASE)?(+BUILD_METADATA)?`, and is
 based on [Semantic Versioning][semver]. (Pre-release version and build
@@ -204,7 +209,7 @@ metadata are optional.)
 This is parsed using the following regular expression:
 
 ```text
-^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?
+^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?$
 ```
 
 To customize the version format, use the [`Parser::version_format`] method

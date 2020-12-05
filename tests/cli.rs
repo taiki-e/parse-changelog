@@ -35,7 +35,7 @@ fn success() {
         "--prefix",
         "Cargo ",
         "--version-format",
-        r"^\d+\.\d+",
+        r"^\d+\.\d+$",
     ])
     .assert_success()
     .stdout_eq(include_str!("fixtures/cargo-1.50.md"));

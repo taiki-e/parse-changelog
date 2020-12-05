@@ -1,4 +1,4 @@
-//! Parses a release note for the specified version from a changelog.
+//! A simple changelog parser, written in Rust.
 //!
 //! # Examples
 //!
@@ -131,6 +131,11 @@
 //!
 //! ### Versions
 //!
+//! ```text
+//! ## v0.1.0 -- 2020-01-01
+//!     ^^^^^
+//! ```
+//!
 //! The default version format is
 //! `MAJOR.MINOR.PATCH(-PRE_RELEASE)?(+BUILD_METADATA)?`, and is
 //! based on [Semantic Versioning][semver]. (Pre-release version and build
@@ -139,7 +144,7 @@
 //! This is parsed using the following regular expression:
 //!
 //! ```text
-//! ^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?
+//! ^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?$
 //! ```
 //!
 //! To customize the version format, use the [`Parser::version_format`] method.
@@ -178,7 +183,7 @@ pub type Changelog<'a> = IndexMap<&'a str, Release<'a>>;
 
 /// Parses release notes from the given `text`.
 ///
-/// This function uses the default version format. If you want to use another
+/// This function uses the default version and prefix format. If you want to use another
 /// version format, use [`Parser::version_format`].
 ///
 /// See crate level documentation for changelog and version format supported
@@ -246,7 +251,7 @@ pub struct Parser {
 static DEFAULT_PREFIX_FORMAT: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"^(v|Version |Release )?").unwrap());
 static DEFAULT_VERSION_FORMAT: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?").unwrap());
+    Lazy::new(|| Regex::new(r"^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?$").unwrap());
 
 impl Parser {
     /// Creates a new changelog parser.
@@ -440,8 +445,9 @@ fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
 
         let mut unlinked = unlink(heading.text);
         if let Some(m) = prefix_format.find(unlinked) {
-            unlinked = unlink(&unlinked[m.end()..]);
+            unlinked = &unlinked[m.end()..];
         }
+        let unlinked = unlink(unlinked.splitn(2, char::is_whitespace).next().unwrap());
         let version = match version_format.find(unlinked) {
             Some(m) => &unlinked[m.start()..m.end()],
             None => {
@@ -546,10 +552,11 @@ fn trim(s: &str) -> &str {
     if cnt < 4 { s[cnt..].trim_end() } else { s.trim_end() }
 }
 
-/// If a leading `[` exists, returns a string with it removed.
+/// If a leading `[` or trailing `]` exists, returns a string with it removed.
 ///
 /// This is not a full "unlink" on markdown, but this is enough as this crate
 /// does not parse a string at the end of headings.
-fn unlink(s: &str) -> &str {
-    s.strip_prefix('[').unwrap_or(s)
+fn unlink(mut s: &str) -> &str {
+    s = s.strip_prefix('[').unwrap_or(s);
+    s.strip_suffix(']').unwrap_or(s)
 }
