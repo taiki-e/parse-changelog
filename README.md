@@ -18,7 +18,7 @@ To use this crate as a command line tool, run the following command:
 cargo install parse-changelog
 ```
 
-Or download from [GitHub Releases](https://github.com/taiki-e/parse-changelog/releases).
+Alternatively, download compiled binaries from [GitHub Releases](https://github.com/taiki-e/parse-changelog/releases).
 
 ### Library
 
@@ -26,10 +26,12 @@ To use this crate as a library, add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-# When using this crate as a library, we recommend disabling the default feature
-# due to the default feature enables CLI-related dependencies.
 parse-changelog = { version = "0.2", default-features = false }
 ```
+
+Note: When using this crate as a library, we recommend disabling the default
+feature because the default features enable CLI-related dependencies and the
+library part of this crate does not use them.
 
 *Compiler support: requires rustc 1.45+*
 
