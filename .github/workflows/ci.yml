@@ -23,9 +23,6 @@ jobs:
     strategy:
       matrix:
         include:
-          # This is the minimum supported Rust version of this crate.
-          # When updating this, the reminder to update the minimum supported Rust version in README.md.
-          - rust: 1.45
           - rust: stable
           - rust: beta
           - rust: nightly
@@ -50,9 +47,22 @@ jobs:
       - if: matrix.target == ''
         run: cargo test --all
       - if: matrix.target == ''
-        run: cargo hack check --all --feature-powerset --no-dev-deps --lib
+        run: cargo hack check --all --ignore-private --feature-powerset --no-dev-deps --lib
       - if: startsWith(matrix.rust, 'nightly') && !startsWith(matrix.os, 'windows') && matrix.target == ''
         run: bash scripts/check-minimal-versions.sh
+
+  build:
+    strategy:
+      matrix:
+        range:
+          # This is the minimum supported Rust version of this crate.
+          # When updating this, the reminder to update the minimum supported Rust version in README.md.
+          - 1.45..
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: cargo install cargo-hack
+      - run: cargo hack build --all --ignore-private --no-dev-deps --version-range ${{ matrix.range }}
 
   clippy:
     runs-on: ubuntu-latest
