@@ -37,7 +37,8 @@
 //! );
 //! ```
 //!
-//! The key of the map returned does not include prefixes such as "v", "Version ", etc.
+//! The key of the map returned does not include prefixes such as
+//! "v", "Version ", etc.
 //!
 //! ```rust
 //! let changelog_a = "\
@@ -98,8 +99,8 @@
 //!
 //! ### Titles
 //!
-//! The title of each release must start with a text or a link text (text with `[` and `]`)
-//! that starts with a valid version format. For example:
+//! The title of each release must start with a text or a link text (text with
+//! `[` and `]`) that starts with a valid version format. For example:
 //!
 //! ```markdown
 //! # [0.2.0]
@@ -121,8 +122,8 @@
 //! By default only "v", "Version " and "Release " are allowed as prefixes and
 //! can be customized using the [`Parser::prefix_format`] method.
 //!
-//! You can freely include characters after the version (this crate
-//! does not parse it).
+//! You can freely include characters after the version (this crate does not
+//! parse it).
 //!
 //! ```text
 //! # 0.1.0 - 2020-01-01
@@ -183,8 +184,8 @@ pub type Changelog<'a> = IndexMap<&'a str, Release<'a>>;
 
 /// Parses release notes from the given `text`.
 ///
-/// This function uses the default version and prefix format. If you want to use another
-/// version format, use [`Parser::version_format`].
+/// This function uses the default version and prefix format. If you want to use
+/// another version format, use [`Parser::version_format`].
 ///
 /// See crate level documentation for changelog and version format supported
 /// by default.
@@ -220,7 +221,8 @@ pub struct Release<'a> {
     ///    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
     /// ```
     ///
-    /// Note that leading and trailing [whitespaces](char::is_whitespace) have been removed.
+    /// Note that leading and trailing [whitespaces](char::is_whitespace) have
+    /// been removed.
     pub title: &'a str,
     /// The descriptions of this release.
     ///

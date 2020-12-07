@@ -30,14 +30,15 @@ parse-changelog = { version = "0.2", default-features = false }
 ```
 
 Note: When using this crate as a library, we recommend disabling the default
-feature because the default features enable CLI-related dependencies and the
+features because the default features enable CLI-related dependencies and the
 library part of this crate does not use them.
 
 *Compiler support: requires rustc 1.45+*
 
 ## Usage (CLI)
 
-`parse-changelog` command parses changelog and returns a release note for the specified version.
+`parse-changelog` command parses changelog and returns a release note for the
+specified version.
 
 ```text
 USAGE:
@@ -69,7 +70,10 @@ curl -sSf https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md \
 
 ### Example: Get Cargo's changelog
 
-In [Cargo's changelog](https://github.com/rust-lang/cargo/blob/master/CHANGELOG.md), the title starts with "Cargo ", and the patch version is omitted. This is a format `parse-changelog` don't support by default, so use `--prefix` and `--version-format` to specify a custom format. For example:
+In [Cargo's changelog](https://github.com/rust-lang/cargo/blob/master/CHANGELOG.md),
+the title starts with "Cargo ", and the patch version is omitted. This is a
+format `parse-changelog` don't support by default, so use `--prefix` and
+`--version-format` to specify a custom format. For example:
 
 ```sh
 curl -sSf https://raw.githubusercontent.com/rust-lang/cargo/master/CHANGELOG.md \
@@ -78,7 +82,9 @@ curl -sSf https://raw.githubusercontent.com/rust-lang/cargo/master/CHANGELOG.md 
 
 [*output of the above command.*](tests/fixtures/cargo-1.50.md)
 
-`--prefix` is the same as [`Parser::prefix_format`] and `--version-format` is the same as [`Parser::version_format`]. See documentation of those methods for more information.
+`--prefix` is the same as [`Parser::prefix_format`] and `--version-format` is
+the same as [`Parser::version_format`]. See documentation of those methods for
+more information.
 
 ### Example: Create a new GitHub release from changelog
 
@@ -163,7 +169,8 @@ assert_eq!(
 );
 ```
 
-See [documentation](https://docs.rs/parse-changelog) for more information on `parse-changelog` as a library.
+See [documentation](https://docs.rs/parse-changelog) for more information on
+`parse-changelog` as a library.
 
 ## Format
 
@@ -202,8 +209,8 @@ Setext-style headings:
 
 ### Titles
 
-The title of each release must start with a text or a link text (text with `[` and `]`)
-that starts with a valid version format. For example:
+The title of each release must start with a text or a link text (text with
+`[` and `]`) that starts with a valid version format. For example:
 
 ```markdown
 # [0.2.0]
@@ -226,8 +233,8 @@ By default only "v", "Version " and "Release " are allowed as prefixes and
 can be customized using the [`Parser::prefix_format`] method
 (`--prefix-format` option if command line).
 
-You can freely include characters after the version (this crate
-does not parse it).
+You can freely include characters after the version (this crate does not
+parse it).
 
 ```text
 # 0.1.0 - 2020-01-01
@@ -262,6 +269,9 @@ To customize the version format, use the [`Parser::version_format`] method
 
 ## License
 
-Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or [MIT license](LICENSE-MIT) at your option.
+Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or
+[MIT license](LICENSE-MIT) at your option.
 
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall
+be dual licensed as above, without any additional terms or conditions.
