@@ -22,6 +22,23 @@ pub enum Error {
     Parse(String),
 }
 
+impl Error {
+    /// Returns `true` if this error is [`Error::Regex`].
+    pub fn is_regex(&self) -> bool {
+        matches!(self, Self::Regex(..))
+    }
+
+    /// Returns `true` if this error is [`Error::Format`].
+    pub fn is_format(&self) -> bool {
+        matches!(self, Self::Format(..))
+    }
+
+    /// Returns `true` if this error is [`Error::Parse`].
+    pub fn is_parse(&self) -> bool {
+        matches!(self, Self::Parse(..))
+    }
+}
+
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

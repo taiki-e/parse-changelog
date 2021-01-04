@@ -2,6 +2,8 @@
 
 mod auxiliary;
 
+use std::iter;
+
 use auxiliary::{assert_diff, trim};
 use parse_changelog::{parse, Parser};
 
@@ -97,10 +99,39 @@ fn failure() {
         // Setext-style & 4 indents
         "    0.1.0\n    ==\n    0.1.0.\n",
     ];
-
     for changelog in &changelogs {
-        assert!(parse(changelog).is_err());
+        assert!(parse(changelog).unwrap_err().is_parse());
     }
+
+    assert!(Parser::new().prefix_format("").unwrap_err().is_format());
+    assert!(Parser::new().prefix_format("  ").unwrap_err().is_format());
+    assert!(Parser::new().prefix_format("\t\n").unwrap_err().is_format());
+    assert!(Parser::new().prefix_format(r"\/").unwrap_err().is_regex());
+
+    assert!(Parser::new().version_format("").unwrap_err().is_format());
+    assert!(Parser::new().version_format("  ").unwrap_err().is_format());
+    assert!(Parser::new().version_format("\t\n").unwrap_err().is_format());
+    assert!(Parser::new().version_format(r"\/").unwrap_err().is_regex());
+}
+
+#[test]
+fn multiple_heading() {
+    let changelogs = ["## 0.1.0\n##0.1.0\n", "## 0.1.0\n##0.1.0\n##0.0.0\n"];
+    for changelog in &changelogs {
+        assert!(parse(changelog).unwrap_err().is_parse());
+    }
+}
+
+// Atx-style heading
+#[test]
+fn atx_heading() {
+    for level in 1..=6 {
+        let changelog = &format!("{} 0.1.0", iter::repeat('#').take(level).collect::<String>());
+        assert_eq!(1, parse(changelog).unwrap().len());
+    }
+
+    let changelog = &format!("{} 0.1.0", iter::repeat('#').take(7).collect::<String>());
+    assert!(parse(changelog).unwrap_err().is_parse());
 }
 
 #[test]

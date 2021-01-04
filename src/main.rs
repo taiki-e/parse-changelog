@@ -2,15 +2,13 @@
 #![warn(future_incompatible, rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
 #![warn(clippy::all, clippy::default_trait_access)]
 
-use anyhow::{bail, Context as _};
+use anyhow::{bail, Context as _, Result};
 use parse_changelog::Parser;
 use std::{
     fs,
     io::{self, Read},
 };
 use structopt::{clap::AppSettings, StructOpt};
-
-type Result<T, E = anyhow::Error> = std::result::Result<T, E>;
 
 /// Parses changelog and returns a release note for the specified version.
 #[derive(StructOpt)]

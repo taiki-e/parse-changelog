@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Library
+
+- Add `Error::{is_regex, is_format, is_parse}` methods.
+
 ## [0.2.1] - 2020-12-03
 
 ### CLI
