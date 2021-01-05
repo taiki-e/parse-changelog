@@ -153,6 +153,13 @@
 //! [keepachangelog]: https://keepachangelog.com/en/1.0.0
 //! [semver]: https://semver.org/spec/v2.0.0.html
 
+#![doc(test(
+    no_crate_inject,
+    attr(
+        deny(warnings, rust_2018_idioms, single_use_lifetimes),
+        allow(dead_code, unused_variables)
+    )
+))]
 #![forbid(unsafe_code)]
 #![warn(future_incompatible, rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
 #![warn(missing_debug_implementations, missing_docs)]
