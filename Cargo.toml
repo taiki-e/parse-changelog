@@ -8,7 +8,7 @@ repository = "https://github.com/taiki-e/parse-changelog"
 documentation = "https://docs.rs/parse-changelog"
 keywords = ["changelog", "parser"]
 categories = ["command-line-utilities", "parsing", "text-processing"]
-exclude = ["/.github", "/scripts"]
+exclude = ["/.*", "/scripts"]
 description = """
 A simple changelog parser, written in Rust.
 """
