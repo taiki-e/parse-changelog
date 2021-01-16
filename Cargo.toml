@@ -8,7 +8,6 @@ repository = "https://github.com/taiki-e/parse-changelog"
 documentation = "https://docs.rs/parse-changelog"
 keywords = ["changelog", "parser"]
 categories = ["command-line-utilities", "parsing", "text-processing"]
-readme = "README.md"
 exclude = ["/.github", "/scripts"]
 description = """
 A simple changelog parser, written in Rust.
