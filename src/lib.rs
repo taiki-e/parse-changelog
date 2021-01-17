@@ -569,3 +569,25 @@ fn unlink(mut s: &str) -> &str {
     s = s.strip_prefix('[').unwrap_or(s);
     s.strip_suffix(']').unwrap_or(s)
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::*;
+    use static_assertions::assert_impl_all as assert_impl;
+
+    assert_impl!(Changelog<'_>: Send);
+    assert_impl!(Changelog<'_>: Sync);
+    assert_impl!(Changelog<'_>: Unpin);
+
+    assert_impl!(Parser: Send);
+    assert_impl!(Parser: Sync);
+    assert_impl!(Parser: Unpin);
+
+    assert_impl!(Release<'_>: Send);
+    assert_impl!(Release<'_>: Sync);
+    assert_impl!(Release<'_>: Unpin);
+
+    assert_impl!(Error: Send);
+    assert_impl!(Error: Sync);
+    assert_impl!(Error: Unpin);
+}
