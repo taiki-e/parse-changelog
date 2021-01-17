@@ -3,6 +3,7 @@
 #[cfg(feature = "default")]
 mod cli;
 
+use anyhow::Result;
 use std::{fs, path::Path, process::Command, str};
 use tempfile::Builder;
 
@@ -23,7 +24,7 @@ pub fn assert_diff(expected_path: impl AsRef<Path>, actual: impl AsRef<str>) {
     let actual = actual.as_ref();
     let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
     let expected_path = &manifest_dir.join(expected_path);
-    (|| -> Result<(), Box<dyn std::error::Error>> {
+    (|| -> Result<()> {
         let expected = fs::read_to_string(expected_path)?;
         if expected.trim() != actual.trim() {
             let outdir = Builder::new().prefix("assert_diff").tempdir()?;
@@ -38,5 +39,5 @@ pub fn assert_diff(expected_path: impl AsRef<Path>, actual: impl AsRef<str>) {
         }
         Ok(())
     })()
-    .unwrap_or_else(|e| panic!("{}", e))
+    .unwrap_or_else(|e| panic!("{:?}", e))
 }
