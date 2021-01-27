@@ -167,12 +167,13 @@
 
 mod error;
 
+use std::{iter::Peekable, mem, str::Lines};
+
 use indexmap::IndexMap;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use std::{iter::Peekable, mem, str::Lines};
 
-pub use error::Error;
+pub use crate::error::Error;
 
 type Result<T, E = Error> = std::result::Result<T, E>;
 
@@ -572,8 +573,9 @@ fn unlink(mut s: &str) -> &str {
 
 #[cfg(test)]
 mod tests {
-    use crate::*;
     use static_assertions::assert_impl_all as assert_impl;
+
+    use crate::*;
 
     assert_impl!(Changelog<'_>: Send);
     assert_impl!(Changelog<'_>: Sync);

@@ -2,20 +2,21 @@
 #![warn(future_incompatible, rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
 #![warn(clippy::all, clippy::default_trait_access)]
 
-use anyhow::{bail, Context as _, Result};
-use parse_changelog::Parser;
 use std::{
     fs,
     io::{self, Read},
 };
+
+use anyhow::{bail, Context as _, Result};
+use parse_changelog::Parser;
 use structopt::{clap::AppSettings, StructOpt};
 
 /// Parses changelog and returns a release note for the specified version.
 #[derive(StructOpt)]
 #[structopt(
-    setting = AppSettings::UnifiedHelpMessage,
-    setting = AppSettings::DeriveDisplayOrder,
     rename_all = "kebab-case",
+    setting = AppSettings::DeriveDisplayOrder,
+    setting = AppSettings::UnifiedHelpMessage,
 )]
 struct Args {
     /// Path to the changelog file (use '-' for standard input).

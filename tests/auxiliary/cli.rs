@@ -1,9 +1,10 @@
-use easy_ext::ext;
 use std::{
     env,
     ffi::OsStr,
     process::{Command, ExitStatus},
 };
+
+use easy_ext::ext;
 
 pub fn parse_changelog<O: AsRef<OsStr>>(args: impl AsRef<[O]>) -> Command {
     let mut cmd = Command::new(env!("CARGO_BIN_EXE_parse-changelog"));

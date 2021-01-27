@@ -3,12 +3,13 @@
 #[cfg(feature = "default")]
 mod cli;
 
-use anyhow::Result;
 use std::{fs, path::Path, process::Command, str};
+
+use anyhow::Result;
 use tempfile::Builder;
 
 #[cfg(feature = "default")]
-pub use cli::*;
+pub use self::cli::*;
 
 pub fn trim(s: &str) -> &str {
     let mut cnt = 0;
