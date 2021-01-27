@@ -39,18 +39,18 @@ jobs:
       - uses: taiki-e/github-actions/install-rust@main
         with:
           toolchain: ${{ matrix.rust }}
-      - if: matrix.target == ''
-        run: cargo install cargo-hack
-      - if: matrix.target != ''
-        run: cargo install cross
-      - if: matrix.target != ''
-        run: cross test --target ${{ matrix.target }}
-      - if: matrix.target == ''
-        run: cargo test --all
-      - if: matrix.target == ''
-        run: cargo hack check --all --ignore-private --feature-powerset --no-dev-deps --lib
-      - if: startsWith(matrix.rust, 'nightly') && !startsWith(matrix.os, 'windows') && matrix.target == ''
-        run: bash scripts/check-minimal-versions.sh
+      - run: cargo install cargo-hack
+        if: matrix.target == ''
+      - run: cargo install cross
+        if: matrix.target != ''
+      - run: cross test --target ${{ matrix.target }}
+        if: matrix.target != ''
+      - run: cargo test --all
+        if: matrix.target == ''
+      - run: cargo hack check --all --ignore-private --feature-powerset --no-dev-deps --lib
+        if: matrix.target == ''
+      - run: scripts/check-minimal-versions.sh
+        if: startsWith(matrix.rust, 'nightly') && !startsWith(matrix.os, 'windows') && matrix.target == ''
 
   build:
     strategy:
@@ -84,6 +84,15 @@ jobs:
           component: rustfmt
       - run: cargo fmt --all -- --check
 
+  rustdoc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: taiki-e/github-actions/install-rust@main
+      - run: cargo doc --no-deps --all --all-features
+        env:
+          RUSTDOCFLAGS: -D warnings
+
   shellcheck:
     runs-on: ubuntu-latest
     steps:
@@ -104,6 +113,7 @@ jobs:
       - build
       - clippy
       - rustfmt
+      - rustdoc
       - shellcheck
     runs-on: ubuntu-latest
     steps:
