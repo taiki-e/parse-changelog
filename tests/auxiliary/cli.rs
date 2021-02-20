@@ -15,7 +15,7 @@ pub fn parse_changelog<O: AsRef<OsStr>>(args: impl AsRef<[O]>) -> Command {
 
 #[ext(CommandExt)]
 impl Command {
-    #[rustversion::attr(since(1.46), track_caller)]
+    #[track_caller]
     pub fn assert_output(&mut self) -> AssertOutput {
         let output = self.output().unwrap_or_else(|e| panic!("could not execute process: {}", e));
         AssertOutput {
@@ -25,7 +25,7 @@ impl Command {
         }
     }
 
-    #[rustversion::attr(since(1.46), track_caller)]
+    #[track_caller]
     pub fn assert_success(&mut self) -> AssertOutput {
         let output = self.assert_output();
         if !output.status.success() {
@@ -39,7 +39,7 @@ impl Command {
         output
     }
 
-    #[rustversion::attr(since(1.46), track_caller)]
+    #[track_caller]
     pub fn assert_failure(&mut self) -> AssertOutput {
         let output = self.assert_output();
         if output.status.success() {
@@ -66,7 +66,7 @@ fn line_separated(lines: &str, f: impl FnMut(&str)) {
 
 impl AssertOutput {
     /// Receives a line(`\n`)-separated list of patterns and asserts whether stderr contains each pattern.
-    #[rustversion::attr(since(1.46), track_caller)]
+    #[track_caller]
     pub fn stderr_contains(&self, pats: &str) -> &Self {
         line_separated(pats, |pat| {
             if !self.stderr.contains(pat) {
@@ -82,7 +82,7 @@ impl AssertOutput {
     }
 
     /// Receives a line(`\n`)-separated list of patterns and asserts whether stdout contains each pattern.
-    #[rustversion::attr(since(1.46), track_caller)]
+    #[track_caller]
     pub fn stderr_not_contains(&self, pats: &str) -> &Self {
         line_separated(pats, |pat| {
             if self.stderr.contains(pat) {
@@ -97,14 +97,14 @@ impl AssertOutput {
         self
     }
 
-    #[rustversion::attr(since(1.46), track_caller)]
+    #[track_caller]
     pub fn stdout_eq(&self, s: &str) -> &Self {
         assert_eq!(self.stdout.trim(), s.trim());
         self
     }
 
     /// Receives a line(`\n`)-separated list of patterns and asserts whether stdout contains each pattern.
-    #[rustversion::attr(since(1.46), track_caller)]
+    #[track_caller]
     pub fn stdout_contains(&self, pats: &str) -> &Self {
         line_separated(pats, |pat| {
             if !self.stdout.contains(pat) {
@@ -120,7 +120,7 @@ impl AssertOutput {
     }
 
     /// Receives a line(`\n`)-separated list of patterns and asserts whether stdout contains each pattern.
-    #[rustversion::attr(since(1.46), track_caller)]
+    #[track_caller]
     pub fn stdout_not_contains(&self, pats: &str) -> &Self {
         line_separated(pats, |pat| {
             if self.stdout.contains(pat) {

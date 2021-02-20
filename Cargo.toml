@@ -37,6 +37,5 @@ structopt = { version = "0.3", optional = true }
 
 [dev-dependencies]
 easy-ext = "0.2"
-rustversion = "1"
 static_assertions = "1"
 tempfile = "3"
