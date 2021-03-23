@@ -1,4 +1,4 @@
-<!-- https://github.com/taiki-e/pin-project/blob/master/CHANGELOG.md -->
+<!-- https://github.com/taiki-e/pin-project/blob/HEAD/CHANGELOG.md -->
 
 # Changelog
 

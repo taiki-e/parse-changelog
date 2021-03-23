@@ -1,3 +1,5 @@
+<!-- https://github.com/rust-lang/cargo/blob/HEAD/CHANGELOG.md -->
+
 # Changelog
 
 ## Cargo 1.50 (2021-02-11)

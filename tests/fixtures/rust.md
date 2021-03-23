@@ -1,4 +1,4 @@
-<!-- https://github.com/rust-lang/rust/blob/master/RELEASES.md -->
+<!-- https://github.com/rust-lang/rust/blob/HEAD/RELEASES.md -->
 
 Version 1.48.0 (2020-11-19)
 ==========================
