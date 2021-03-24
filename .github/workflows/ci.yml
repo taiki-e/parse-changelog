@@ -49,7 +49,7 @@ jobs:
         if: matrix.target == ''
       - run: cargo hack check --all --ignore-private --feature-powerset --no-dev-deps --lib
         if: matrix.target == ''
-      - run: scripts/check-minimal-versions.sh
+      - run: tools/check-minimal-versions.sh
         if: startsWith(matrix.rust, 'nightly') && !startsWith(matrix.os, 'windows') && matrix.target == ''
 
   build:
