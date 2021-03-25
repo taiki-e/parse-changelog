@@ -42,8 +42,8 @@ impl Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::Regex(e) => fmt::Display::fmt(e, f),
-            Error::Format(e) | Error::Parse(e) => fmt::Display::fmt(e, f),
+            Self::Regex(e) => fmt::Display::fmt(e, f),
+            Self::Format(e) | Self::Parse(e) => fmt::Display::fmt(e, f),
         }
     }
 }
@@ -51,7 +51,7 @@ impl fmt::Display for Error {
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            Error::Regex(e) => Some(e),
+            Self::Regex(e) => Some(e),
             _ => None,
         }
     }
@@ -59,6 +59,6 @@ impl std::error::Error for Error {
 
 impl From<regex::Error> for Error {
     fn from(e: regex::Error) -> Self {
-        Error::Regex(e)
+        Self::Regex(e)
     }
 }
