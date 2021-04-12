@@ -10,6 +10,14 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+### Library
+
+- Increase the minimum supported Rust version of this crate from Rust 1.45 to Rust 1.51.
+
+- Change `Error` from enum to struct.
+
+- Remove `Error::is_regex` method. Use `Error::is_format` method instead.
+
 ## [0.2.2] - 2021-01-05
 
 ### Library
