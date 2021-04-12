@@ -161,9 +161,15 @@
     )
 ))]
 #![forbid(unsafe_code)]
-#![warn(future_incompatible, rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
-#![warn(missing_debug_implementations, missing_docs)]
-#![warn(clippy::all, clippy::default_trait_access)]
+#![warn(
+    future_incompatible,
+    missing_debug_implementations,
+    missing_docs,
+    rust_2018_idioms,
+    single_use_lifetimes,
+    unreachable_pub
+)]
+#![warn(clippy::default_trait_access)]
 
 #[cfg(test)]
 #[path = "gen/assert_impl.rs"]
