@@ -1,0 +1,13 @@
+[package]
+name = "parse-changelog-internal-codegen"
+version = "0.0.0"
+authors = ["Taiki Endo <te316e89@gmail.com>"]
+edition = "2018"
+publish = false
+
+[dependencies]
+anyhow = "1"
+fs = { package = "fs-err", version = "2" }
+quote = "1"
+syn = { version = "1", features = ["full", "visit-mut"] }
+walkdir = "2"

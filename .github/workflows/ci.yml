@@ -66,6 +66,16 @@ jobs:
       - run: cargo install cargo-hack
       - run: cargo hack build --all --ignore-private --no-dev-deps --version-range ${{ matrix.range }}
 
+  codegen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: taiki-e/github-actions/install-rust@main
+        with:
+          component: rustfmt
+      - run: tools/gen.sh
+      - run: git diff --exit-code
+
   clippy:
     runs-on: ubuntu-latest
     steps:
@@ -111,6 +121,7 @@ jobs:
     needs:
       - test
       - build
+      - codegen
       - clippy
       - rustfmt
       - rustdoc
