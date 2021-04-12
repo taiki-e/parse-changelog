@@ -39,7 +39,7 @@ impl Error {
         Self(ErrorKind::Parse(e.into()))
     }
 
-    /// Returns `true` if this error is that occurred during parsing changelog.
+    /// Returns `true` if this error is that occurred during configuring the parser.
     pub fn is_format(&self) -> bool {
         matches!(self.0, ErrorKind::Format(..) | ErrorKind::Regex(..))
     }
