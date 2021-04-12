@@ -12,9 +12,9 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [0.3.0] - 2021-04-12
 
-### Library
-
 - Increase the minimum supported Rust version from Rust 1.45 to Rust 1.51.
+
+### Library
 
 - Change `Error` from enum to struct.
 
