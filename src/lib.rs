@@ -309,9 +309,9 @@ impl Parser {
     /// [semver]: https://semver.org/spec/v2.0.0.html
     pub fn version_format(&mut self, version_format: &str) -> Result<&mut Self> {
         if version_format.trim().is_empty() {
-            return Err(Error::Format("empty or whitespace version format".into()));
+            return Err(Error::format("empty or whitespace version format"));
         }
-        self.version = Some(Regex::new(version_format)?);
+        self.version = Some(Regex::new(version_format).map_err(Error::new)?);
         Ok(self)
     }
 
@@ -350,9 +350,9 @@ impl Parser {
     /// [regex]: https://docs.rs/regex
     pub fn prefix_format(&mut self, prefix_format: &str) -> Result<&mut Self> {
         if prefix_format.trim().is_empty() {
-            return Err(Error::Format("empty or whitespace version format".into()));
+            return Err(Error::format("empty or whitespace version format"));
         }
-        self.prefix = Some(Regex::new(prefix_format)?);
+        self.prefix = Some(Regex::new(prefix_format).map_err(Error::new)?);
         Ok(self)
     }
 
@@ -396,7 +396,7 @@ fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
             cur_release.notes.pop();
         }
         if let Some(release) = map.insert(cur_release.version, cur_release) {
-            return Err(Error::Parse(format!("multiple release notes for '{}'", release.version)));
+            return Err(Error::parse(format!("multiple release notes for '{}'", release.version)));
         }
         Ok(())
     };
@@ -506,7 +506,7 @@ fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
     }
 
     if map.is_empty() {
-        return Err(Error::Parse("no release was found".into()));
+        return Err(Error::parse("no release was found"));
     }
 
     Ok(map)

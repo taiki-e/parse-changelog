@@ -29,7 +29,7 @@ required-features = ["default"]
 # When using this crate as a library, we recommend disabling the default features.
 default = ["anyhow", "structopt"]
 
-# Note: indexmap and regex are public dependencies.
+# Note: indexmap is public dependency.
 [dependencies]
 indexmap = { version = "1.5.2", features = ["std"] }
 once_cell = "1"
