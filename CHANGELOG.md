@@ -10,9 +10,11 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.3.0] - 2021-04-12
+
 ### Library
 
-- Increase the minimum supported Rust version of this crate from Rust 1.45 to Rust 1.51.
+- Increase the minimum supported Rust version from Rust 1.45 to Rust 1.51.
 
 - Change `Error` from enum to struct.
 
@@ -52,7 +54,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/taiki-e/parse-changelog/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/taiki-e/parse-changelog/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/taiki-e/parse-changelog/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/taiki-e/parse-changelog/compare/v0.1.0...v0.2.0
