@@ -169,7 +169,7 @@
     single_use_lifetimes,
     unreachable_pub
 )]
-#![warn(clippy::default_trait_access)]
+#![warn(clippy::default_trait_access, clippy::wildcard_imports)]
 
 #[cfg(test)]
 #[path = "gen/assert_impl.rs"]
