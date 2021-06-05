@@ -2,7 +2,7 @@
 
 mod auxiliary;
 
-use std::{error::Error as _, iter};
+use std::error::Error as _;
 
 use auxiliary::{assert_diff, trim};
 use parse_changelog::{parse, Parser};
@@ -130,11 +130,11 @@ fn multiple_heading() {
 #[test]
 fn atx_heading() {
     for level in 1..=6 {
-        let changelog = &format!("{} 0.1.0", iter::repeat('#').take(level).collect::<String>());
+        let changelog = &format!("{} 0.1.0", "#".repeat(level));
         assert_eq!(1, parse(changelog).unwrap().len());
     }
 
-    let changelog = &format!("{} 0.1.0", iter::repeat('#').take(7).collect::<String>());
+    let changelog = &format!("{} 0.1.0", "#".repeat(7));
     assert!(parse(changelog).unwrap_err().is_parse());
 }
 
