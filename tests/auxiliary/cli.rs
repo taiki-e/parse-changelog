@@ -34,7 +34,7 @@ impl Command {
                 "-".repeat(60),
                 output.stdout,
                 output.stderr,
-            )
+            );
         }
         output
     }
@@ -48,7 +48,7 @@ impl Command {
                 "-".repeat(60),
                 output.stdout,
                 output.stderr,
-            )
+            );
         }
         output
     }
@@ -75,7 +75,7 @@ impl AssertOutput {
                     "-".repeat(60),
                     pat,
                     self.stderr
-                )
+                );
             }
         });
         self
@@ -91,7 +91,7 @@ impl AssertOutput {
                     "-".repeat(60),
                     pat,
                     self.stderr
-                )
+                );
             }
         });
         self
@@ -113,7 +113,7 @@ impl AssertOutput {
                     "-".repeat(60),
                     pat,
                     self.stdout
-                )
+                );
             }
         });
         self
@@ -129,7 +129,7 @@ impl AssertOutput {
                     "-".repeat(60),
                     pat,
                     self.stdout
-                )
+                );
             }
         });
         self
