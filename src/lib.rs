@@ -169,7 +169,12 @@
     single_use_lifetimes,
     unreachable_pub
 )]
-#![warn(clippy::default_trait_access, clippy::wildcard_imports)]
+#![warn(
+    clippy::default_trait_access,
+    clippy::exhaustive_enums,
+    clippy::exhaustive_structs,
+    clippy::wildcard_imports
+)]
 
 #[cfg(test)]
 #[path = "gen/assert_impl.rs"]
@@ -177,7 +182,7 @@ mod assert_impl;
 
 mod error;
 
-use std::{iter::Peekable, mem, str::Lines};
+use std::mem;
 
 use indexmap::IndexMap;
 use once_cell::sync::Lazy;
@@ -245,12 +250,12 @@ pub struct Release<'a> {
     /// The descriptions of this release.
     ///
     /// Note that leading and trailing newlines have been removed.
-    pub notes: String,
+    pub notes: &'a str,
 }
 
 impl Release<'_> {
     fn new() -> Self {
-        Self { version: "", title: "", notes: String::new() }
+        Self { version: "", title: "", notes: "" }
     }
 }
 
@@ -397,18 +402,18 @@ fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
     let mut map = IndexMap::new();
     let mut insert_release = |mut cur_release: Release<'a>| {
         debug_assert!(!cur_release.version.is_empty());
-        while cur_release.notes.ends_with(LN) {
-            // Remove trailing newlines.
-            cur_release.notes.pop();
-        }
+        // Remove trailing newlines.
+        cur_release.notes = cur_release.notes.trim_end_matches(LN);
         if let Some(release) = map.insert(cur_release.version, cur_release) {
             return Err(Error::parse(format!("multiple release notes for '{}'", release.version)));
         }
         Ok(())
     };
 
-    let lines = &mut text.lines().peekable();
+    let mut line_start = 0;
+    let mut next = text.find(LN);
     let mut cur_release = Release::new();
+    let mut cur_release_start = 0;
     // If `true`, we are in a release section.
     let mut on_release = false;
     // If `true`, we are in a code block ("```").
@@ -417,9 +422,15 @@ fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
     let mut on_comment = false;
     // The heading level of release sections.
     let mut level = None;
-
-    while let Some(line) = lines.next() {
-        let heading = heading(line, lines);
+    loop {
+        let (line, line_end) = match next {
+            Some(line_end) => {
+                next = text.get(line_end + 1..).and_then(|s| s.find(LN)).map(|n| line_end + 1 + n);
+                (&text[line_start..line_end], line_end)
+            }
+            None => (&text[line_start..], text.len()),
+        };
+        let heading = heading(text, line, line_end, next);
         if heading.is_none() || on_code_block || on_comment {
             if trim(line).starts_with("```") {
                 on_code_block = !on_code_block;
@@ -455,10 +466,10 @@ fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
 
             // Non-heading lines are always considered part of the current
             // section.
-            if on_release {
-                cur_release.notes.push_str(line);
-                cur_release.notes.push(LN);
+            if line_end == text.len() {
+                break;
             }
+            line_start = line_end + 1;
             continue;
         }
         let heading = heading.unwrap();
@@ -477,14 +488,19 @@ fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
                     on_release = false;
                 } else if on_release {
                     // Otherwise, it is considered part of the current section.
-                    cur_release.notes.push_str(line);
-                    cur_release.notes.push(LN);
                 }
+                if line_end == text.len() {
+                    break;
+                }
+                line_start = line_end + 1;
                 continue;
             }
         };
 
         if mem::replace(&mut on_release, true) {
+            if cur_release_start < line_start {
+                cur_release.notes = &text[cur_release_start..line_start - 1];
+            }
             // end of prev release
             insert_release(mem::replace(&mut cur_release, Release::new()))?;
         }
@@ -493,21 +509,31 @@ fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
         cur_release.title = heading.text;
         level.get_or_insert(heading.level);
 
+        line_start = line_end + 1;
         if heading.style == HeadingStyle::Setext {
             // Remove an underline after a Setext-style heading.
-            lines.next();
+            line_start = next.unwrap() + 1;
+            next = text.get(line_start..).and_then(|s| s.find(LN)).map(|n| line_start + n);
         }
-        while let Some(next) = lines.peek() {
-            if next.trim().is_empty() {
+        while let Some(n) = next {
+            if text[line_start..n].trim().is_empty() {
                 // Remove newlines after a heading.
-                lines.next();
+                line_start = n + 1;
+                next = text.get(line_start..).and_then(|s| s.find(LN)).map(|n| line_start + n);
             } else {
                 break;
             }
         }
+        cur_release_start = line_start;
+        if line_end == text.len() {
+            break;
+        }
     }
 
     if !cur_release.version.is_empty() {
+        if cur_release_start < line_start {
+            cur_release.notes = &text[cur_release_start..];
+        }
         insert_release(cur_release)?;
     }
 
@@ -534,7 +560,12 @@ enum HeadingStyle {
     Setext,
 }
 
-fn heading<'a>(line: &'a str, lines: &mut Peekable<Lines<'_>>) -> Option<Heading<'a>> {
+fn heading<'a>(
+    text: &'a str,
+    line: &'a str,
+    line_end: usize,
+    next: Option<usize>,
+) -> Option<Heading<'a>> {
     static ALL_EQUAL_SIGNS: Lazy<Regex> = Lazy::new(|| Regex::new("^=+$").unwrap());
     static ALL_DASHES: Lazy<Regex> = Lazy::new(|| Regex::new("^-+$").unwrap());
 
@@ -549,8 +580,8 @@ fn heading<'a>(line: &'a str, lines: &mut Peekable<Lines<'_>>) -> Option<Heading
         } else {
             None
         }
-    } else if let Some(next) = lines.peek() {
-        let next = trim(next);
+    } else if let Some(next) = next {
+        let next = trim(&text[line_end + 1..next]);
         if ALL_EQUAL_SIGNS.is_match(next) {
             Some(Heading { text: line, level: 1, style: HeadingStyle::Setext })
         } else if ALL_DASHES.is_match(next) {

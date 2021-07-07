@@ -81,13 +81,13 @@ unreleased
     for changelog in &changelogs {
         let changelog = parse(changelog).unwrap();
         assert_eq!(changelog[0].title, "0.2.0");
-        assert_eq!(trim(&changelog[0].notes), "0.2.0.");
+        assert_eq!(trim(changelog[0].notes), "0.2.0.");
 
         assert_eq!(changelog["0.2.0"].title, "0.2.0");
-        assert_eq!(trim(&changelog["0.2.0"].notes), "0.2.0.");
+        assert_eq!(trim(changelog["0.2.0"].notes), "0.2.0.");
 
         assert_eq!(changelog["0.1.0"].title, "0.1.0");
-        assert_eq!(trim(&changelog["0.1.0"].notes), "0.1.0.");
+        assert_eq!(trim(changelog["0.1.0"].notes), "0.1.0.");
     }
 }
 
