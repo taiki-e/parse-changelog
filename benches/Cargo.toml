@@ -1,0 +1,16 @@
+[package]
+name = "bench"
+version = "0.0.0"
+authors = ["Taiki Endo <te316e89@gmail.com>"]
+edition = "2018"
+publish = false
+
+[dev-dependencies]
+parse-changelog = { path = ".." }
+
+criterion = "0.3"
+
+[[bench]]
+name = "parse"
+path = "parse.rs"
+harness = false
