@@ -1,0 +1,22 @@
+[package]
+name = "fuzz"
+version = "0.0.0"
+authors = ["Taiki Endo <te316e89@gmail.com>"]
+edition = "2018"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[workspace]
+
+[dependencies]
+parse-changelog = { path = ".." }
+
+libfuzzer-sys = "0.4"
+
+[[bin]]
+name = "parse"
+path = "parse.rs"
+test = false
+doc = false
