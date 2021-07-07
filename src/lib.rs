@@ -597,7 +597,7 @@ fn heading<'a>(
 
 fn trim(s: &str) -> &str {
     let mut count = 0;
-    while s[count..].starts_with(' ') {
+    while s.as_bytes().get(count) == Some(&b' ') {
         count += 1;
     }
     // Indents less than 4 are ignored.

@@ -6,7 +6,7 @@ edition = "2018"
 publish = false
 
 [dev-dependencies]
-parse-changelog = { path = ".." }
+parse-changelog = { path = "..", default-features = false }
 
 criterion = "0.3"
 
