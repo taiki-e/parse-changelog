@@ -182,9 +182,10 @@ mod assert_impl;
 
 mod error;
 
-use std::mem;
+use std::{iter::Peekable, mem};
 
 use indexmap::IndexMap;
+use memchr::memmem;
 use once_cell::sync::Lazy;
 use regex::Regex;
 
@@ -394,16 +395,16 @@ impl Parser {
 }
 
 fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
-    const LN: char = '\n';
+    const LN: u8 = b'\n';
+    const OPEN: &[u8] = b"<!--";
+    const CLOSE: &[u8] = b"-->";
 
     let version_format = parser.get_version_format();
     let prefix_format = parser.get_prefix_format();
 
     let mut map = IndexMap::new();
-    let mut insert_release = |mut cur_release: Release<'a>| {
+    let mut insert_release = |cur_release: Release<'a>| {
         debug_assert!(!cur_release.version.is_empty());
-        // Remove trailing newlines.
-        cur_release.notes = cur_release.notes.trim_end_matches(LN);
         if let Some(release) = map.insert(cur_release.version, cur_release) {
             return Err(Error::parse(format!("multiple release notes for '{}'", release.version)));
         }
@@ -411,7 +412,7 @@ fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
     };
 
     let mut line_start = 0;
-    let mut next = text.find(LN);
+    let mut lines = memchr::Memchr::new(LN, text.as_bytes()).peekable();
     let mut cur_release = Release::new();
     let mut cur_release_start = 0;
     // If `true`, we are in a release section.
@@ -422,26 +423,23 @@ fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
     let mut on_comment = false;
     // The heading level of release sections.
     let mut level = None;
+    let find_open = memmem::Finder::new(OPEN);
+    let find_close = memmem::Finder::new(CLOSE);
     loop {
-        let (line, line_end) = match next {
-            Some(line_end) => {
-                next = text.get(line_end + 1..).and_then(|s| s.find(LN)).map(|n| line_end + 1 + n);
-                (&text[line_start..line_end], line_end)
-            }
+        let (line, line_end) = match lines.next() {
+            Some(line_end) => (&text[line_start..line_end], line_end),
             None => (&text[line_start..], text.len()),
         };
-        let heading = heading(text, line, line_end, next);
+        let heading = heading(text, line, line_end, &mut lines);
         if heading.is_none() || on_code_block || on_comment {
             if trim(line).starts_with("```") {
                 on_code_block = !on_code_block;
             }
 
             if !on_code_block {
-                const OPEN: &str = "<!--";
-                const CLOSE: &str = "-->";
                 let mut ll = Some(line);
                 while let Some(l) = ll {
-                    match (l.find(OPEN), l.find(CLOSE)) {
+                    match (find_open.find(l.as_bytes()), find_close.find(l.as_bytes())) {
                         (None, None) => {}
                         // <!-- ...
                         (Some(_), None) => on_comment = true,
@@ -499,7 +497,8 @@ fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
 
         if mem::replace(&mut on_release, true) {
             if cur_release_start < line_start {
-                cur_release.notes = &text[cur_release_start..line_start - 1];
+                // Remove trailing newlines.
+                cur_release.notes = text[cur_release_start..line_start - 1].trim_end();
             }
             // end of prev release
             insert_release(mem::replace(&mut cur_release, Release::new()))?;
@@ -512,14 +511,15 @@ fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
         line_start = line_end + 1;
         if heading.style == HeadingStyle::Setext {
             // Remove an underline after a Setext-style heading.
-            line_start = next.unwrap() + 1;
-            next = text.get(line_start..).and_then(|s| s.find(LN)).map(|n| line_start + n);
+            if let Some(next) = lines.next() {
+                line_start = next + 1;
+            }
         }
-        while let Some(n) = next {
-            if text[line_start..n].trim().is_empty() {
+        while let Some(&next) = lines.peek() {
+            if text[line_start..next].trim().is_empty() {
                 // Remove newlines after a heading.
-                line_start = n + 1;
-                next = text.get(line_start..).and_then(|s| s.find(LN)).map(|n| line_start + n);
+                line_start = next + 1;
+                lines.next();
             } else {
                 break;
             }
@@ -532,7 +532,8 @@ fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
 
     if !cur_release.version.is_empty() {
         if cur_release_start < line_start {
-            cur_release.notes = &text[cur_release_start..];
+            // Remove trailing newlines.
+            cur_release.notes = text[cur_release_start..].trim_end();
         }
         insert_release(cur_release)?;
     }
@@ -564,7 +565,7 @@ fn heading<'a>(
     text: &'a str,
     line: &'a str,
     line_end: usize,
-    next: Option<usize>,
+    lines: &mut Peekable<impl Iterator<Item = usize>>,
 ) -> Option<Heading<'a>> {
     static ALL_EQUAL_SIGNS: Lazy<Regex> = Lazy::new(|| Regex::new("^=+$").unwrap());
     static ALL_DASHES: Lazy<Regex> = Lazy::new(|| Regex::new("^-+$").unwrap());
@@ -580,7 +581,7 @@ fn heading<'a>(
         } else {
             None
         }
-    } else if let Some(next) = next {
+    } else if let Some(&next) = lines.peek() {
         let next = trim(&text[line_end + 1..next]);
         if ALL_EQUAL_SIGNS.is_match(next) {
             Some(Heading { text: line, level: 1, style: HeadingStyle::Setext })
@@ -595,12 +596,12 @@ fn heading<'a>(
 }
 
 fn trim(s: &str) -> &str {
-    let mut cnt = 0;
-    while s[cnt..].starts_with(' ') {
-        cnt += 1;
+    let mut count = 0;
+    while s[count..].starts_with(' ') {
+        count += 1;
     }
     // Indents less than 4 are ignored.
-    if cnt < 4 { s[cnt..].trim_end() } else { s.trim_end() }
+    if count < 4 { s[count..].trim_end() } else { s.trim_end() }
 }
 
 /// If a leading `[` or trailing `]` exists, returns a string with it removed.
