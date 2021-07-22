@@ -228,7 +228,7 @@ fn rust() {
     assert_diff("tests/fixtures/rust-1.46.0.md", map["1.46.0"].notes);
     let vec: Vec<_> = parse_iter(text).collect();
     assert_eq!(vec.len(), 72);
-    assert_eq!(vec[2].notes, map["1.46.0"].notes);
+    assert_eq!(vec[2], map["1.46.0"]);
 
     let text = include_str!("fixtures/rust-atx.md");
     let map = parse(text).unwrap();
@@ -236,14 +236,14 @@ fn rust() {
     assert_diff("tests/fixtures/rust-1.46.0-atx.md", map["1.46.0"].notes);
     let vec: Vec<_> = parse_iter(text).collect();
     assert_eq!(vec.len(), 72);
-    assert_eq!(vec[2].notes, map["1.46.0"].notes);
+    assert_eq!(vec[2], map["1.46.0"]);
 }
 
 #[test]
 fn pin_project() {
     let changelog = parse(include_str!("fixtures/pin-project.md")).unwrap();
     assert_eq!(changelog.len(), 62);
-    assert_diff("tests/fixtures/pin-project-1.0.0.md", &changelog["1.0.0"].notes);
+    assert_diff("tests/fixtures/pin-project-1.0.0.md", changelog["1.0.0"].notes);
 }
 
 #[test]
@@ -256,5 +256,5 @@ fn cargo() {
         .parse(include_str!("fixtures/cargo.md"))
         .unwrap();
     assert_eq!(changelog.len(), 21);
-    assert_diff("tests/fixtures/cargo-1.50.md", &changelog["1.50"].notes);
+    assert_diff("tests/fixtures/cargo-1.50.md", changelog["1.50"].notes);
 }
