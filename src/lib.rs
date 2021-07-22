@@ -644,10 +644,10 @@ fn heading<'a>(
     let line = trim(line);
     if line.starts_with('#') {
         let mut level = 0;
-        while line[level..].starts_with('#') {
+        while line.as_bytes().get(level) == Some(&b'#') {
             level += 1;
         }
-        if level <= 6 {
+        if level <= 6 && line.as_bytes().get(level) == Some(&b' ') {
             Some(Heading { text: line[level..].trim(), level, style: HeadingStyle::Atx })
         } else {
             None

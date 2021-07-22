@@ -11,7 +11,7 @@ cargo-fuzz = true
 [workspace]
 
 [dependencies]
-parse-changelog = { path = ".." }
+parse-changelog = { path = "..", default-features = false }
 
 libfuzzer-sys = "0.4"
 

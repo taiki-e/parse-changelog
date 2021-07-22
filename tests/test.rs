@@ -120,9 +120,14 @@ fn failure() {
 
 #[test]
 fn multiple_heading() {
-    let changelogs = ["## 0.1.0\n##0.1.0\n", "## 0.1.0\n##0.1.0\n##0.0.0\n"];
+    let changelogs = ["## 0.1.0\n## 0.1.0\n", "## 0.1.0\n## 0.1.0\n## 0.0.0\n"];
     for changelog in &changelogs {
         assert!(parse(changelog).unwrap_err().is_parse());
+    }
+
+    let changelogs = ["## 0.1.0\n##0.1.0\n", "##0.1.0\n## 0.1.0\n##0.0.0\n"];
+    for changelog in &changelogs {
+        assert_eq!(parse(changelog).unwrap().len(), 1);
     }
 }
 
