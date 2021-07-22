@@ -235,7 +235,7 @@ pub fn parse(text: &str) -> Result<Changelog<'_>> {
 /// See crate level documentation for changelog and version format supported
 /// by default.
 pub fn parse_iter(text: &str) -> ParseIter<'_, 'static> {
-    ParseIter::new(text, &DEFAULT_VERSION_FORMAT, &DEFAULT_PREFIX_FORMAT)
+    ParseIter::new(text, None, None)
 }
 
 /// A release note for a version.
@@ -382,14 +382,6 @@ impl Parser {
         Ok(self)
     }
 
-    fn get_version_format(&self) -> &Regex {
-        self.version.as_ref().unwrap_or(&DEFAULT_VERSION_FORMAT)
-    }
-
-    fn get_prefix_format(&self) -> &Regex {
-        self.prefix.as_ref().unwrap_or(&DEFAULT_PREFIX_FORMAT)
-    }
-
     /// Parses release notes from the given `text`.
     ///
     /// See crate level documentation for changelog and version format supported
@@ -429,7 +421,7 @@ impl Parser {
     ///
     /// [`parse`]: Self::parse
     pub fn parse_iter<'a, 'b>(&'b self, text: &'a str) -> ParseIter<'a, 'b> {
-        ParseIter::new(text, self.get_version_format(), self.get_prefix_format())
+        ParseIter::new(text, self.version.as_ref(), self.prefix.as_ref())
     }
 }
 
@@ -461,11 +453,15 @@ const OPEN: &[u8] = b"<!--";
 const CLOSE: &[u8] = b"-->";
 
 impl<'a, 'b> ParseIter<'a, 'b> {
-    fn new(text: &'a str, version_format: &'b Regex, prefix_format: &'b Regex) -> Self {
+    fn new(
+        text: &'a str,
+        version_format: Option<&'b Regex>,
+        prefix_format: Option<&'b Regex>,
+    ) -> Self {
         Self {
             text,
-            version_format,
-            prefix_format,
+            version_format: version_format.unwrap_or(&DEFAULT_VERSION_FORMAT),
+            prefix_format: prefix_format.unwrap_or(&DEFAULT_PREFIX_FORMAT),
             line_start: 0,
             lines: memchr::memchr_iter(LN, text.as_bytes()).peekable(),
             cur_release: Release::new(),
