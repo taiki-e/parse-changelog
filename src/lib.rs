@@ -150,6 +150,11 @@
 //!
 //! To customize the version format, use the [`Parser::version_format`] method.
 //!
+//! # Optional features
+//!
+//! * **`serde`** — Implements [`serde::Serialize`] trait for parse-changelog types.
+//!
+//! [`serde::Serialize`]: https://docs.rs/serde/1/serde/trait.Serialize.html
 //! [keepachangelog]: https://keepachangelog.com/en/1.0.0
 //! [semver]: https://semver.org/spec/v2.0.0.html
 

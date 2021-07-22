@@ -10,15 +10,17 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
-- Performance improvements.
+## [0.4.2] - 2021-07-22
+
+- [Performance improvements.](https://github.com/taiki-e/parse-changelog/pull/11)
 
 ### CLI
 
-- Add `--json` flag to return JSON representation of changelog.
+- [Add `--json` flag to return JSON representation of changelog.](https://github.com/taiki-e/parse-changelog/pull/12)
 
 ### Library
 
-- Add `serde` optional feature.
+- [Add `serde` optional feature.](https://github.com/taiki-e/parse-changelog/pull/12)
 
 ## [0.4.1] - 2021-07-22
 
@@ -82,7 +84,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.4.2...HEAD
+[0.4.2]: https://github.com/taiki-e/parse-changelog/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/taiki-e/parse-changelog/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/taiki-e/parse-changelog/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/taiki-e/parse-changelog/compare/v0.2.2...v0.3.0
