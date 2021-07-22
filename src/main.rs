@@ -4,7 +4,7 @@
 
 use std::{
     fs,
-    io::{self, Read},
+    io::{self, Read, Write},
 };
 
 use anyhow::{bail, Context as _, Result};
@@ -76,11 +76,10 @@ fn try_main() -> Result<()> {
     } else {
         &changelog[0]
     };
-    if args.title {
-        println!("{}", release.title);
-    } else {
-        println!("{}", release.notes);
-    }
+    let text = if args.title { release.title } else { release.notes };
+    let mut stdout = io::stdout();
+    stdout.write_all(text.as_bytes())?;
+    stdout.flush()?;
 
     Ok(())
 }
