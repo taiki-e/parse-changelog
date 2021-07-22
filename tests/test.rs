@@ -5,7 +5,7 @@ mod auxiliary;
 use std::error::Error as _;
 
 use auxiliary::{assert_diff, trim};
-use parse_changelog::{parse, Parser};
+use parse_changelog::{parse, parse_iter, Parser};
 
 #[test]
 fn success() {
@@ -120,9 +120,14 @@ fn failure() {
 
 #[test]
 fn multiple_heading() {
-    let changelogs = ["## 0.1.0\n##0.1.0\n", "## 0.1.0\n##0.1.0\n##0.0.0\n"];
+    let changelogs = ["## 0.1.0\n## 0.1.0\n", "## 0.1.0\n## 0.1.0\n## 0.0.0\n"];
     for changelog in &changelogs {
         assert!(parse(changelog).unwrap_err().is_parse());
+    }
+
+    let changelogs = ["## 0.1.0\n##0.1.0\n", "##0.1.0\n## 0.1.0\n##0.0.0\n"];
+    for changelog in &changelogs {
+        assert_eq!(parse(changelog).unwrap().len(), 1);
     }
 }
 
@@ -217,13 +222,21 @@ fn comment() {
 
 #[test]
 fn rust() {
-    let changelog = parse(include_str!("fixtures/rust.md")).unwrap();
-    assert_eq!(changelog.len(), 72);
-    assert_diff("tests/fixtures/rust-1.46.0.md", &changelog["1.46.0"].notes);
+    let text = include_str!("fixtures/rust.md");
+    let map = parse(text).unwrap();
+    assert_eq!(map.len(), 72);
+    assert_diff("tests/fixtures/rust-1.46.0.md", map["1.46.0"].notes);
+    let vec: Vec<_> = parse_iter(text).collect();
+    assert_eq!(vec.len(), 72);
+    assert_eq!(vec[2].notes, map["1.46.0"].notes);
 
-    let changelog = parse(include_str!("fixtures/rust-atx.md")).unwrap();
-    assert_eq!(changelog.len(), 72);
-    assert_diff("tests/fixtures/rust-1.46.0-atx.md", &changelog["1.46.0"].notes);
+    let text = include_str!("fixtures/rust-atx.md");
+    let map = parse(text).unwrap();
+    assert_eq!(map.len(), 72);
+    assert_diff("tests/fixtures/rust-1.46.0-atx.md", map["1.46.0"].notes);
+    let vec: Vec<_> = parse_iter(text).collect();
+    assert_eq!(vec.len(), 72);
+    assert_eq!(vec[2].notes, map["1.46.0"].notes);
 }
 
 #[test]

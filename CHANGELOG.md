@@ -10,6 +10,12 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+### Library
+
+- [Add `parse_iter` for partial parsing changelog.](https://github.com/taiki-e/parse-changelog/pull/9)
+
+- [Fix bug in parsing of atx style heading.](https://github.com/taiki-e/parse-changelog/pull/9)
+
 ## [0.3.0] - 2021-04-12
 
 - Increase the minimum supported Rust version from Rust 1.45 to Rust 1.51.

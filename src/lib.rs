@@ -190,8 +190,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 
 pub use crate::error::Error;
-
-type Result<T, E = Error> = std::result::Result<T, E>;
+use crate::error::Result;
 
 /// A changelog.
 ///
@@ -223,6 +222,20 @@ pub type Changelog<'a> = IndexMap<&'a str, Release<'a>>;
 ///   written in the supported format.
 pub fn parse(text: &str) -> Result<Changelog<'_>> {
     Parser::new().parse(text)
+}
+
+/// An iterator over all release notes in the given `text`.
+///
+/// Unlike [`parse`] function, this function doesn't error on duplicate release
+/// notes or empty changelog.
+///
+/// This function uses the default version and prefix format. If you want to use
+/// another version format, use [`Parser::version_format`].
+///
+/// See crate level documentation for changelog and version format supported
+/// by default.
+pub fn parse_iter(text: &str) -> ParseIter<'_, 'static> {
+    ParseIter::new(text, &DEFAULT_VERSION_FORMAT, &DEFAULT_PREFIX_FORMAT)
 }
 
 /// A release note for a version.
@@ -390,159 +403,217 @@ impl Parser {
     ///   written in the supported format, or that the specified format is wrong
     ///   if you specify your own format.
     pub fn parse<'a>(&self, text: &'a str) -> Result<Changelog<'a>> {
-        parse_inner(self, text)
+        let mut map = IndexMap::new();
+        for release in self.parse_iter(text) {
+            if let Some(release) = map.insert(release.version, release) {
+                return Err(Error::parse(format!(
+                    "multiple release notes for '{}'",
+                    release.version
+                )));
+            }
+        }
+        if map.is_empty() {
+            return Err(Error::parse("no release was found"));
+        }
+        Ok(map)
+    }
+
+    /// An iterator over all release notes in the given `text`.
+    ///
+    /// Unlike [`parse`] method, this method doesn't error on duplicate release
+    /// notes or empty changelog.
+    ///
+    /// See crate level documentation for changelog and version format supported
+    /// by default.
+    ///
+    /// [`parse`]: Self::parse
+    pub fn parse_iter<'a, 'b>(&'b self, text: &'a str) -> ParseIter<'a, 'b> {
+        ParseIter::new(text, self.get_version_format(), self.get_prefix_format())
     }
 }
 
-fn parse_inner<'a>(parser: &Parser, text: &'a str) -> Result<Changelog<'a>> {
-    const LN: u8 = b'\n';
-    const OPEN: &[u8] = b"<!--";
-    const CLOSE: &[u8] = b"-->";
+/// An iterator for [`parse_iter`].
+#[allow(missing_debug_implementations)]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
+pub struct ParseIter<'a, 'b> {
+    text: &'a str,
+    version_format: &'b Regex,
+    prefix_format: &'b Regex,
+    line_start: usize,
+    lines: Peekable<memchr::Memchr<'a>>,
+    cur_release: Release<'a>,
+    cur_release_start: usize,
+    /// If `true`, we are in a release section.
+    on_release: bool,
+    /// If `true`, we are in a code block ("```").
+    on_code_block: bool,
+    /// If `true`, we are in a comment (`<!--` and `-->`).
+    on_comment: bool,
+    /// The heading level of release sections.
+    level: Option<usize>,
+    find_open: memmem::Finder<'static>,
+    find_close: memmem::Finder<'static>,
+}
 
-    let version_format = parser.get_version_format();
-    let prefix_format = parser.get_prefix_format();
+const LN: u8 = b'\n';
+const OPEN: &[u8] = b"<!--";
+const CLOSE: &[u8] = b"-->";
 
-    let mut map = IndexMap::new();
-    let mut insert_release = |cur_release: Release<'a>| {
-        debug_assert!(!cur_release.version.is_empty());
-        if let Some(release) = map.insert(cur_release.version, cur_release) {
-            return Err(Error::parse(format!("multiple release notes for '{}'", release.version)));
+impl<'a, 'b> ParseIter<'a, 'b> {
+    fn new(text: &'a str, version_format: &'b Regex, prefix_format: &'b Regex) -> Self {
+        Self {
+            text,
+            version_format,
+            prefix_format,
+            line_start: 0,
+            lines: memchr::memchr_iter(LN, text.as_bytes()).peekable(),
+            cur_release: Release::new(),
+            cur_release_start: 0,
+            on_release: false,
+            on_code_block: false,
+            on_comment: false,
+            level: None,
+            find_open: memmem::Finder::new(OPEN),
+            find_close: memmem::Finder::new(CLOSE),
         }
-        Ok(())
-    };
+    }
+}
 
-    let mut line_start = 0;
-    let mut lines = memchr::Memchr::new(LN, text.as_bytes()).peekable();
-    let mut cur_release = Release::new();
-    let mut cur_release_start = 0;
-    // If `true`, we are in a release section.
-    let mut on_release = false;
-    // If `true`, we are in a code block ("```").
-    let mut on_code_block = false;
-    // If `true`, we are in a comment (`<!--` and `-->`).
-    let mut on_comment = false;
-    // The heading level of release sections.
-    let mut level = None;
-    let find_open = memmem::Finder::new(OPEN);
-    let find_close = memmem::Finder::new(CLOSE);
-    loop {
-        let (line, line_end) = match lines.next() {
-            Some(line_end) => (&text[line_start..line_end], line_end),
-            None => (&text[line_start..], text.len()),
-        };
-        let heading = heading(text, line, line_end, &mut lines);
-        if heading.is_none() || on_code_block || on_comment {
-            if trim(line).starts_with("```") {
-                on_code_block = !on_code_block;
-            }
+impl<'a> Iterator for ParseIter<'a, '_> {
+    type Item = Release<'a>;
 
-            if !on_code_block {
-                let mut ll = Some(line);
-                while let Some(l) = ll {
-                    match (find_open.find(l.as_bytes()), find_close.find(l.as_bytes())) {
-                        (None, None) => {}
-                        // <!-- ...
-                        (Some(_), None) => on_comment = true,
-                        // ... -->
-                        (None, Some(_)) => on_comment = false,
-                        (Some(open), Some(close)) => {
-                            if open < close {
-                                // <!-- ... -->
-                                on_comment = false;
-                                ll = l.get(close + CLOSE.len()..);
-                            } else {
-                                // --> ... <!--
-                                on_comment = true;
-                                ll = l.get(open + OPEN.len()..);
-                            }
-                            continue;
-                        }
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut next_value = None;
+        loop {
+            let (line, line_end) = match self.lines.next() {
+                Some(line_end) => (&self.text[self.line_start..line_end], line_end),
+                None => {
+                    if let Some(l) = self.text.get(self.line_start..) {
+                        (l, self.text.len())
+                    } else {
+                        break;
                     }
+                }
+            };
+            let heading = heading(self.text, line, line_end, &mut self.lines);
+            if heading.is_none() || self.on_code_block || self.on_comment {
+                if trim(line).starts_with("```") {
+                    self.on_code_block = !self.on_code_block;
+                }
+
+                if !self.on_code_block {
+                    let mut ll = Some(line);
+                    while let Some(l) = ll {
+                        match (
+                            self.find_open.find(l.as_bytes()),
+                            self.find_close.find(l.as_bytes()),
+                        ) {
+                            (None, None) => {}
+                            // <!-- ...
+                            (Some(_), None) => self.on_comment = true,
+                            // ... -->
+                            (None, Some(_)) => self.on_comment = false,
+                            (Some(open), Some(close)) => {
+                                if open < close {
+                                    // <!-- ... -->
+                                    self.on_comment = false;
+                                    ll = l.get(close + CLOSE.len()..);
+                                } else {
+                                    // --> ... <!--
+                                    self.on_comment = true;
+                                    ll = l.get(open + OPEN.len()..);
+                                }
+                                continue;
+                            }
+                        }
+                        break;
+                    }
+                }
+
+                // Non-heading lines are always considered part of the current
+                // section.
+                if line_end == self.text.len() {
                     break;
                 }
-            }
-
-            // Non-heading lines are always considered part of the current
-            // section.
-            if line_end == text.len() {
-                break;
-            }
-            line_start = line_end + 1;
-            continue;
-        }
-        let heading = heading.unwrap();
-
-        let mut unlinked = unlink(heading.text);
-        if let Some(m) = prefix_format.find(unlinked) {
-            unlinked = &unlinked[m.end()..];
-        }
-        let unlinked = unlink(unlinked.splitn(2, char::is_whitespace).next().unwrap());
-        let version = match version_format.find(unlinked) {
-            Some(m) => &unlinked[m.start()..m.end()],
-            None => {
-                if level.map_or(true, |l| heading.level <= l) {
-                    // Ignore non-release sections that have the same or higher
-                    // heading levels as release sections.
-                    on_release = false;
-                } else if on_release {
-                    // Otherwise, it is considered part of the current section.
-                }
-                if line_end == text.len() {
-                    break;
-                }
-                line_start = line_end + 1;
+                self.line_start = line_end + 1;
                 continue;
             }
-        };
+            let heading = heading.unwrap();
 
-        if mem::replace(&mut on_release, true) {
-            if cur_release_start < line_start {
-                // Remove trailing newlines.
-                cur_release.notes = text[cur_release_start..line_start - 1].trim_end();
+            let mut unlinked = unlink(heading.text);
+            if let Some(m) = self.prefix_format.find(unlinked) {
+                unlinked = &unlinked[m.end()..];
             }
-            // end of prev release
-            insert_release(mem::replace(&mut cur_release, Release::new()))?;
-        }
+            let unlinked = unlink(unlinked.splitn(2, char::is_whitespace).next().unwrap());
+            let version = match self.version_format.find(unlinked) {
+                Some(m) => &unlinked[m.start()..m.end()],
+                None => {
+                    if self.level.map_or(true, |l| heading.level <= l) {
+                        // Ignore non-release sections that have the same or higher
+                        // heading levels as release sections.
+                        self.on_release = false;
+                    } else {
+                        // Otherwise, it is considered part of the current section.
+                    }
+                    if line_end == self.text.len() {
+                        break;
+                    }
+                    self.line_start = line_end + 1;
+                    continue;
+                }
+            };
 
-        cur_release.version = version;
-        cur_release.title = heading.text;
-        level.get_or_insert(heading.level);
-
-        line_start = line_end + 1;
-        if heading.style == HeadingStyle::Setext {
-            // Remove an underline after a Setext-style heading.
-            if let Some(next) = lines.next() {
-                line_start = next + 1;
+            if mem::replace(&mut self.on_release, true) {
+                if self.cur_release_start < self.line_start {
+                    // Remove trailing newlines.
+                    self.cur_release.notes =
+                        self.text[self.cur_release_start..self.line_start - 1].trim_end();
+                }
+                // end of prev release
+                debug_assert!(!self.cur_release.version.is_empty());
+                debug_assert!(next_value.is_none());
+                next_value = Some(mem::replace(&mut self.cur_release, Release::new()));
             }
-        }
-        while let Some(&next) = lines.peek() {
-            if text[line_start..next].trim().is_empty() {
-                // Remove newlines after a heading.
-                line_start = next + 1;
-                lines.next();
-            } else {
+
+            self.cur_release.version = version;
+            self.cur_release.title = heading.text;
+            self.level.get_or_insert(heading.level);
+
+            self.line_start = line_end + 1;
+            if heading.style == HeadingStyle::Setext {
+                // Remove an underline after a Setext-style heading.
+                if let Some(next) = self.lines.next() {
+                    self.line_start = next + 1;
+                }
+            }
+            while let Some(&next) = self.lines.peek() {
+                if self.text[self.line_start..next].trim().is_empty() {
+                    // Remove newlines after a heading.
+                    self.line_start = next + 1;
+                    self.lines.next();
+                } else {
+                    break;
+                }
+            }
+            self.cur_release_start = self.line_start;
+            if next_value.is_some() {
+                return next_value.take();
+            }
+            if line_end == self.text.len() {
                 break;
             }
         }
-        cur_release_start = line_start;
-        if line_end == text.len() {
-            break;
+
+        if !self.cur_release.version.is_empty() {
+            if self.cur_release_start < self.line_start {
+                // Remove trailing newlines.
+                self.cur_release.notes = self.text[self.cur_release_start..].trim_end();
+            }
+            return Some(mem::replace(&mut self.cur_release, Release::new()));
         }
-    }
 
-    if !cur_release.version.is_empty() {
-        if cur_release_start < line_start {
-            // Remove trailing newlines.
-            cur_release.notes = text[cur_release_start..].trim_end();
-        }
-        insert_release(cur_release)?;
+        None
     }
-
-    if map.is_empty() {
-        return Err(Error::parse("no release was found"));
-    }
-
-    Ok(map)
 }
 
 struct Heading<'a> {
@@ -573,10 +644,10 @@ fn heading<'a>(
     let line = trim(line);
     if line.starts_with('#') {
         let mut level = 0;
-        while line[level..].starts_with('#') {
+        while line.as_bytes().get(level) == Some(&b'#') {
             level += 1;
         }
-        if level <= 6 {
+        if level <= 6 && line.as_bytes().get(level) == Some(&b' ') {
             Some(Heading { text: line[level..].trim(), level, style: HeadingStyle::Atx })
         } else {
             None
