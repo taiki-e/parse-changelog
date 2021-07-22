@@ -58,22 +58,52 @@ library part of this crate does not use them.
 `parse-changelog` command parses changelog and returns a release note for the
 specified version.
 
-```text
+<details>
+<summary>Click to show a complete list of options</summary>
+
+<!-- readme-long-help:start -->
+```console
+$ parse-changelog --help
+parse-changelog
+Parses changelog and returns a release note for the specified version
+
 USAGE:
     parse-changelog [OPTIONS] <PATH> [VERSION]
 
 OPTIONS:
-    -t, --title                       Returns title instead of notes
-        --version-format <PATTERN>    Specify version format
-        --prefix <PATTERN>            Alias for --prefix-format
-        --prefix-format <PATTERN>     Specify prefix format
-    -h, --help                        Prints help information
-    -V, --version                     Prints version information
+    -t, --title
+            Returns title instead of notes
+
+        --json
+            Returns JSON representation of all releases in changelog
+
+        --version-format <PATTERN>
+            Specify version format
+
+        --prefix <PATTERN>
+            Alias for --prefix-format
+
+        --prefix-format <PATTERN>
+            Specify prefix format
+
+    -h, --help
+            Prints help information
+
+    -V, --version
+            Prints version information
+
 
 ARGS:
-    <PATH>       Path to the changelog file (use '-' for standard input)
-    <VERSION>    Specify version (by default, select the latest release)
+    <PATH>
+            Path to the changelog file (use '-' for standard input)
+
+    <VERSION>
+            Specify version (by default, select the latest release)
+
 ```
+<!-- readme-long-help:end -->
+
+</details>
 
 ### Example: Get Rust's release notes
 
