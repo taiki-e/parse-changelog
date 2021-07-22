@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [0.4.0] - 2021-07-22
 
+- [Fix bug in parsing of atx style heading.](https://github.com/taiki-e/parse-changelog/pull/9)
+
 - [Performance improvements.](https://github.com/taiki-e/parse-changelog/pull/8)
 
 ### Library
@@ -21,8 +23,6 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 - [Add `parse_iter` for partial parsing changelog.](https://github.com/taiki-e/parse-changelog/pull/9)
 
 - Implement `PartialEq` and `Eq` for `Release`.
-
-- [Fix bug in parsing of atx style heading.](https://github.com/taiki-e/parse-changelog/pull/9)
 
 ## [0.3.0] - 2021-04-12
 
