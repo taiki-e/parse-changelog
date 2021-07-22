@@ -28,6 +28,9 @@ struct Args {
     /// Returns title instead of notes.
     #[structopt(short, long)]
     title: bool,
+    /// Returns JSON representation of all releases in changelog.
+    #[structopt(long, conflicts_with = "version", conflicts_with = "title")]
+    json: bool,
     /// Specify version format.
     #[structopt(long, value_name = "PATTERN")]
     version_format: Option<String>,
@@ -67,6 +70,14 @@ fn try_main() -> Result<()> {
     };
 
     let changelog = parser.parse(&text)?;
+
+    if args.json {
+        let mut stdout = io::stdout();
+        serde_json::to_writer(stdout.lock(), &changelog)?;
+        stdout.flush()?;
+        return Ok(());
+    }
+
     let release = if let Some(version) = args.version.as_deref() {
         if let Some(release) = changelog.get(version) {
             release

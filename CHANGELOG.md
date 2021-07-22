@@ -12,6 +12,14 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 - Performance improvements.
 
+### CLI
+
+- Add `--json` flag to return JSON representation of changelog.
+
+### Library
+
+- Add `serde` optional feature.
+
 ## [0.4.1] - 2021-07-22
 
 - Documentation improvements.

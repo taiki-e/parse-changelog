@@ -55,9 +55,9 @@ impl Command {
 }
 
 pub struct AssertOutput {
-    stdout: String,
-    stderr: String,
-    status: ExitStatus,
+    pub stdout: String,
+    pub stderr: String,
+    pub status: ExitStatus,
 }
 
 fn line_separated(lines: &str, f: impl FnMut(&str)) {

@@ -3,6 +3,7 @@
 mod auxiliary;
 
 use auxiliary::{parse_changelog, CommandExt};
+use indexmap::IndexMap;
 
 #[test]
 fn failures() {
@@ -39,4 +40,22 @@ fn success() {
     ])
     .assert_success()
     .stdout_eq(include_str!("fixtures/cargo-1.50.md"));
+}
+
+type ChangelogOwned = IndexMap<String, ReleaseOwned>;
+
+#[derive(Debug, PartialEq, Eq, serde_crate::Deserialize)]
+#[serde(crate = "serde_crate")]
+
+struct ReleaseOwned {
+    version: String,
+    title: String,
+    notes: String,
+}
+
+#[test]
+fn json() {
+    let text = parse_changelog(["tests/fixtures/rust.md", "--json"]).assert_success().stdout;
+    let changelog: ChangelogOwned = serde_json::from_str(&*text).unwrap();
+    assert_eq!(changelog.len(), 72);
 }
