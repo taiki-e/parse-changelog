@@ -8,17 +8,34 @@
 
 A simple changelog parser, written in Rust.
 
+- [Installation](#installation)
+- [Usage (CLI)](#usage-cli)
+- [Usage (Library)](#usage-library)
+- [Supported format](#supported-format)
+- [License](#license)
+
 ## Installation
 
 ### CLI
 
-To use this crate as a command line tool, run the following command:
+#### From source
 
 ```sh
 cargo install parse-changelog
 ```
 
-Alternatively, download compiled binaries from [GitHub Releases](https://github.com/taiki-e/parse-changelog/releases).
+#### From prebuilt binaries
+
+You can download prebuilt binaries from the [Release page](https://github.com/taiki-e/parse-changelog/releases).
+Prebuilt binaries are available for macOS, Linux (gnu and musl), and Windows.
+
+#### Via Homebrew
+
+You can install parse-changelog using [Homebrew tap on macOS and Linux](https://github.com/taiki-e/homebrew-tap/blob/main/Formula/parse-changelog.rb):
+
+```sh
+brew install taiki-e/tap/parse-changelog
+```
 
 ### Library
 
@@ -132,7 +149,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## Examples (Library)
+## Usage (Library)
 
 ```rust
 let changelog = "\
@@ -172,7 +189,7 @@ assert_eq!(
 See [documentation](https://docs.rs/parse-changelog) for more information on
 `parse-changelog` as a library.
 
-## Format
+## Supported format
 
 By default, this crate is intended to support markdown-based changelogs
 that have the title of each release starts with the version format based on

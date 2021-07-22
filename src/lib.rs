@@ -62,14 +62,14 @@
 //! assert_eq!(changelog_b["0.1.0"].notes, "Initial release");
 //! ```
 //!
-//! # Format
+//! # Supported format
 //!
 //! By default, this crate is intended to support markdown-based changelogs
 //! that have the title of each release starts with the version format based on
 //! [Semantic Versioning][semver]. (e.g., [Keep a Changelog][keepachangelog]'s
 //! changelog format.)
 //!
-//! ### Headings
+//! ## Headings
 //!
 //! The heading for each release must be Atx-style (1-6 `#`) or
 //! Setext-style (`=` or `-` in a line under text), and the heading levels
@@ -97,7 +97,7 @@
 //! -----
 //! ```
 //!
-//! ### Titles
+//! ## Titles
 //!
 //! The title of each release must start with a text or a link text (text with
 //! `[` and `]`) that starts with a valid version format. For example:
@@ -130,7 +130,7 @@
 //!        ^^^^^^^^^^^^^
 //! ```
 //!
-//! ### Versions
+//! ## Versions
 //!
 //! ```text
 //! ## v0.1.0 -- 2020-01-01
