@@ -639,9 +639,6 @@ fn heading<'a>(
     line_end: usize,
     lines: &mut Peekable<impl Iterator<Item = usize>>,
 ) -> Option<Heading<'a>> {
-    static ALL_EQUAL_SIGNS: Lazy<Regex> = Lazy::new(|| Regex::new("^=+$").unwrap());
-    static ALL_DASHES: Lazy<Regex> = Lazy::new(|| Regex::new("^-+$").unwrap());
-
     let line = trim(line);
     if line.starts_with('#') {
         let mut level = 0;
@@ -655,9 +652,11 @@ fn heading<'a>(
         }
     } else if let Some(&next) = lines.peek() {
         let next = trim(&text[line_end + 1..next]);
-        if ALL_EQUAL_SIGNS.is_match(next) {
+        if next.is_empty() {
+            None
+        } else if next.as_bytes().iter().all(|&b| b == b'=') {
             Some(Heading { text: line, level: 1, style: HeadingStyle::Setext })
-        } else if ALL_DASHES.is_match(next) {
+        } else if next.as_bytes().iter().all(|&b| b == b'-') {
             Some(Heading { text: line, level: 2, style: HeadingStyle::Setext })
         } else {
             None

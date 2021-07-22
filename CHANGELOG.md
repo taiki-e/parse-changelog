@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Performance improvements.
+
 ## [0.4.1] - 2021-07-22
 
 - Documentation improvements.
