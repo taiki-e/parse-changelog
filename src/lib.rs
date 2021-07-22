@@ -295,11 +295,6 @@ pub struct Parser {
     prefix: Option<Regex>,
 }
 
-static DEFAULT_PREFIX_FORMAT: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"^(v|Version |Release )?").unwrap());
-static DEFAULT_VERSION_FORMAT: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?$").unwrap());
-
 impl Parser {
     /// Creates a new changelog parser.
     pub fn new() -> Self {
@@ -455,7 +450,6 @@ pub struct ParseIter<'a, 'b> {
     find_close: memmem::Finder<'static>,
 }
 
-const LN: u8 = b'\n';
 const OPEN: &[u8] = b"<!--";
 const CLOSE: &[u8] = b"-->";
 
@@ -465,12 +459,17 @@ impl<'a, 'b> ParseIter<'a, 'b> {
         version_format: Option<&'b Regex>,
         prefix_format: Option<&'b Regex>,
     ) -> Self {
+        static DEFAULT_PREFIX_FORMAT: Lazy<Regex> =
+            Lazy::new(|| Regex::new(r"^(v|Version |Release )?").unwrap());
+        static DEFAULT_VERSION_FORMAT: Lazy<Regex> =
+            Lazy::new(|| Regex::new(r"^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?$").unwrap());
+
         Self {
             text,
             version_format: version_format.unwrap_or(&DEFAULT_VERSION_FORMAT),
             prefix_format: prefix_format.unwrap_or(&DEFAULT_PREFIX_FORMAT),
             line_start: 0,
-            lines: memchr::memchr_iter(LN, text.as_bytes()).peekable(),
+            lines: memchr::memchr_iter(b'\n', text.as_bytes()).peekable(),
             cur_release: Release::new(),
             cur_release_start: 0,
             on_release: false,
