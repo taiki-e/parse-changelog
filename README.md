@@ -11,7 +11,8 @@ A simple changelog parser, written in Rust.
 - [Installation](#installation)
 - [Usage (CLI)](#usage-cli)
 - [Usage (Library)](#usage-library)
-- [Supported format](#supported-format)
+- [Supported Format](#supported-format)
+- [Related Projects](#related-projects)
 - [License](#license)
 
 ## Installation
@@ -189,7 +190,7 @@ assert_eq!(
 See [documentation](https://docs.rs/parse-changelog) for more information on
 `parse-changelog` as a library.
 
-## Supported format
+## Supported Format
 
 By default, this crate is intended to support markdown-based changelogs
 that have the title of each release starts with the version format based on
@@ -283,6 +284,12 @@ To customize the version format, use the [`Parser::version_format`] method
 [`Parser::version_format`]: https://docs.rs/parse-changelog/0.1/parse_changelog/struct.Parser.html#method.version_format
 [keepachangelog]: https://keepachangelog.com/en/1.0.0
 [semver]: https://semver.org/spec/v2.0.0.html
+
+## Related Projects
+
+- [create-gh-release-action]: GitHub Action for creating GitHub Releases based on changelog. (Using this crate for changelog parsing.)
+
+[create-gh-release-action]: https://github.com/taiki-e/create-gh-release-action
 
 ## License
 

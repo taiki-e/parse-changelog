@@ -62,7 +62,7 @@
 //! assert_eq!(changelog_b["0.1.0"].notes, "Initial release");
 //! ```
 //!
-//! # Supported format
+//! # Supported Format
 //!
 //! By default, this crate is intended to support markdown-based changelogs
 //! that have the title of each release starts with the version format based on
