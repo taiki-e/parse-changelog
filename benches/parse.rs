@@ -2,28 +2,30 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use parse_changelog::{parse, parse_iter};
 
 fn parse_changelog_atx(c: &mut Criterion) {
-    let text = black_box(include_str!("../tests/fixtures/rust-atx.md"));
-    c.bench_function("parse_atx", |b| {
-        b.iter(|| black_box(parse(text).unwrap()));
+    let mut g = c.benchmark_group("atx");
+    let text = include_str!("../tests/fixtures/rust-atx.md");
+    g.bench_function("parse", |b| {
+        b.iter(|| parse(black_box(text)).unwrap());
     });
-    c.bench_function("parse_iter_atx", |b| {
-        b.iter(|| parse_iter(text).for_each(|r| drop(black_box(r))));
+    g.bench_function("parse_iter", |b| {
+        b.iter(|| parse_iter(black_box(text)).for_each(|r| drop(black_box(r))));
     });
-    c.bench_function("parse_iter_first_atx", |b| {
-        b.iter(|| parse_iter(text).next().unwrap());
+    g.bench_function("parse_iter_first", |b| {
+        b.iter(|| parse_iter(black_box(text)).next().unwrap());
     });
 }
 
 fn parse_changelog_setext(c: &mut Criterion) {
-    let text = black_box(include_str!("../tests/fixtures/rust.md"));
-    c.bench_function("parse_setext", |b| {
-        b.iter(|| black_box(parse(text).unwrap()));
+    let mut g = c.benchmark_group("setext");
+    let text = include_str!("../tests/fixtures/rust.md");
+    g.bench_function("parse", |b| {
+        b.iter(|| parse(black_box(text)).unwrap());
     });
-    c.bench_function("parse_iter_setext", |b| {
-        b.iter(|| parse_iter(text).for_each(|r| drop(black_box(r))));
+    g.bench_function("parse_iter", |b| {
+        b.iter(|| parse_iter(black_box(text)).for_each(|r| drop(black_box(r))));
     });
-    c.bench_function("parse_iter_first_setext", |b| {
-        b.iter(|| parse_iter(text).next().unwrap());
+    g.bench_function("parse_iter_first", |b| {
+        b.iter(|| parse_iter(black_box(text)).next().unwrap());
     });
 }
 
