@@ -10,6 +10,10 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.4.1] - 2021-07-22
+
+- Documentation improvements.
+
 ## [0.4.0] - 2021-07-22
 
 - [Fix bug in parsing of atx style heading.](https://github.com/taiki-e/parse-changelog/pull/9)
@@ -68,7 +72,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/taiki-e/parse-changelog/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/taiki-e/parse-changelog/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/taiki-e/parse-changelog/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/taiki-e/parse-changelog/compare/v0.2.1...v0.2.2
