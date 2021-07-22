@@ -95,9 +95,17 @@ unreleased
 fn failure() {
     let changelogs = [
         // Atx-style & 4 indents
-        "    ## 0.1.0\n    0.1.0.\n",
+        "    ## 0.1.0\n",
         // Setext-style & 4 indents
-        "    0.1.0\n    ==\n    0.1.0.\n",
+        "    0.1.0\n    ==\n",
+        // Setext-style & 4 indents
+        "    0.1.0\n==\n",
+        // Setext-style & 4 indents
+        "    0.1.0\n--\n",
+        // Setext-style & non-'=' char
+        "0.1.0\n==?\n",
+        // Setext-style & non-'-' char
+        "0.1.0\n--?\n",
     ];
     for changelog in &changelogs {
         assert!(parse(changelog).unwrap_err().is_parse());
