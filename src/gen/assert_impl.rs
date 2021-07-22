@@ -20,4 +20,7 @@ const _: fn() = || {
     assert_send::<Parser>();
     assert_sync::<Parser>();
     assert_unpin::<Parser>();
+    assert_send::<ParseIter<'_, '_>>();
+    assert_sync::<ParseIter<'_, '_>>();
+    assert_unpin::<ParseIter<'_, '_>>();
 };

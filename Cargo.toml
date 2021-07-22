@@ -43,9 +43,3 @@ structopt = { version = "0.3", optional = true }
 [dev-dependencies]
 easy-ext = "0.2"
 tempfile = "3"
-
-[profile.release]
-debug = true
-
-[profile.bench]
-debug = true

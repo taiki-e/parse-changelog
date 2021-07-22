@@ -1,5 +1,7 @@
 use std::fmt;
 
+pub(crate) type Result<T, E = Error> = std::result::Result<T, E>;
+
 /// An error that occurred during parsing changelog or configuring the parser.
 #[derive(Debug)]
 pub struct Error(ErrorKind);

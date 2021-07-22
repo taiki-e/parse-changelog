@@ -5,7 +5,7 @@ mod auxiliary;
 use std::error::Error as _;
 
 use auxiliary::{assert_diff, trim};
-use parse_changelog::{parse, Parser};
+use parse_changelog::{parse, parse_iter, Parser};
 
 #[test]
 fn success() {
@@ -217,13 +217,21 @@ fn comment() {
 
 #[test]
 fn rust() {
-    let changelog = parse(include_str!("fixtures/rust.md")).unwrap();
-    assert_eq!(changelog.len(), 72);
-    assert_diff("tests/fixtures/rust-1.46.0.md", &changelog["1.46.0"].notes);
+    let text = include_str!("fixtures/rust.md");
+    let map = parse(text).unwrap();
+    assert_eq!(map.len(), 72);
+    assert_diff("tests/fixtures/rust-1.46.0.md", map["1.46.0"].notes);
+    let vec: Vec<_> = parse_iter(text).collect();
+    assert_eq!(vec.len(), 72);
+    assert_eq!(vec[2].notes, map["1.46.0"].notes);
 
-    let changelog = parse(include_str!("fixtures/rust-atx.md")).unwrap();
-    assert_eq!(changelog.len(), 72);
-    assert_diff("tests/fixtures/rust-1.46.0-atx.md", &changelog["1.46.0"].notes);
+    let text = include_str!("fixtures/rust-atx.md");
+    let map = parse(text).unwrap();
+    assert_eq!(map.len(), 72);
+    assert_diff("tests/fixtures/rust-1.46.0-atx.md", map["1.46.0"].notes);
+    let vec: Vec<_> = parse_iter(text).collect();
+    assert_eq!(vec.len(), 72);
+    assert_eq!(vec[2].notes, map["1.46.0"].notes);
 }
 
 #[test]
