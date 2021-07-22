@@ -78,11 +78,11 @@
 //! Atx-style headings:
 //!
 //! ```markdown
-//! # 0.1.0
+//! ## 0.1.0
 //! ```
 //!
 //! ```markdown
-//! ## 0.1.0
+//! ### 0.1.0
 //! ```
 //!
 //! Setext-style headings:
@@ -103,11 +103,11 @@
 //! `[` and `]`) that starts with a valid version format. For example:
 //!
 //! ```markdown
-//! # [0.2.0]
+//! ## [0.2.0]
 //!
 //! description...
 //!
-//! # 0.1.0
+//! ## 0.1.0
 //!
 //! description...
 //! ```
@@ -115,7 +115,7 @@
 //! You can also include characters before the version as prefix.
 //!
 //! ```text
-//! ## Version 0.1.0
+//! ### Version 0.1.0
 //!    ^^^^^^^^
 //! ```
 //!
@@ -126,14 +126,14 @@
 //! parse it).
 //!
 //! ```text
-//! # 0.1.0 - 2020-01-01
+//! ## 0.1.0 - 2020-01-01
 //!        ^^^^^^^^^^^^^
 //! ```
 //!
 //! ## Versions
 //!
 //! ```text
-//! ## v0.1.0 -- 2020-01-01
+//! ### v0.1.0 -- 2020-01-01
 //!     ^^^^^
 //! ```
 //!
@@ -246,7 +246,7 @@ pub struct Release<'a> {
     /// The version of this release.
     ///
     /// ```text
-    /// ## Version 0.1.0 -- 2020-01-01
+    /// ### Version 0.1.0 -- 2020-01-01
     ///            ^^^^^
     /// ```
     ///
@@ -255,7 +255,7 @@ pub struct Release<'a> {
     /// The title of this release.
     ///
     /// ```text
-    /// ## Version 0.1.0 -- 2020-01-01
+    /// ### Version 0.1.0 -- 2020-01-01
     ///    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
     /// ```
     ///
@@ -302,7 +302,7 @@ impl Parser {
     /// Sets the version format.
     ///
     /// ```text
-    /// ## v0.1.0 -- 2020-01-01
+    /// ### v0.1.0 -- 2020-01-01
     ///     ^^^^^
     /// ```
     ///
@@ -348,11 +348,11 @@ impl Parser {
     /// characters). For example:
     ///
     /// ```text
-    /// ## Version 0.1.0 -- 2020-01-01
+    /// ### Version 0.1.0 -- 2020-01-01
     ///    ^^^^^^^^
     /// ```
     /// ```text
-    /// ## v0.1.0 -- 2020-01-01
+    /// ### v0.1.0 -- 2020-01-01
     ///    ^
     /// ```
     ///
