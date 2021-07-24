@@ -1,4 +1,13 @@
-<!-- https://github.com/rust-lang/rust/blob/HEAD/RELEASES.md -->
+<!--
+This file is based on rust-lang/rust's changelog.
+
+Source:
+- https://github.com/rust-lang/rust/blob/1.48.0/RELEASES.md
+
+Copyright & License:
+- https://github.com/rust-lang/rust/blob/1.48.0/LICENSE-APACHE
+- https://github.com/rust-lang/rust/blob/1.48.0/LICENSE-MIT
+-->
 
 # Version 1.48.0 (2020-11-19)
 

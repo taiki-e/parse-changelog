@@ -1,4 +1,13 @@
-<!-- https://github.com/taiki-e/pin-project/blob/HEAD/CHANGELOG.md -->
+<!--
+This file is based on taiki-e/pin-project's changelog.
+
+Source:
+- https://github.com/taiki-e/pin-project/blob/v1.0.2/CHANGELOG.md
+
+Copyright & License:
+- https://github.com/taiki-e/pin-project/blob/v1.0.2/LICENSE-APACHE
+- https://github.com/taiki-e/pin-project/blob/v1.0.2/LICENSE-MIT
+-->
 
 # Changelog
 

@@ -1,4 +1,13 @@
-<!-- https://github.com/rust-lang/cargo/blob/HEAD/CHANGELOG.md -->
+<!--
+This file is based on rust-lang/cargo's changelog.
+
+Source:
+- https://github.com/rust-lang/cargo/blob/0.51.0/CHANGELOG.md
+
+Copyright & License:
+- https://github.com/rust-lang/cargo/blob/0.51.0/LICENSE-APACHE
+- https://github.com/rust-lang/cargo/blob/0.51.0/LICENSE-MIT
+-->
 
 # Changelog
 
