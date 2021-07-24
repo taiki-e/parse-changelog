@@ -187,7 +187,7 @@ mod assert_impl;
 
 mod error;
 
-use std::{iter::Peekable, mem};
+use std::mem;
 
 use indexmap::IndexMap;
 use memchr::memmem;
@@ -273,12 +273,6 @@ pub struct Release<'a> {
     ///
     /// Note that leading and trailing newlines have been removed.
     pub notes: &'a str,
-}
-
-impl Release<'_> {
-    fn new() -> Self {
-        Self { version: "", title: "", notes: "" }
-    }
 }
 
 /// A changelog parser.
@@ -434,18 +428,9 @@ pub struct ParseIter<'a, 'b> {
     text: &'a str,
     version_format: &'b Regex,
     prefix_format: &'b Regex,
-    line_start: usize,
-    lines: Peekable<memchr::Memchr<'a>>,
-    cur_release: Release<'a>,
-    cur_release_start: usize,
-    /// If `true`, we are in a release section.
-    on_release: bool,
-    /// If `true`, we are in a code block ("```").
-    on_code_block: bool,
-    /// If `true`, we are in a comment (`<!--` and `-->`).
-    on_comment: bool,
+    lines: Lines<'a>,
     /// The heading level of release sections.
-    level: Option<usize>,
+    level: Option<u8>,
     find_open: memmem::Finder<'static>,
     find_close: memmem::Finder<'static>,
 }
@@ -468,16 +453,50 @@ impl<'a, 'b> ParseIter<'a, 'b> {
             text,
             version_format: version_format.unwrap_or(&DEFAULT_VERSION_FORMAT),
             prefix_format: prefix_format.unwrap_or(&DEFAULT_PREFIX_FORMAT),
-            line_start: 0,
-            lines: memchr::memchr_iter(b'\n', text.as_bytes()).peekable(),
-            cur_release: Release::new(),
-            cur_release_start: 0,
-            on_release: false,
-            on_code_block: false,
-            on_comment: false,
+            lines: Lines::new(text),
             level: None,
             find_open: memmem::Finder::new(OPEN),
             find_close: memmem::Finder::new(CLOSE),
+        }
+    }
+
+    fn end_release(
+        &self,
+        mut cur_release: Release<'a>,
+        release_note_start: usize,
+        line_start: usize,
+    ) -> Release<'a> {
+        assert!(!cur_release.version.is_empty());
+        if release_note_start < line_start {
+            // Remove trailing newlines.
+            cur_release.notes = self.text[release_note_start..line_start - 1].trim_end();
+        }
+        cur_release
+    }
+
+    fn handle_comment(&self, on_comment: &mut bool, line: &'a str) {
+        let mut ll = Some(line);
+        while let Some(l) = ll {
+            match (self.find_open.find(l.as_bytes()), self.find_close.find(l.as_bytes())) {
+                (None, None) => {}
+                // <!-- ...
+                (Some(_), None) => *on_comment = true,
+                // ... -->
+                (None, Some(_)) => *on_comment = false,
+                (Some(open), Some(close)) => {
+                    if open < close {
+                        // <!-- ... -->
+                        *on_comment = false;
+                        ll = l.get(close + CLOSE.len()..);
+                    } else {
+                        // --> ... <!--
+                        *on_comment = true;
+                        ll = l.get(open + OPEN.len()..);
+                    }
+                    continue;
+                }
+            }
+            break;
         }
     }
 }
@@ -486,63 +505,63 @@ impl<'a> Iterator for ParseIter<'a, '_> {
     type Item = Release<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut next_value = None;
-        loop {
-            let (line, line_end) = match self.lines.next() {
-                Some(line_end) => (&self.text[self.line_start..line_end], line_end),
-                None => {
-                    if let Some(l) = self.text.get(self.line_start..) {
-                        (l, self.text.len())
-                    } else {
-                        break;
-                    }
-                }
-            };
-            let heading = heading(self.text, line, line_end, &mut self.lines);
-            if heading.is_none() || self.on_code_block || self.on_comment {
+        // If `true`, we are in a code block ("```").
+        let mut on_code_block = false;
+        // If `true`, we are in a comment (`<!--` and `-->`).
+        let mut on_comment = false;
+        let mut release_note_start = None;
+        let mut cur_release = Release { version: "", title: "", notes: "" };
+
+        while let Some((line, line_start, line_end)) = self.lines.peek() {
+            let heading =
+                if on_code_block || on_comment { None } else { heading(line, &mut self.lines) };
+            if heading.is_none() {
+                self.lines.next();
                 if trim(line).starts_with("```") {
-                    self.on_code_block = !self.on_code_block;
+                    on_code_block = !on_code_block;
                 }
 
-                if !self.on_code_block {
-                    let mut ll = Some(line);
-                    while let Some(l) = ll {
-                        match (
-                            self.find_open.find(l.as_bytes()),
-                            self.find_close.find(l.as_bytes()),
-                        ) {
-                            (None, None) => {}
-                            // <!-- ...
-                            (Some(_), None) => self.on_comment = true,
-                            // ... -->
-                            (None, Some(_)) => self.on_comment = false,
-                            (Some(open), Some(close)) => {
-                                if open < close {
-                                    // <!-- ... -->
-                                    self.on_comment = false;
-                                    ll = l.get(close + CLOSE.len()..);
-                                } else {
-                                    // --> ... <!--
-                                    self.on_comment = true;
-                                    ll = l.get(open + OPEN.len()..);
-                                }
-                                continue;
-                            }
-                        }
-                        break;
-                    }
+                if !on_code_block {
+                    self.handle_comment(&mut on_comment, line);
                 }
 
                 // Non-heading lines are always considered part of the current
                 // section.
+
                 if line_end == self.text.len() {
                     break;
                 }
-                self.line_start = line_end + 1;
                 continue;
             }
             let heading = heading.unwrap();
+            if let Some(release_level) = self.level {
+                if heading.level > release_level {
+                    // Consider sections that have lower heading levels than
+                    // release sections are part of the current section.
+                    self.lines.next();
+                    if line_end == self.text.len() {
+                        break;
+                    }
+                    continue;
+                }
+                if heading.level < release_level {
+                    // Ignore sections that have higher heading levels than
+                    // release sections.
+                    self.lines.next();
+                    if let Some(release_note_start) = release_note_start {
+                        return Some(self.end_release(cur_release, release_note_start, line_start));
+                    }
+                    if line_end == self.text.len() {
+                        break;
+                    }
+                    continue;
+                }
+                if let Some(release_note_start) = release_note_start {
+                    return Some(self.end_release(cur_release, release_note_start, line_start));
+                }
+            }
 
+            debug_assert!(release_note_start.is_none());
             let mut unlinked = unlink(heading.text);
             if let Some(m) = self.prefix_format.find(unlinked) {
                 unlinked = &unlinked[m.end()..];
@@ -551,77 +570,109 @@ impl<'a> Iterator for ParseIter<'a, '_> {
             let version = match self.version_format.find(unlinked) {
                 Some(m) => &unlinked[m.start()..m.end()],
                 None => {
-                    if self.level.map_or(true, |l| heading.level <= l) {
-                        // Ignore non-release sections that have the same or higher
-                        // heading levels as release sections.
-                        self.on_release = false;
-                    } else {
-                        // Otherwise, it is considered part of the current section.
-                    }
+                    // Ignore non-release sections that have the same heading
+                    // levels as release sections.
+                    self.lines.next();
                     if line_end == self.text.len() {
                         break;
                     }
-                    self.line_start = line_end + 1;
                     continue;
                 }
             };
 
-            if mem::replace(&mut self.on_release, true) {
-                if self.cur_release_start < self.line_start {
-                    // Remove trailing newlines.
-                    self.cur_release.notes =
-                        self.text[self.cur_release_start..self.line_start - 1].trim_end();
-                }
-                // end of prev release
-                debug_assert!(!self.cur_release.version.is_empty());
-                debug_assert!(next_value.is_none());
-                next_value = Some(mem::replace(&mut self.cur_release, Release::new()));
-            }
-
-            self.cur_release.version = version;
-            self.cur_release.title = heading.text;
+            cur_release.version = version;
+            cur_release.title = heading.text;
             self.level.get_or_insert(heading.level);
 
-            self.line_start = line_end + 1;
+            self.lines.next();
             if heading.style == HeadingStyle::Setext {
-                // Remove an underline after a Setext-style heading.
-                if let Some(next) = self.lines.next() {
-                    self.line_start = next + 1;
-                }
+                // Skip an underline after a Setext-style heading.
+                self.lines.next();
             }
-            while let Some(&next) = self.lines.peek() {
-                if self.text[self.line_start..next].trim().is_empty() {
-                    // Remove newlines after a heading.
-                    self.line_start = next + 1;
+            while let Some((next, ..)) = self.lines.peek() {
+                if next.trim().is_empty() {
+                    // Skip newlines after a heading.
                     self.lines.next();
                 } else {
                     break;
                 }
             }
-            self.cur_release_start = self.line_start;
-            if next_value.is_some() {
-                return next_value.take();
-            }
-            if line_end == self.text.len() {
+            if let Some((_, line_start, _)) = self.lines.peek() {
+                release_note_start = Some(line_start);
+            } else {
                 break;
             }
         }
 
-        if !self.cur_release.version.is_empty() {
-            if self.cur_release_start < self.line_start {
-                // Remove trailing newlines.
-                self.cur_release.notes = self.text[self.cur_release_start..].trim_end();
+        if !cur_release.version.is_empty() {
+            if let Some(release_note_start) = release_note_start {
+                if let Some(nodes) = self.text.get(release_note_start..) {
+                    // Remove trailing newlines.
+                    cur_release.notes = nodes.trim_end();
+                }
             }
-            return Some(mem::replace(&mut self.cur_release, Release::new()));
+            return Some(cur_release);
         }
 
         None
     }
 }
 
+struct Lines<'a> {
+    text: &'a str,
+    iter: memchr::Memchr<'a>,
+    line_start: usize,
+    peeked: Option<(&'a str, usize, usize)>,
+    peeked2: Option<(&'a str, usize, usize)>,
+}
+
+impl<'a> Lines<'a> {
+    fn new(text: &'a str) -> Self {
+        Self {
+            text,
+            iter: memchr::memchr_iter(b'\n', text.as_bytes()),
+            line_start: 0,
+            peeked: None,
+            peeked2: None,
+        }
+    }
+
+    fn peek(&mut self) -> Option<(&'a str, usize, usize)> {
+        self.peeked = self.next();
+        self.peeked
+    }
+
+    fn peek2(&mut self) -> Option<(&'a str, usize, usize)> {
+        let peeked = self.next();
+        let peeked2 = self.next();
+        self.peeked = peeked;
+        self.peeked2 = peeked2;
+        self.peeked2
+    }
+}
+
+impl<'a> Iterator for Lines<'a> {
+    type Item = (&'a str, usize, usize);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(triple) = self.peeked.take() {
+            return Some(triple);
+        }
+        if let Some(triple) = self.peeked2.take() {
+            return Some(triple);
+        }
+        let (line, line_end) = match self.iter.next() {
+            Some(line_end) => (&self.text[self.line_start..line_end], line_end),
+            None => (self.text.get(self.line_start..)?, self.text.len()),
+        };
+        let line_start = mem::replace(&mut self.line_start, line_end + 1);
+        Some((line, line_start, line_end))
+    }
+}
+
 struct Heading<'a> {
     text: &'a str,
-    level: usize,
+    level: u8,
     style: HeadingStyle,
 }
 
@@ -635,25 +686,24 @@ enum HeadingStyle {
     Setext,
 }
 
-fn heading<'a>(
-    text: &'a str,
-    line: &'a str,
-    line_end: usize,
-    lines: &mut Peekable<impl Iterator<Item = usize>>,
-) -> Option<Heading<'a>> {
+fn heading<'a>(line: &'a str, lines: &mut Lines<'a>) -> Option<Heading<'a>> {
     let line = trim(line);
     if line.starts_with('#') {
-        let mut level = 0;
+        let mut level = 0usize;
         while line.as_bytes().get(level) == Some(&b'#') {
             level += 1;
         }
         if level <= 6 && line.as_bytes().get(level) == Some(&b' ') {
-            Some(Heading { text: line[level..].trim(), level, style: HeadingStyle::Atx })
+            Some(Heading {
+                text: line[level..].trim(),
+                level: level as _,
+                style: HeadingStyle::Atx,
+            })
         } else {
             None
         }
-    } else if let Some(&next) = lines.peek() {
-        let next = trim(&text[line_end + 1..next]);
+    } else if let Some((next, ..)) = lines.peek2() {
+        let next = trim(next);
         if next.is_empty() {
             None
         } else if next.as_bytes().iter().all(|&b| b == b'=') {
