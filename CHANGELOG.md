@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Fix bug in parsing of heading.
+
 ## [0.4.2] - 2021-07-22
 
 - [Performance improvements.](https://github.com/taiki-e/parse-changelog/pull/11)

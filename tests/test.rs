@@ -266,3 +266,16 @@ fn cargo() {
     assert_eq!(changelog.len(), 21);
     assert_diff("tests/fixtures/cargo-1.50.md", changelog["1.50"].notes);
 }
+
+// Regression tests for bugs caught by fuzzing.
+#[test]
+fn fuzz() {
+    let tests =
+        &[("1115.8.8 '9.\n-\n\u{c}\"----\u{19}\u{1f}<!--.4\n## 444.444.4\r\r \u{b}---->", Some(1))];
+    for &(test, expected_len) in tests {
+        let res = parse(test);
+        if let Some(expected_len) = expected_len {
+            assert_eq!(res.unwrap().len(), expected_len);
+        }
+    }
+}
