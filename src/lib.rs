@@ -429,7 +429,7 @@ pub struct ParseIter<'a, 'b> {
     version_format: &'b Regex,
     prefix_format: &'b Regex,
     lines: Lines<'a>,
-    /// The heading level of release sections.
+    /// The heading level of release sections. 1-6
     level: Option<u8>,
     find_open: memmem::Finder<'static>,
     find_close: memmem::Finder<'static>,
@@ -475,8 +475,8 @@ impl<'a, 'b> ParseIter<'a, 'b> {
     }
 
     fn handle_comment(&self, on_comment: &mut bool, line: &'a str) {
-        let mut ll = Some(line);
-        while let Some(l) = ll {
+        let mut line = Some(line);
+        while let Some(l) = line {
             match (self.find_open.find(l.as_bytes()), self.find_close.find(l.as_bytes())) {
                 (None, None) => {}
                 // <!-- ...
@@ -487,11 +487,11 @@ impl<'a, 'b> ParseIter<'a, 'b> {
                     if open < close {
                         // <!-- ... -->
                         *on_comment = false;
-                        ll = l.get(close + CLOSE.len()..);
+                        line = l.get(close + CLOSE.len()..);
                     } else {
                         // --> ... <!--
                         *on_comment = true;
-                        ll = l.get(open + OPEN.len()..);
+                        line = l.get(open + OPEN.len()..);
                     }
                     continue;
                 }

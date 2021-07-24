@@ -1,7 +1,5 @@
 #![no_main]
 
-use std::str;
-
 use libfuzzer_sys::fuzz_target;
 use parse_changelog::parse;
 
