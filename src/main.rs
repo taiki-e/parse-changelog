@@ -12,6 +12,8 @@ use parse_changelog::Parser;
 use structopt::{clap::AppSettings, StructOpt};
 
 /// Parses changelog and returns a release note for the specified version.
+///
+/// Use -h for short descriptions and --help for more details.
 #[derive(StructOpt)]
 #[structopt(
     rename_all = "kebab-case",
@@ -38,6 +40,9 @@ struct Args {
     #[structopt(long, value_name = "PATTERN")]
     prefix: Option<String>,
     /// Specify prefix format.
+    ///
+    /// By default only "v", "Version ", "Release ", and "" (no prefix) are
+    /// allowed as prefixes.
     #[structopt(long, value_name = "PATTERN", conflicts_with = "prefix")]
     prefix_format: Option<String>,
 }
@@ -56,7 +61,7 @@ fn try_main() -> Result<()> {
     if let Some(version_format) = &args.version_format {
         parser.version_format(version_format)?;
     }
-    if let Some(prefix_format) = args.prefix_format.as_ref().map_or(args.prefix.as_ref(), Some) {
+    if let Some(prefix_format) = args.prefix_format.as_ref().or_else(|| args.prefix.as_ref()) {
         parser.prefix_format(prefix_format)?;
     }
 

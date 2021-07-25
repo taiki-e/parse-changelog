@@ -1,5 +1,7 @@
 parse-changelog
-Parses changelog and returns a release note for the specified version
+Parses changelog and returns a release note for the specified version.
+
+Use -h for short descriptions and --help for more details.
 
 USAGE:
     parse-changelog [OPTIONS] <PATH> [VERSION]
@@ -18,8 +20,9 @@ OPTIONS:
             Alias for --prefix-format
 
         --prefix-format <PATTERN>
-            Specify prefix format
+            Specify prefix format.
 
+            By default only "v", "Version ", "Release ", and "" (no prefix) are allowed as prefixes.
     -h, --help
             Prints help information
 

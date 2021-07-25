@@ -65,7 +65,9 @@ specified version.
 ```console
 $ parse-changelog --help
 parse-changelog
-Parses changelog and returns a release note for the specified version
+Parses changelog and returns a release note for the specified version.
+
+Use -h for short descriptions and --help for more details.
 
 USAGE:
     parse-changelog [OPTIONS] <PATH> [VERSION]
@@ -84,8 +86,9 @@ OPTIONS:
             Alias for --prefix-format
 
         --prefix-format <PATTERN>
-            Specify prefix format
+            Specify prefix format.
 
+            By default only "v", "Version ", "Release ", and "" (no prefix) are allowed as prefixes.
     -h, --help
             Prints help information
 
@@ -148,37 +151,7 @@ notes=$(parse-changelog CHANGELOG.md "$version")
 gh release create "$tag" --title "$version" --notes "$notes"
 ```
 
-With [softprops/action-gh-release](https://github.com/softprops/action-gh-release) GitHub Action:
-
-```yaml
-name: Release
-
-on:
-  push:
-    tags:
-      - v[0-9]+.*
-
-jobs:
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Install parse-changelog
-        run: cargo install parse-changelog
-      - name: Generate Changelog
-        run: |
-          # Get version from github ref (remove 'refs/tags/' and prefix 'v')
-          version="${GITHUB_REF#refs/tags/v}"
-          # Get notes for $version from CHANGELOG.md.
-          parse-changelog CHANGELOG.md "$version" > ${{ github.workflow }}-CHANGELOG.txt
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          body_path: ${{ github.workflow }}-CHANGELOG.txt
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```
+See also [create-gh-release-action].
 
 ## Usage (Library)
 
@@ -258,7 +231,8 @@ Setext-style headings:
 ### Titles
 
 The title of each release must start with a text or a link text (text with
-`[` and `]`) that starts with a valid version format. For example:
+`[` and `]`) that starts with a valid [version format](#versions) or
+[prefix format](#prefixes). For example:
 
 ```markdown
 # [0.2.0]
@@ -270,50 +244,50 @@ description...
 description...
 ```
 
-You can also include characters before the version as prefix.
+#### Prefixes
+
+You can include characters before the version as prefix.
 
 ```text
 ## Version 0.1.0
    ^^^^^^^^
 ```
 
-By default only "v", "Version " and "Release " are allowed as prefixes and
-can be customized using the [`Parser::prefix_format`] method
-(`--prefix-format` option if command line).
+By default only "v", "Version ", "Release ", and "" (no prefix) are
+allowed as prefixes.
 
-You can freely include characters after the version (this crate does not
-parse it).
+To customize the prefix format, use the [`Parser::prefix_format`] method (library) or `--prefix-format` option (CLI).
 
-```text
-# 0.1.0 - 2020-01-01
-       ^^^^^^^^^^^^^
-```
-
-### Versions
+#### Versions
 
 ```text
 ## v0.1.0 -- 2020-01-01
     ^^^^^
 ```
 
-The default version format is
-`MAJOR.MINOR.PATCH(-PRE_RELEASE)?(+BUILD_METADATA)?`, and is
-based on [Semantic Versioning][semver]. (Pre-release version and build
-metadata are optional.)
+The default version format is based on [Semantic Versioning][semver].
 
-This is parsed using the following regular expression:
+This is parsed by using the following regular expression:
 
 ```text
 ^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?$
 ```
 
-To customize the version format, use the [`Parser::version_format`] method
-(`--version-format` option if command line).
+To customize the version format, use the [`Parser::version_format`] method (library) or `--version-format` option (CLI).
 
-[`Parser::prefix_format`]: https://docs.rs/parse-changelog/0.1/parse_changelog/struct.Parser.html#method.prefix_format
-[`Parser::version_format`]: https://docs.rs/parse-changelog/0.1/parse_changelog/struct.Parser.html#method.version_format
-[keepachangelog]: https://keepachangelog.com/en/1.0.0
-[semver]: https://semver.org/spec/v2.0.0.html
+#### Suffixes
+
+You can freely include characters after the version.
+
+```text
+# 0.1.0 - 2020-01-01
+       ^^^^^^^^^^^^^
+```
+
+[`Parser::prefix_format`]: https://docs.rs/parse-changelog/0.4/parse_changelog/struct.Parser.html#method.prefix_format
+[`Parser::version_format`]: https://docs.rs/parse-changelog/0.4/parse_changelog/struct.Parser.html#method.version_format
+[keepachangelog]: https://keepachangelog.com
+[semver]: https://semver.org
 
 ## Related Projects
 

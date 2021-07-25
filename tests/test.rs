@@ -111,9 +111,9 @@ fn failure() {
         assert!(parse(changelog).unwrap_err().is_parse());
     }
 
-    assert!(Parser::new().prefix_format("").unwrap_err().is_format());
-    assert!(Parser::new().prefix_format("  ").unwrap_err().is_format());
-    assert!(Parser::new().prefix_format("\t\n").unwrap_err().is_format());
+    assert!(Parser::new().prefix_format("").is_ok());
+    assert!(Parser::new().prefix_format("  ").is_ok());
+    assert!(Parser::new().prefix_format("\t\n").is_ok());
     let e = Parser::new().prefix_format(r"\/").unwrap_err();
     assert!(e.is_format());
     assert!(e.source().is_some());
@@ -249,7 +249,13 @@ fn rust() {
 
 #[test]
 fn pin_project() {
-    let changelog = parse(include_str!("fixtures/pin-project.md")).unwrap();
+    let text = include_str!("fixtures/pin-project.md");
+    let changelog = parse(text).unwrap();
+    assert_eq!(changelog.len(), 62);
+    assert_diff("tests/fixtures/pin-project-1.0.0.md", changelog["1.0.0"].notes);
+
+    // empty prefix format
+    let changelog = Parser::new().prefix_format("").unwrap().parse(text).unwrap();
     assert_eq!(changelog.len(), 62);
     assert_diff("tests/fixtures/pin-project-1.0.0.md", changelog["1.0.0"].notes);
 }

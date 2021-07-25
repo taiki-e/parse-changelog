@@ -100,7 +100,8 @@
 //! ## Titles
 //!
 //! The title of each release must start with a text or a link text (text with
-//! `[` and `]`) that starts with a valid version format. For example:
+//! `[` and `]`) that starts with a valid [version format](#versions) or
+//! [prefix format](#prefixes). For example:
 //!
 //! ```markdown
 //! ## [0.2.0]
@@ -112,37 +113,30 @@
 //! description...
 //! ```
 //!
-//! You can also include characters before the version as prefix.
+//! ### Prefixes
+//!
+//! You can include characters before the version as prefix.
 //!
 //! ```text
 //! ### Version 0.1.0
 //!    ^^^^^^^^
 //! ```
 //!
-//! By default only "v", "Version " and "Release " are allowed as prefixes and
-//! can be customized using the [`Parser::prefix_format`] method.
+//! By default only "v", "Version ", "Release ", and "" (no prefix) are
+//! allowed as prefixes.
 //!
-//! You can freely include characters after the version (this crate does not
-//! parse it).
+//! To customize the prefix format, use the [`Parser::prefix_format`] method.
 //!
-//! ```text
-//! ## 0.1.0 - 2020-01-01
-//!        ^^^^^^^^^^^^^
-//! ```
-//!
-//! ## Versions
+//! ### Versions
 //!
 //! ```text
 //! ### v0.1.0 -- 2020-01-01
 //!     ^^^^^
 //! ```
 //!
-//! The default version format is
-//! `MAJOR.MINOR.PATCH(-PRE_RELEASE)?(+BUILD_METADATA)?`, and is
-//! based on [Semantic Versioning][semver]. (Pre-release version and build
-//! metadata are optional.)
+//! The default version format is based on [Semantic Versioning][semver].
 //!
-//! This is parsed using the following regular expression:
+//! This is parsed by using the following regular expression:
 //!
 //! ```text
 //! ^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?$
@@ -150,13 +144,22 @@
 //!
 //! To customize the version format, use the [`Parser::version_format`] method.
 //!
+//! ### Suffixes
+//!
+//! You can freely include characters after the version.
+//!
+//! ```text
+//! ## 0.1.0 - 2020-01-01
+//!        ^^^^^^^^^^^^^
+//! ```
+//!
 //! # Optional features
 //!
 //! * **`serde`** — Implements [`serde::Serialize`] trait for parse-changelog types.
 //!
 //! [`serde::Serialize`]: https://docs.rs/serde/1/serde/trait.Serialize.html
-//! [keepachangelog]: https://keepachangelog.com/en/1.0.0
-//! [semver]: https://semver.org/spec/v2.0.0.html
+//! [keepachangelog]: https://keepachangelog.com
+//! [semver]: https://semver.org
 
 #![doc(test(
     no_crate_inject,
@@ -207,13 +210,13 @@ use crate::error::Result;
 ///
 /// This type is returned by [`parse`] function or [`Parser::parse`] method.
 ///
-/// [keepachangelog]: https://keepachangelog.com/en/1.0.0
+/// [keepachangelog]: https://keepachangelog.com
 pub type Changelog<'a> = IndexMap<&'a str, Release<'a>>;
 
 /// Parses release notes from the given `text`.
 ///
 /// This function uses the default version and prefix format. If you want to use
-/// another version format, use [`Parser::version_format`].
+/// another format, consider using the [`Parser`] type instead.
 ///
 /// See crate level documentation for changelog and version format supported
 /// by default.
@@ -231,11 +234,11 @@ pub fn parse(text: &str) -> Result<Changelog<'_>> {
 
 /// An iterator over all release notes in the given `text`.
 ///
-/// Unlike [`parse`] function, this function doesn't error on duplicate release
-/// notes or empty changelog.
+/// Unlike [`parse`] function, the returned iterator doesn't error on
+/// duplicate release notes or empty changelog.
 ///
 /// This function uses the default version and prefix format. If you want to use
-/// another version format, use [`Parser::version_format`].
+/// another format, consider using the [`Parser`] type instead.
 ///
 /// See crate level documentation for changelog and version format supported
 /// by default.
@@ -302,19 +305,19 @@ impl Parser {
     ///     ^^^^^
     /// ```
     ///
-    /// The default version format is based on [Semantic Versioning][semver]
-    /// and is the following regular expression:
-    ///
-    /// ```text
-    /// ^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?
-    /// ```
-    ///
-    /// **Note**: Most projects that adopt [Semantic Versioning][semver] do not
-    /// need to change this.
-    ///
-    /// To customize the text before the version number (e.g., "v" in "# v0.1.0",
+    /// *Tip*: To customize the text before the version number (e.g., "v" in "# v0.1.0",
     /// "Version " in "# Version 0.1.0", etc.), use the [`prefix_format`] method
     /// instead of this method.
+    ///
+    /// # Default
+    ///
+    /// The default version format is based on [Semantic Versioning][semver].
+    ///
+    /// This is parsed by using the following regular expression:
+    ///
+    /// ```text
+    /// ^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?$
+    /// ```
     ///
     /// # Errors
     ///
@@ -325,15 +328,14 @@ impl Parser {
     /// - The specified format is empty or contains only
     ///   [whitespace](char::is_whitespace).
     ///
-    /// [`parse`]: Self::parse
     /// [`prefix_format`]: Self::prefix_format
     /// [regex]: https://docs.rs/regex
-    /// [semver]: https://semver.org/spec/v2.0.0.html
-    pub fn version_format(&mut self, version_format: &str) -> Result<&mut Self> {
-        if version_format.trim().is_empty() {
+    /// [semver]: https://semver.org
+    pub fn version_format(&mut self, format: &str) -> Result<&mut Self> {
+        if format.trim().is_empty() {
             return Err(Error::format("empty or whitespace version format"));
         }
-        self.version = Some(Regex::new(version_format).map_err(Error::new)?);
+        self.version = Some(Regex::new(format).map_err(Error::new)?);
         Ok(self)
     }
 
@@ -347,12 +349,18 @@ impl Parser {
     /// ### Version 0.1.0 -- 2020-01-01
     ///    ^^^^^^^^
     /// ```
+    ///
     /// ```text
     /// ### v0.1.0 -- 2020-01-01
     ///    ^
     /// ```
     ///
-    /// The default prefix format is the following regular expression:
+    /// # Default
+    ///
+    /// By default only "v", "Version ", "Release ", and "" (no prefix) are
+    /// allowed as prefixes.
+    ///
+    /// This is parsed by using the following regular expression:
     ///
     /// ```text
     /// ^(v|Version |Release )?
@@ -364,17 +372,10 @@ impl Parser {
     ///
     /// - The specified format is not a valid regular expression or supported by
     ///   [regex] crate.
-    /// - The specified format is empty or contains only
-    ///   [whitespace](char::is_whitespace).
     ///
-    /// [`parse`]: Self::parse
-    /// [`version_format`]: Self::version_format
     /// [regex]: https://docs.rs/regex
-    pub fn prefix_format(&mut self, prefix_format: &str) -> Result<&mut Self> {
-        if prefix_format.trim().is_empty() {
-            return Err(Error::format("empty or whitespace version format"));
-        }
-        self.prefix = Some(Regex::new(prefix_format).map_err(Error::new)?);
+    pub fn prefix_format(&mut self, format: &str) -> Result<&mut Self> {
+        self.prefix = Some(Regex::new(format).map_err(Error::new)?);
         Ok(self)
     }
 
@@ -409,40 +410,41 @@ impl Parser {
 
     /// An iterator over all release notes in the given `text`.
     ///
-    /// Unlike [`parse`] method, this method doesn't error on duplicate release
-    /// notes or empty changelog.
+    /// Unlike [`parse`] method, the returned iterator doesn't error on
+    /// duplicate release notes or empty changelog.
     ///
     /// See crate level documentation for changelog and version format supported
     /// by default.
     ///
     /// [`parse`]: Self::parse
-    pub fn parse_iter<'a, 'b>(&'b self, text: &'a str) -> ParseIter<'a, 'b> {
+    pub fn parse_iter<'a, 'r>(&'r self, text: &'a str) -> ParseIter<'a, 'r> {
         ParseIter::new(text, self.version.as_ref(), self.prefix.as_ref())
     }
 }
 
-/// An iterator for [`parse_iter`].
+/// An iterator over release notes.
+///
+/// This type is returned by [`parse_iter`] function or [`Parser::parse_iter`] method.
 #[allow(missing_debug_implementations)]
 #[must_use = "iterators are lazy and do nothing unless consumed"]
-pub struct ParseIter<'a, 'b> {
-    text: &'a str,
-    version_format: &'b Regex,
-    prefix_format: &'b Regex,
+pub struct ParseIter<'a, 'r> {
+    version_format: &'r Regex,
+    prefix_format: &'r Regex,
+    find_open: memmem::Finder<'static>,
+    find_close: memmem::Finder<'static>,
     lines: Lines<'a>,
     /// The heading level of release sections. 1-6
     level: Option<u8>,
-    find_open: memmem::Finder<'static>,
-    find_close: memmem::Finder<'static>,
 }
 
 const OPEN: &[u8] = b"<!--";
 const CLOSE: &[u8] = b"-->";
 
-impl<'a, 'b> ParseIter<'a, 'b> {
+impl<'a, 'r> ParseIter<'a, 'r> {
     fn new(
         text: &'a str,
-        version_format: Option<&'b Regex>,
-        prefix_format: Option<&'b Regex>,
+        version_format: Option<&'r Regex>,
+        prefix_format: Option<&'r Regex>,
     ) -> Self {
         static DEFAULT_PREFIX_FORMAT: Lazy<Regex> =
             Lazy::new(|| Regex::new(r"^(v|Version |Release )?").unwrap());
@@ -450,13 +452,12 @@ impl<'a, 'b> ParseIter<'a, 'b> {
             Lazy::new(|| Regex::new(r"^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?$").unwrap());
 
         Self {
-            text,
             version_format: version_format.unwrap_or(&DEFAULT_VERSION_FORMAT),
             prefix_format: prefix_format.unwrap_or(&DEFAULT_PREFIX_FORMAT),
-            lines: Lines::new(text),
-            level: None,
             find_open: memmem::Finder::new(OPEN),
             find_close: memmem::Finder::new(CLOSE),
+            lines: Lines::new(text),
+            level: None,
         }
     }
 
@@ -469,7 +470,7 @@ impl<'a, 'b> ParseIter<'a, 'b> {
         assert!(!cur_release.version.is_empty());
         if release_note_start < line_start {
             // Remove trailing newlines.
-            cur_release.notes = self.text[release_note_start..line_start - 1].trim_end();
+            cur_release.notes = self.lines.text[release_note_start..line_start - 1].trim_end();
         }
         cur_release
     }
@@ -528,7 +529,7 @@ impl<'a> Iterator for ParseIter<'a, '_> {
                 // Non-heading lines are always considered part of the current
                 // section.
 
-                if line_end == self.text.len() {
+                if line_end == self.lines.text.len() {
                     break;
                 }
                 continue;
@@ -539,7 +540,7 @@ impl<'a> Iterator for ParseIter<'a, '_> {
                     // Consider sections that have lower heading levels than
                     // release sections are part of the current section.
                     self.lines.next();
-                    if line_end == self.text.len() {
+                    if line_end == self.lines.text.len() {
                         break;
                     }
                     continue;
@@ -551,7 +552,7 @@ impl<'a> Iterator for ParseIter<'a, '_> {
                     if let Some(release_note_start) = release_note_start {
                         return Some(self.end_release(cur_release, release_note_start, line_start));
                     }
-                    if line_end == self.text.len() {
+                    if line_end == self.lines.text.len() {
                         break;
                     }
                     continue;
@@ -566,18 +567,15 @@ impl<'a> Iterator for ParseIter<'a, '_> {
             if let Some(m) = self.prefix_format.find(unlinked) {
                 unlinked = &unlinked[m.end()..];
             }
-            let unlinked = unlink(unlinked.splitn(2, char::is_whitespace).next().unwrap());
-            let version = match self.version_format.find(unlinked) {
-                Some(m) => &unlinked[m.start()..m.end()],
-                None => {
-                    // Ignore non-release sections that have the same heading
-                    // levels as release sections.
-                    self.lines.next();
-                    if line_end == self.text.len() {
-                        break;
-                    }
-                    continue;
+            let version = unlink(unlinked.splitn(2, char::is_whitespace).next().unwrap());
+            if !self.version_format.is_match(version) {
+                // Ignore non-release sections that have the same heading
+                // levels as release sections.
+                self.lines.next();
+                if line_end == self.lines.text.len() {
+                    break;
                 }
+                continue;
             };
 
             cur_release.version = version;
@@ -606,7 +604,7 @@ impl<'a> Iterator for ParseIter<'a, '_> {
 
         if !cur_release.version.is_empty() {
             if let Some(release_note_start) = release_note_start {
-                if let Some(nodes) = self.text.get(release_note_start..) {
+                if let Some(nodes) = self.lines.text.get(release_note_start..) {
                     // Remove trailing newlines.
                     cur_release.notes = nodes.trim_end();
                 }
