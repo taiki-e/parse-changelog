@@ -36,7 +36,7 @@ jobs:
   #         persist-credentials: false
   #     - uses: taiki-e/github-actions/install-rust@main
   #     - run: cargo install cargo-fuzz
-  #     - run: cargo fuzz run --release --fuzz-dir . parse -- -max_total_time="$MAX_TOTAL_TIME"
+  #     - run: cargo fuzz run --fuzz-dir . parse -- -max_total_time="$MAX_TOTAL_TIME"
   #       working-directory: fuzz/libfuzzer
 
   # https://rust-fuzz.github.io/book/afl.html
@@ -50,5 +50,5 @@ jobs:
       - uses: taiki-e/github-actions/install-rust@main
       - run: cargo install afl
       - run: echo 'core' | sudo tee /proc/sys/kernel/core_pattern
-      - run: cargo afl build --release && cargo afl fuzz -i in -o out -V "$MAX_TOTAL_TIME" target/release/parse
+      - run: cargo afl build && cargo afl fuzz -i in -o out -V "$MAX_TOTAL_TIME" target/debug/parse
         working-directory: fuzz/afl

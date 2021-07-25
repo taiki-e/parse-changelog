@@ -21,6 +21,3 @@ name = "parse"
 path = "parse.rs"
 test = false
 doc = false
-
-[profile.release]
-debug = true
