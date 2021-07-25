@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Allow specifying empty prefix format in `Parser::prefix_format` method (library) and `--prefix-format` option (CLI).
+
 ## [0.4.3] - 2021-07-24
 
 - [Fix bug in parsing of heading.](https://github.com/taiki-e/parse-changelog/pull/13)
