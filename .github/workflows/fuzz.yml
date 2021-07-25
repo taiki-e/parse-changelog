@@ -9,7 +9,7 @@ on:
   #   branches:
   #     - fuzz
   schedule:
-    - cron: '0 15 * * *'
+    - cron: '0 5,13,21 * * *'
   workflow_dispatch:
 
 env:
@@ -17,7 +17,7 @@ env:
   CARGO_TERM_COLOR: always
   RUSTFLAGS: -D warnings
   RUST_BACKTRACE: 1
-  MAX_TOTAL_TIME: 1200 # 20 minutes
+  MAX_TOTAL_TIME: 2400 # 40 minutes
 
 defaults:
   run:
