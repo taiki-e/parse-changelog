@@ -1,7 +1,6 @@
 [package]
 name = "fuzz-libfuzzer"
 version = "0.0.0"
-authors = ["Taiki Endo <te316e89@gmail.com>"]
 edition = "2018"
 publish = false
 
@@ -12,7 +11,7 @@ cargo-fuzz = true
 resolver = "2"
 
 [dependencies]
-parse-changelog = { path = "../..", default-features = false }
+parse-changelog = { path = "..", default-features = false }
 
 libfuzzer-sys = "0.4"
 
@@ -21,3 +20,8 @@ name = "parse"
 path = "parse.rs"
 test = false
 doc = false
+
+[profile.release]
+debug = true
+debug-assertions = true
+overflow-checks = true

@@ -87,6 +87,19 @@ jobs:
       - run: tools/gen.sh
       - run: git diff --exit-code
 
+  fuzz:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - uses: taiki-e/github-actions/install-rust@main
+      - run: cargo install cargo-fuzz --debug
+      - run: cargo install afl --debug
+      - run: cargo fuzz build
+      - run: cargo afl build
+        working-directory: fuzz/afl
+
   clippy:
     runs-on: ubuntu-18.04
     steps:
@@ -141,6 +154,7 @@ jobs:
       - test
       - build
       - codegen
+      - fuzz
       - clippy
       - fmt
       - docs
