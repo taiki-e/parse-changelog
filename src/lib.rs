@@ -722,7 +722,11 @@ fn trim(s: &str) -> &str {
         count += 1;
     }
     // Indents less than 4 are ignored.
-    if count < 4 { s[count..].trim_end() } else { s.trim_end() }
+    if count < 4 {
+        s[count..].trim_end()
+    } else {
+        s.trim_end()
+    }
 }
 
 /// If a leading `[` or trailing `]` exists, returns a string with it removed.
