@@ -8,42 +8,38 @@ use std::{
 };
 
 use anyhow::{bail, Context as _, Result};
+use clap::{AppSettings, Clap};
 use parse_changelog::Parser;
-use structopt::{clap::AppSettings, StructOpt};
 
 /// Parses changelog and returns a release note for the specified version.
 ///
 /// Use -h for short descriptions and --help for more details.
-#[derive(StructOpt)]
-#[structopt(
-    rename_all = "kebab-case",
-    setting = AppSettings::DeriveDisplayOrder,
-    setting = AppSettings::UnifiedHelpMessage,
-)]
+#[derive(Clap)]
+#[clap(setting = AppSettings::DeriveDisplayOrder, setting = AppSettings::UnifiedHelpMessage)]
 struct Args {
     /// Path to the changelog file (use '-' for standard input).
-    #[structopt(value_name = "PATH")]
+    #[clap(value_name = "PATH")]
     path: String,
     /// Specify version (by default, select the latest release).
-    #[structopt(value_name = "VERSION")]
-    version: Option<String>,
+    #[clap(value_name = "VERSION")]
+    release: Option<String>,
     /// Returns title instead of notes.
-    #[structopt(short, long)]
+    #[clap(short, long)]
     title: bool,
     /// Returns JSON representation of all releases in changelog.
-    #[structopt(long, conflicts_with = "version", conflicts_with = "title")]
+    #[clap(long, conflicts_with = "version", conflicts_with = "title")]
     json: bool,
     /// Specify version format.
-    #[structopt(long, value_name = "PATTERN")]
+    #[clap(long, value_name = "PATTERN")]
     version_format: Option<String>,
     /// Alias for --prefix-format.
-    #[structopt(long, value_name = "PATTERN")]
+    #[clap(long, value_name = "PATTERN")]
     prefix: Option<String>,
     /// Specify prefix format.
     ///
     /// By default only "v", "Version ", "Release ", and "" (no prefix) are
     /// allowed as prefixes.
-    #[structopt(long, value_name = "PATTERN", conflicts_with = "prefix")]
+    #[clap(long, value_name = "PATTERN", conflicts_with = "prefix")]
     prefix_format: Option<String>,
 }
 
@@ -55,7 +51,7 @@ fn main() {
 }
 
 fn try_main() -> Result<()> {
-    let args = Args::from_args();
+    let args = Args::parse();
 
     let mut parser = Parser::new();
     if let Some(version_format) = &args.version_format {
@@ -83,7 +79,7 @@ fn try_main() -> Result<()> {
         return Ok(());
     }
 
-    let release = if let Some(version) = args.version.as_deref() {
+    let release = if let Some(version) = args.release.as_deref() {
         if let Some(release) = changelog.get(version) {
             release
         } else {
@@ -105,15 +101,14 @@ mod tests {
     use std::{env, fs, path::Path, process::Command};
 
     use anyhow::Result;
-    use structopt::StructOpt;
+    use clap::IntoApp;
     use tempfile::Builder;
 
     use super::Args;
 
     fn get_long_help() -> Result<String> {
-        let mut app = Args::clap();
         let mut buf = vec![];
-        app.write_long_help(&mut buf)?;
+        Args::into_app().term_width(80).write_long_help(&mut buf)?;
         let mut out = String::new();
         for mut line in String::from_utf8(buf)?.lines() {
             if let Some(new) = line.trim_end().strip_suffix(env!("CARGO_PKG_VERSION")) {

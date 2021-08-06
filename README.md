@@ -72,6 +72,12 @@ Use -h for short descriptions and --help for more details.
 USAGE:
     parse-changelog [OPTIONS] <PATH> [VERSION]
 
+ARGS:
+    <PATH>
+            Path to the changelog file (use '-' for standard input)
+    <VERSION>
+            Specify version (by default, select the latest release)
+
 OPTIONS:
     -t, --title
             Returns title instead of notes
@@ -88,20 +94,15 @@ OPTIONS:
         --prefix-format <PATTERN>
             Specify prefix format.
 
-            By default only "v", "Version ", "Release ", and "" (no prefix) are allowed as prefixes.
+            By default only "v", "Version ", "Release ", and "" (no prefix) are
+            allowed as prefixes.
+
     -h, --help
             Prints help information
 
     -V, --version
             Prints version information
 
-
-ARGS:
-    <PATH>
-            Path to the changelog file (use '-' for standard input)
-
-    <VERSION>
-            Specify version (by default, select the latest release)
 
 ```
 <!-- readme-long-help:end -->
