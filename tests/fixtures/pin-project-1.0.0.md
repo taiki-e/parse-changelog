@@ -1,4 +1,4 @@
-* [Remove deprecated `#[project]`, `#[project_ref]`, and `#[project_replace]` attributes.](https://github.com/taiki-e/pin-project/pull/265)
+- [Remove deprecated `#[project]`, `#[project_ref]`, and `#[project_replace]` attributes.](https://github.com/taiki-e/pin-project/pull/265)
 
   Name the projected type by passing an argument with the same name as the method to the `#[pin_project]` attribute instead:
 
@@ -19,18 +19,18 @@
     }
   ```
 
-* [Remove deprecated `Replace` argument from `#[pin_project]` attribute.](https://github.com/taiki-e/pin-project/pull/266) Use `project_replace` argument instead.
+- [Remove deprecated `Replace` argument from `#[pin_project]` attribute.](https://github.com/taiki-e/pin-project/pull/266) Use `project_replace` argument instead.
 
-* [Optimize code generation when used on enums.](https://github.com/taiki-e/pin-project/pull/270)
+- [Optimize code generation when used on enums.](https://github.com/taiki-e/pin-project/pull/270)
 
-* [Raise the minimum supported Rust version of this crate from Rust 1.34 to Rust 1.37.](https://github.com/taiki-e/pin-project/pull/292)
+- [Raise the minimum supported Rust version of this crate from Rust 1.34 to Rust 1.37.](https://github.com/taiki-e/pin-project/pull/292)
 
-* Suppress `explicit_outlives_requirements`, `box_pointers`, `clippy::large_enum_variant`, `clippy::pattern_type_mismatch`, `clippy::implicit_return`, and `clippy::redundant_pub_crate` lints in generated code. ([#276](https://github.com/taiki-e/pin-project/pull/276), [#277](https://github.com/taiki-e/pin-project/pull/277), [#284](https://github.com/taiki-e/pin-project/pull/284))
+- Suppress `explicit_outlives_requirements`, `box_pointers`, `clippy::large_enum_variant`, `clippy::pattern_type_mismatch`, `clippy::implicit_return`, and `clippy::redundant_pub_crate` lints in generated code. ([#276](https://github.com/taiki-e/pin-project/pull/276), [#277](https://github.com/taiki-e/pin-project/pull/277), [#284](https://github.com/taiki-e/pin-project/pull/284))
 
-* Diagnostic improvements.
+- Diagnostic improvements.
 
 Changes since the 1.0.0-alpha.1 release:
 
-* [Fix drop order of pinned fields in project_replace](https://github.com/taiki-e/pin-project/pull/287)
+- [Fix drop order of pinned fields in `project_replace`.](https://github.com/taiki-e/pin-project/pull/287)
 
-* Update minimal version of `syn` to 1.0.44
+- Update minimal version of `syn` to 1.0.44
