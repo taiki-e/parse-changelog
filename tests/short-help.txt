@@ -1,4 +1,6 @@
 parse-changelog
+Simple changelog parser, written in Rust.
+
 Parses changelog and returns a release note for the specified version.
 
 Use -h for short descriptions and --help for more details.

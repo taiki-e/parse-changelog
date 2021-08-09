@@ -9,7 +9,7 @@ keywords = ["changelog", "parser"]
 categories = ["command-line-utilities", "parser-implementations", "text-processing"]
 exclude = ["/.*", "/tools"]
 description = """
-A simple changelog parser, written in Rust.
+Simple changelog parser, written in Rust.
 """
 autobenches = false
 

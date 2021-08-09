@@ -1,4 +1,4 @@
-//! A simple changelog parser, written in Rust.
+//! Simple changelog parser, written in Rust.
 //!
 //! # Examples
 //!
@@ -155,7 +155,7 @@
 //!
 //! # Optional features
 //!
-//! * **`serde`** — Implements [`serde::Serialize`] trait for parse-changelog types.
+//! - **`serde`** — Implements [`serde::Serialize`] trait for parse-changelog types.
 //!
 //! [`serde::Serialize`]: https://docs.rs/serde/1/serde/trait.Serialize.html
 //! [keepachangelog]: https://keepachangelog.com
@@ -232,7 +232,7 @@ pub fn parse(text: &str) -> Result<Changelog<'_>> {
     Parser::new().parse(text)
 }
 
-/// An iterator over all release notes in the given `text`.
+/// Returns an iterator over all release notes in the given `text`.
 ///
 /// Unlike [`parse`] function, the returned iterator doesn't error on
 /// duplicate release notes or empty changelog.
@@ -408,7 +408,7 @@ impl Parser {
         Ok(map)
     }
 
-    /// An iterator over all release notes in the given `text`.
+    /// Returns an iterator over all release notes in the given `text`.
     ///
     /// Unlike [`parse`] method, the returned iterator doesn't error on
     /// duplicate release notes or empty changelog.

@@ -6,7 +6,7 @@
 [![rustc](https://img.shields.io/badge/rustc-1.51+-blue?style=flat-square&logo=rust)](https://www.rust-lang.org)
 [![build status](https://img.shields.io/github/workflow/status/taiki-e/parse-changelog/CI/main?style=flat-square&logo=github)](https://github.com/taiki-e/parse-changelog/actions)
 
-A simple changelog parser, written in Rust.
+Simple changelog parser, written in Rust.
 
 - [Installation](#installation)
 - [Usage (CLI)](#usage-cli)
@@ -65,6 +65,8 @@ specified version.
 ```console
 $ parse-changelog --help
 parse-changelog
+Simple changelog parser, written in Rust.
+
 Parses changelog and returns a release note for the specified version.
 
 Use -h for short descriptions and --help for more details.

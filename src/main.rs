@@ -11,7 +11,9 @@ use anyhow::{bail, Context as _, Result};
 use clap::{AppSettings, Clap};
 use parse_changelog::Parser;
 
-const ABOUT: &str = "Parses changelog and returns a release note for the specified version.
+const ABOUT: &str = "Simple changelog parser, written in Rust.
+
+Parses changelog and returns a release note for the specified version.
 
 Use -h for short descriptions and --help for more details.";
 
