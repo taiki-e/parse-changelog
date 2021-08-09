@@ -102,8 +102,6 @@ OPTIONS:
 
     -V, --version
             Prints version information
-
-
 ```
 <!-- readme-long-help:end -->
 

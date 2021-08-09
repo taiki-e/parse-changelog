@@ -36,4 +36,3 @@ OPTIONS:
 
     -V, --version
             Prints version information
-

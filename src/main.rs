@@ -117,6 +117,7 @@ mod tests {
             out.push_str(line.trim_end());
             out.push('\n');
         }
+        out.pop();
         Ok(out)
     }
 
@@ -170,7 +171,6 @@ mod tests {
                 out.push_str("```console\n");
                 out.push_str("$ parse-changelog --help\n");
                 out.push_str(&new);
-                out.push('\n');
                 for line in &mut lines {
                     if line == "<!-- readme-long-help:end -->" {
                         out.push_str("```\n");
