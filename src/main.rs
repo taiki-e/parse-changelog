@@ -11,11 +11,19 @@ use anyhow::{bail, Context as _, Result};
 use clap::{AppSettings, Clap};
 use parse_changelog::Parser;
 
-/// Parses changelog and returns a release note for the specified version.
-///
-/// Use -h for short descriptions and --help for more details.
+const ABOUT: &str = "Parses changelog and returns a release note for the specified version.
+
+Use -h for short descriptions and --help for more details.";
+
+const MAX_TERM_WIDTH: usize = 100;
+
 #[derive(Clap)]
-#[clap(setting = AppSettings::DeriveDisplayOrder, setting = AppSettings::UnifiedHelpMessage)]
+#[clap(
+    about = ABOUT,
+    max_term_width = MAX_TERM_WIDTH,
+    setting = AppSettings::DeriveDisplayOrder,
+    setting = AppSettings::UnifiedHelpMessage,
+)]
 struct Args {
     /// Path to the changelog file (use '-' for standard input).
     #[clap(value_name = "PATH")]
@@ -104,11 +112,15 @@ mod tests {
     use clap::IntoApp;
     use tempfile::Builder;
 
-    use super::Args;
+    use super::{Args, MAX_TERM_WIDTH};
 
-    fn get_long_help() -> Result<String> {
+    fn get_help(long: bool) -> Result<String> {
         let mut buf = vec![];
-        Args::into_app().term_width(80).write_long_help(&mut buf)?;
+        if long {
+            Args::into_app().term_width(MAX_TERM_WIDTH).write_long_help(&mut buf)?;
+        } else {
+            Args::into_app().term_width(MAX_TERM_WIDTH).write_help(&mut buf)?;
+        }
         let mut out = String::new();
         for mut line in String::from_utf8(buf)?.lines() {
             if let Some(new) = line.trim_end().strip_suffix(env!("CARGO_PKG_VERSION")) {
@@ -117,7 +129,9 @@ mod tests {
             out.push_str(line.trim_end());
             out.push('\n');
         }
-        out.pop();
+        if long {
+            out.pop();
+        }
         Ok(out)
     }
 
@@ -150,13 +164,19 @@ mod tests {
 
     #[test]
     fn long_help() {
-        let actual = get_long_help().unwrap();
+        let actual = get_help(true).unwrap();
         assert_diff("tests/long-help.txt", actual);
     }
 
     #[test]
+    fn short_help() {
+        let actual = get_help(false).unwrap();
+        assert_diff("tests/short-help.txt", actual);
+    }
+
+    #[test]
     fn update_readme() -> Result<()> {
-        let new = get_long_help()?;
+        let new = get_help(true)?;
         let path = &Path::new(env!("CARGO_MANIFEST_DIR")).join("README.md");
         let base = fs::read_to_string(path)?;
         let mut out = String::with_capacity(base.capacity());
