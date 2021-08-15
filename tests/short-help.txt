@@ -1,4 +1,5 @@
 parse-changelog
+
 Simple changelog parser, written in Rust.
 
 Parses changelog and returns a release note for the specified version.
@@ -13,10 +14,9 @@ ARGS:
     <VERSION>    Specify version (by default, select the latest release)
 
 OPTIONS:
+    -h, --help                        Print help information
+    -V, --version                     Print version information
     -t, --title                       Returns title instead of notes
         --json                        Returns JSON representation of all releases in changelog
         --version-format <PATTERN>    Specify version format
-        --prefix <PATTERN>            Alias for --prefix-format
-        --prefix-format <PATTERN>     Specify prefix format
-    -h, --help                        Prints help information
-    -V, --version                     Prints version information
+        --prefix-format <PATTERN>     Specify prefix format [aliases: prefix]
