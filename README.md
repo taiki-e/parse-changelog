@@ -3,7 +3,7 @@
 [![crates.io](https://img.shields.io/crates/v/parse-changelog?style=flat-square&logo=rust)](https://crates.io/crates/parse-changelog)
 [![docs.rs](https://img.shields.io/badge/docs.rs-parse--changelog-blue?style=flat-square)](https://docs.rs/parse-changelog)
 [![license](https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue?style=flat-square)](#license)
-[![rustc](https://img.shields.io/badge/rustc-1.51+-blue?style=flat-square&logo=rust)](https://www.rust-lang.org)
+[![rustc](https://img.shields.io/badge/rustc-1.54+-blue?style=flat-square&logo=rust)](https://www.rust-lang.org)
 [![build status](https://img.shields.io/github/workflow/status/taiki-e/parse-changelog/CI/main?style=flat-square&logo=github)](https://github.com/taiki-e/parse-changelog/actions)
 
 Simple changelog parser, written in Rust.
@@ -51,7 +51,7 @@ Note: When using this crate as a library, we recommend disabling the default
 features because the default features enable CLI-related dependencies and the
 library part of this crate does not use them.
 
-*Compiler support: requires rustc 1.51+*
+*Compiler support: requires rustc 1.54+*
 
 ## Usage (CLI)
 
@@ -65,6 +65,7 @@ specified version.
 ```console
 $ parse-changelog --help
 parse-changelog
+
 Simple changelog parser, written in Rust.
 
 Parses changelog and returns a release note for the specified version.
@@ -77,10 +78,17 @@ USAGE:
 ARGS:
     <PATH>
             Path to the changelog file (use '-' for standard input)
+
     <VERSION>
             Specify version (by default, select the latest release)
 
 OPTIONS:
+    -h, --help
+            Print help information
+
+    -V, --version
+            Print version information
+
     -t, --title
             Returns title instead of notes
 
@@ -90,19 +98,11 @@ OPTIONS:
         --version-format <PATTERN>
             Specify version format
 
-        --prefix <PATTERN>
-            Alias for --prefix-format
-
         --prefix-format <PATTERN>
             Specify prefix format.
 
             By default only "v", "Version ", "Release ", and "" (no prefix) are allowed as prefixes.
-
-    -h, --help
-            Prints help information
-
-    -V, --version
-            Prints version information
+            [aliases: prefix]
 ```
 <!-- readme-long-help:end -->
 

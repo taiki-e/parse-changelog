@@ -8,7 +8,7 @@ use std::{
 };
 
 use anyhow::{bail, Context as _, Result};
-use clap::{AppSettings, Clap};
+use clap::{AppSettings, ArgSettings, Clap};
 use parse_changelog::Parser;
 
 const ABOUT: &str = "Simple changelog parser, written in Rust.
@@ -21,17 +21,17 @@ const MAX_TERM_WIDTH: usize = 100;
 
 #[derive(Clap)]
 #[clap(
-    about = ABOUT,
-    max_term_width = MAX_TERM_WIDTH,
-    setting = AppSettings::DeriveDisplayOrder,
-    setting = AppSettings::UnifiedHelpMessage,
+    about(ABOUT),
+    max_term_width(MAX_TERM_WIDTH),
+    setting(AppSettings::DeriveDisplayOrder),
+    setting(AppSettings::UnifiedHelpMessage)
 )]
 struct Args {
     /// Path to the changelog file (use '-' for standard input).
-    #[clap(value_name = "PATH")]
+    #[clap(value_name = "PATH", setting(ArgSettings::ForbidEmptyValues))]
     path: String,
     /// Specify version (by default, select the latest release).
-    #[clap(value_name = "VERSION")]
+    #[clap(value_name = "VERSION", setting(ArgSettings::ForbidEmptyValues))]
     release: Option<String>,
     /// Returns title instead of notes.
     #[clap(short, long)]
@@ -40,16 +40,13 @@ struct Args {
     #[clap(long, conflicts_with = "version", conflicts_with = "title")]
     json: bool,
     /// Specify version format.
-    #[clap(long, value_name = "PATTERN")]
+    #[clap(long, value_name = "PATTERN", setting(ArgSettings::ForbidEmptyValues))]
     version_format: Option<String>,
-    /// Alias for --prefix-format.
-    #[clap(long, value_name = "PATTERN")]
-    prefix: Option<String>,
     /// Specify prefix format.
     ///
     /// By default only "v", "Version ", "Release ", and "" (no prefix) are
     /// allowed as prefixes.
-    #[clap(long, value_name = "PATTERN", conflicts_with = "prefix")]
+    #[clap(long, value_name = "PATTERN", visible_alias = "prefix")]
     prefix_format: Option<String>,
 }
 
@@ -67,7 +64,7 @@ fn try_main() -> Result<()> {
     if let Some(version_format) = &args.version_format {
         parser.version_format(version_format)?;
     }
-    if let Some(prefix_format) = args.prefix_format.as_ref().or_else(|| args.prefix.as_ref()) {
+    if let Some(prefix_format) = &args.prefix_format {
         parser.prefix_format(prefix_format)?;
     }
 
@@ -130,9 +127,6 @@ mod tests {
             }
             out.push_str(line.trim_end());
             out.push('\n');
-        }
-        if long {
-            out.pop();
         }
         Ok(out)
     }
