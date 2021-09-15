@@ -58,3 +58,8 @@ fn json() {
     let changelog: ChangelogOwned = serde_json::from_str(&*text).unwrap();
     assert_eq!(changelog.len(), 72);
 }
+
+#[test]
+fn version() {
+    parse_changelog(["--version"]).assert_success().stdout_contains(env!("CARGO_PKG_VERSION"));
+}

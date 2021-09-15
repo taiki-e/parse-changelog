@@ -22,6 +22,7 @@ const MAX_TERM_WIDTH: usize = 100;
 #[derive(Clap)]
 #[clap(
     about(ABOUT),
+    version,
     max_term_width(MAX_TERM_WIDTH),
     setting(AppSettings::DeriveDisplayOrder),
     setting(AppSettings::UnifiedHelpMessage)
