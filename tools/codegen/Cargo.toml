@@ -10,4 +10,5 @@ fs-err = "2"
 proc-macro2 = "1"
 quote = "1"
 syn = { version = "1", features = ["full", "visit-mut"] }
+tempfile = "3"
 walkdir = "2"

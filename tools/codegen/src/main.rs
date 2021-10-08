@@ -18,7 +18,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn root_dir() -> PathBuf {
+fn workspace_root() -> PathBuf {
     let mut dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     dir.pop(); // codegen
     dir.pop(); // tools
@@ -38,24 +38,36 @@ fn header() -> String {
     .into()
 }
 
-fn write(path: &Path, content: &TokenStream) -> Result<()> {
-    fs::write(path, header() + &content.to_string())?;
+fn write(path: &Path, contents: &TokenStream) -> Result<()> {
+    let contents = header() + &contents.to_string();
+
+    let tmpdir = tempfile::Builder::new().prefix("codegen").tempdir()?;
+    let tmpfile = &tmpdir.path().join("generated");
+    fs::write(tmpfile, &contents)?;
+    fs::copy(workspace_root().join(".rustfmt.toml"), tmpdir.path().join(".rustfmt.toml"))?;
+
     let status = Command::new("rustfmt")
-        .arg(path)
+        .arg(tmpfile)
         .args(&["--config", "normalize_doc_attributes=true,format_macro_matchers=true"])
         .status()?;
     if !status.success() {
         bail!("rustfmt didn't exit successfully");
     }
+
+    let out = fs::read(tmpfile)?;
+    if path.is_file() && fs::read(&path)? == out {
+        return Ok(());
+    }
+    fs::write(path, out)?;
     Ok(())
 }
 
 fn gen_assert_impl() -> Result<()> {
-    let root_dir = &root_dir();
-    let out_dir = &root_dir.join("src/gen");
+    let workspace_root = &workspace_root();
+    let out_dir = &workspace_root.join("src/gen");
     fs::create_dir_all(out_dir)?;
 
-    let files: BTreeSet<String> = WalkDir::new(root_dir.join("src"))
+    let files: BTreeSet<String> = WalkDir::new(workspace_root.join("src"))
         .into_iter()
         .filter_map(Result::ok)
         .filter_map(|e| {
