@@ -170,7 +170,6 @@
 ))]
 #![forbid(unsafe_code)]
 #![warn(
-    future_incompatible,
     missing_debug_implementations,
     missing_docs,
     rust_2018_idioms,

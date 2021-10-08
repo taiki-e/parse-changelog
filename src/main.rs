@@ -1,5 +1,5 @@
 #![forbid(unsafe_code)]
-#![warn(future_incompatible, rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
+#![warn(rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
 #![warn(clippy::default_trait_access, clippy::wildcard_imports)]
 
 use std::{
@@ -71,8 +71,7 @@ fn try_main() -> Result<()> {
 
     let text = if args.path == "-" {
         let mut buf = String::new();
-        let stdin = io::stdin();
-        stdin.lock().read_to_string(&mut buf).context("failed to read standard input")?;
+        io::stdin().read_to_string(&mut buf).context("failed to read standard input")?;
         buf
     } else {
         fs::read_to_string(&args.path).with_context(|| format!("failed to read {}", args.path))?
