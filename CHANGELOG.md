@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.4.4] - 2021-10-13
+
 - Allow specifying empty prefix format in `Parser::prefix_format` method (library) and `--prefix-format` option (CLI).
 
 - Distribute statically linked binary on Windows MSVC. ([#18](https://github.com/taiki-e/parse-changelog/pull/18))
@@ -92,7 +94,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.4.3...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.4.4...HEAD
+[0.4.4]: https://github.com/taiki-e/parse-changelog/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/taiki-e/parse-changelog/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/taiki-e/parse-changelog/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/taiki-e/parse-changelog/compare/v0.4.0...v0.4.1
