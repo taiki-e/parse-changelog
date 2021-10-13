@@ -28,7 +28,7 @@ cargo install parse-changelog
 #### From prebuilt binaries
 
 You can download prebuilt binaries from the [Release page](https://github.com/taiki-e/parse-changelog/releases).
-Prebuilt binaries are available for macOS, Linux (gnu and musl), and Windows.
+Prebuilt binaries are available for macOS, Linux (gnu and musl), and Windows (static executable).
 
 #### Via Homebrew
 
