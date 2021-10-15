@@ -11,7 +11,7 @@ use indexmap::IndexMap;
 fn failures() {
     parse_changelog([] as [&str; 0])
         .assert_failure()
-        .stderr_contains("The following required arguments were not provided");
+        .stderr_contains("free-standing argument is missing");
 
     parse_changelog(["tests/fixtures/pin-project.md", "0.0.0"])
         .assert_failure()
