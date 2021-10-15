@@ -10,7 +10,11 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Support Rust 1.51 again.
+
 ## [0.4.4] - 2021-10-13
+
+- Increase the minimum supported Rust version from Rust 1.51 to Rust 1.54.
 
 - Allow specifying empty prefix format in `Parser::prefix_format` method (library) and `--prefix-format` option (CLI).
 
