@@ -183,6 +183,11 @@
     clippy::wildcard_imports
 )]
 
+#[cfg(doctest)]
+// https://github.com/rust-lang/rust/issues/82768
+#[cfg_attr(doctest, cfg_attr(doctest, doc = include_str!("../README.md")))]
+const _README: () = ();
+
 #[cfg(test)]
 #[path = "gen/assert_impl.rs"]
 mod assert_impl;
