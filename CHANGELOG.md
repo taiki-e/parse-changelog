@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.4.5] - 2021-10-15
+
 - Support Rust 1.51 again.
 
 ## [0.4.4] - 2021-10-13
@@ -98,7 +100,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.4.4...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.4.5...HEAD
+[0.4.5]: https://github.com/taiki-e/parse-changelog/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/taiki-e/parse-changelog/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/taiki-e/parse-changelog/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/taiki-e/parse-changelog/compare/v0.4.1...v0.4.2
