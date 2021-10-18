@@ -80,12 +80,12 @@ ARGS:
     <VERSION>    Specify version (by default, select the latest release)
 
 OPTIONS:
-    -h, --help                        Print help information
-    -V, --version                     Print version information
     -t, --title                       Returns title instead of notes
         --json                        Returns JSON representation of all releases in changelog
         --version-format <PATTERN>    Specify version format
         --prefix-format <PATTERN>     Specify prefix format [aliases: prefix]
+    -h, --help                        Print help information
+    -V, --version                     Print version information
 ```
 <!-- readme-long-help:end -->
 
