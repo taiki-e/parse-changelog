@@ -58,8 +58,6 @@ jobs:
         if: matrix.target == ''
       - run: cargo hack check --all --ignore-private --feature-powerset --no-dev-deps --lib
         if: matrix.target == ''
-      - run: tools/check-minimal-versions.sh
-        if: startsWith(matrix.rust, 'nightly') && !startsWith(matrix.os, 'windows') && matrix.target == ''
 
   build:
     strategy:
@@ -111,8 +109,12 @@ jobs:
       - uses: taiki-e/github-actions/install-rust@main
         with:
           component: clippy,rustfmt
-      - run: cargo clippy --all --all-features --all-targets
+      - run: cargo install cargo-hack --debug
       - run: cargo fmt --all -- --check
+        if: always()
+      - run: cargo clippy --all --all-features --all-targets
+        if: always()
+      - run: tools/check-minimal-versions.sh
         if: always()
       - run: shellcheck **/*.sh
         if: always()
