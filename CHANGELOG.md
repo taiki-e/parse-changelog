@@ -12,7 +12,7 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [0.4.5] - 2021-10-15
 
-- Support Rust 1.51 again.
+- Support Rust 1.51 again. ([#19](https://github.com/taiki-e/parse-changelog/pull/19))
 
 ## [0.4.4] - 2021-10-13
 
