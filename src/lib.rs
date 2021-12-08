@@ -571,7 +571,7 @@ impl<'a> Iterator for ParseIter<'a, '_> {
             if let Some(m) = self.prefix_format.find(unlinked) {
                 unlinked = &unlinked[m.end()..];
             }
-            let version = unlink(unlinked.splitn(2, char::is_whitespace).next().unwrap());
+            let version = unlink(unlinked.split(char::is_whitespace).next().unwrap());
             if !self.version_format.is_match(version) {
                 // Ignore non-release sections that have the same heading
                 // levels as release sections.
