@@ -50,8 +50,6 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
       - uses: taiki-e/install-action@cargo-hack
-        if: matrix.target == ''
-      - uses: taiki-e/install-action@cargo-hack
       - uses: taiki-e/install-action@cargo-minimal-versions
         if: startsWith(matrix.rust, 'nightly')
       - uses: taiki-e/install-action@cross
@@ -96,7 +94,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: taiki-e/github-actions/install-rust@main
-      - run: cargo install cargo-fuzz --debug
+      - uses: dtolnay/install@cargo-fuzz
       - run: cargo install afl --debug
       - run: cargo fuzz build
       - run: cargo afl build
