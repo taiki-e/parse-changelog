@@ -1,12 +1,11 @@
 #!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
 
 # Run code generators.
 #
-# Usage:
+# USAGE:
 #    ./tools/gen.sh
-
-set -euo pipefail
-IFS=$'\n\t'
 
 cd "$(cd "$(dirname "$0")" && pwd)"/..
 
