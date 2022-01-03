@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.4.6] - 2022-01-03
+
 ### CLI
 
 - Fix bugs in argument parsing introduced in 0.4.5. ([#20](https://github.com/taiki-e/parse-changelog/pull/20))
@@ -104,7 +106,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.4.5...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.4.6...HEAD
+[0.4.6]: https://github.com/taiki-e/parse-changelog/compare/v0.4.5...v0.4.6
 [0.4.5]: https://github.com/taiki-e/parse-changelog/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/taiki-e/parse-changelog/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/taiki-e/parse-changelog/compare/v0.4.2...v0.4.3
