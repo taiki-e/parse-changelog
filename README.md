@@ -79,14 +79,12 @@ Simple changelog parser, written in Rust.
 
 Parses changelog and returns a release note for the specified version.
 
-Use -h for short descriptions and --help for more details.
-
 USAGE:
     parse-changelog [OPTIONS] <PATH> [VERSION]
 
 ARGS:
     <PATH>       Path to the changelog file (use '-' for standard input)
-    <VERSION>    Specify version (by default, select the latest release)
+    [VERSION]    Specify version (by default, select the latest release)
 
 OPTIONS:
     -t, --title                       Returns title instead of notes

@@ -10,7 +10,7 @@ use indexmap::IndexMap;
 fn failures() {
     parse_changelog([] as [&str; 0])
         .assert_failure()
-        .stderr_contains("free-standing argument is missing");
+        .stderr_contains("no changelog path specified");
 
     parse_changelog(["tests/fixtures/pin-project.md", "0.0.0"])
         .assert_failure()

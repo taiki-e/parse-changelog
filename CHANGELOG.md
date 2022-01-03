@@ -10,6 +10,10 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+### CLI
+
+- Fix bugs in argument parsing introduced in 0.4.5. ([#20](https://github.com/taiki-e/parse-changelog/pull/20))
+
 ## [0.4.5] - 2021-10-15
 
 - Support Rust 1.51 again. ([#19](https://github.com/taiki-e/parse-changelog/pull/19))
