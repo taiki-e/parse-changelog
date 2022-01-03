@@ -41,7 +41,7 @@ fn header() -> String {
 fn write(path: &Path, contents: &TokenStream) -> Result<()> {
     let contents = &contents.to_string();
 
-    let tmpdir = tempfile::Builder::new().prefix("codegen").tempdir()?;
+    let tmpdir = tempfile::tempdir()?;
     let tmpfile = &tmpdir.path().join("generated");
     fs::write(tmpfile, &contents)?;
     fs::copy(workspace_root().join(".rustfmt.toml"), tmpdir.path().join(".rustfmt.toml"))?;

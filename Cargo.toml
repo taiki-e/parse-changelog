@@ -44,4 +44,3 @@ serde_json = { version = "1", optional = true }
 
 [dev-dependencies]
 easy-ext = "1"
-tempfile = "3"

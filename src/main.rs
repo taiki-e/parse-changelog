@@ -133,11 +133,46 @@ fn try_main() -> Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use std::{env, fs, path::Path};
+    use std::{
+        env, fs,
+        io::Write,
+        path::Path,
+        process::{Command, Stdio},
+    };
 
     use anyhow::Result;
 
     use crate::USAGE;
+
+    #[track_caller]
+    fn assert_diff(expected_path: impl AsRef<Path>, actual: impl AsRef<str>) {
+        let actual = actual.as_ref();
+        let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let manifest_dir =
+            manifest_dir.strip_prefix(env::current_dir().unwrap()).unwrap_or(manifest_dir);
+        let expected_path = &manifest_dir.join(expected_path);
+        if !expected_path.is_file() {
+            fs::write(expected_path, "").unwrap();
+        }
+        let expected = fs::read_to_string(expected_path).unwrap();
+        if expected != actual {
+            if env::var_os("CI").is_some() {
+                let mut child = Command::new("git")
+                    .args(["--no-pager", "diff", "--no-index", "--"])
+                    .arg(expected_path)
+                    .arg("-")
+                    .stdin(Stdio::piped())
+                    .spawn()
+                    .unwrap();
+                child.stdin.as_mut().unwrap().write_all(actual.as_bytes()).unwrap();
+                assert!(!child.wait().unwrap().success());
+                // patch -p1 <<'EOF' ... EOF
+                panic!("assertion failed; please run test locally and commit resulting changes, or apply above diff as patch");
+            } else {
+                fs::write(expected_path, actual).unwrap();
+            }
+        }
+    }
 
     #[test]
     fn update_readme() -> Result<()> {
@@ -168,7 +203,7 @@ mod tests {
             }
         }
         if start && end {
-            fs::write(path, out)?;
+            assert_diff(path, out);
         } else if start {
             panic!("missing `<!-- readme-long-help:end -->` comment in README.md");
         } else {
