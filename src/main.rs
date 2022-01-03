@@ -8,6 +8,10 @@ use std::{
 };
 
 use anyhow::{bail, Context as _, Result};
+use lexopt::{
+    Arg::{Long, Short, Value},
+    ValueExt,
+};
 use parse_changelog::Parser;
 
 static USAGE: &str = "parse-changelog
@@ -16,14 +20,12 @@ Simple changelog parser, written in Rust.
 
 Parses changelog and returns a release note for the specified version.
 
-Use -h for short descriptions and --help for more details.
-
 USAGE:
     parse-changelog [OPTIONS] <PATH> [VERSION]
 
 ARGS:
     <PATH>       Path to the changelog file (use '-' for standard input)
-    <VERSION>    Specify version (by default, select the latest release)
+    [VERSION]    Specify version (by default, select the latest release)
 
 OPTIONS:
     -t, --title                       Returns title instead of notes
@@ -44,37 +46,45 @@ struct Args {
 }
 
 impl Args {
-    fn parse() -> Result<Args> {
-        let mut args = pico_args::Arguments::from_env();
+    fn parse() -> Result<Self> {
+        let mut path = None;
+        let mut release = None;
+        let mut title = false;
+        let mut json = false;
+        let mut version_format = None;
+        let mut prefix_format = None;
 
-        if args.contains(["-h", "--help"]) {
-            print!("{}", USAGE);
-            std::process::exit(0);
-        }
-        if args.contains(["-V", "--version"]) {
-            println!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
-            std::process::exit(0);
-        }
-
-        let this = Args {
-            title: args.contains(["-t", "--title"]),
-            json: args.contains("--json"),
-            version_format: args.opt_value_from_str("--version-format")?,
-            prefix_format: {
-                let mut prefix_format = args.opt_value_from_str("--prefix-format")?;
-                if prefix_format.is_none() {
-                    prefix_format = args.opt_value_from_str("--prefix")?;
+        let mut parser = lexopt::Parser::from_env();
+        while let Some(arg) = parser.next()? {
+            match arg {
+                Short('t') | Long("title") if !title => title = true,
+                Long("json") if !json => json = true,
+                Long("version-format") if version_format.is_none() => {
+                    version_format = Some(parser.value()?.parse()?)
                 }
-                prefix_format
-            },
-            path: args.free_from_str()?,
-            release: args.opt_free_from_str()?,
-        };
-        let remaining = args.finish();
-        if !remaining.is_empty() {
-            bail!("unrecognized arguments {:?}", remaining);
+                Long("prefix-format") | Long("prefix") if prefix_format.is_none() => {
+                    prefix_format = Some(parser.value()?.parse()?)
+                }
+                Short('h') | Long("help") => {
+                    print!("{}", USAGE);
+                    std::process::exit(0);
+                }
+                Short('V') | Long("version") => {
+                    println!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+                    std::process::exit(0);
+                }
+                Value(val) if path.is_none() => path = Some(val.parse()?),
+                Value(val) if release.is_none() => release = Some(val.parse()?),
+                _ => return Err(arg.unexpected().into()),
+            }
         }
-        Ok(this)
+
+        let path = match path {
+            Some(path) => path,
+            None => bail!("no changelog path specified"),
+        };
+
+        Ok(Self { path, release, title, json, version_format, prefix_format })
     }
 }
 
