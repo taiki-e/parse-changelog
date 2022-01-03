@@ -38,6 +38,15 @@ You can install parse-changelog using [Homebrew tap on macOS and Linux](https://
 brew install taiki-e/tap/parse-changelog
 ```
 
+#### On GitHub Actions
+
+You can use [taiki-e/install-action](https://github.com/taiki-e/install-action) to install prebuilt binaries on Linux, macOS, and Windows.
+This makes the installation faster and may avoid the impact of [problems caused by upstream changes](https://github.com/tokio-rs/bytes/issues/506).
+
+```yaml
+- uses: taiki-e/install-action@parse-changelog
+```
+
 ### Library
 
 To use this crate as a library, add this to your `Cargo.toml`:
@@ -96,7 +105,7 @@ OPTIONS:
 Get the release note for version 1.46.0 from [Rust's release notes](https://github.com/rust-lang/rust/blob/master/RELEASES.md):
 
 ```sh
-curl -sSf https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md \
+curl -fsSL https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md \
   | parse-changelog - 1.46.0
 ```
 
@@ -110,7 +119,7 @@ format `parse-changelog` don't support by default, so use `--prefix` and
 `--version-format` to specify a custom format. For example:
 
 ```sh
-curl -sSf https://raw.githubusercontent.com/rust-lang/cargo/master/CHANGELOG.md \
+curl -fsSL https://raw.githubusercontent.com/rust-lang/cargo/master/CHANGELOG.md \
   | parse-changelog --prefix 'Cargo ' --version-format '^\d+\.\d+$' - 1.50
 ```
 
@@ -267,16 +276,15 @@ You can freely include characters after the version.
        ^^^^^^^^^^^^^
 ```
 
-[`Parser::prefix_format`]: https://docs.rs/parse-changelog/0.4/parse_changelog/struct.Parser.html#method.prefix_format
-[`Parser::version_format`]: https://docs.rs/parse-changelog/0.4/parse_changelog/struct.Parser.html#method.version_format
-[keepachangelog]: https://keepachangelog.com
-[semver]: https://semver.org
-
 ## Related Projects
 
 - [create-gh-release-action]: GitHub Action for creating GitHub Releases based on changelog. (Using this crate for changelog parsing.)
 
+[`Parser::prefix_format`]: https://docs.rs/parse-changelog/0.4/parse_changelog/struct.Parser.html#method.prefix_format
+[`Parser::version_format`]: https://docs.rs/parse-changelog/0.4/parse_changelog/struct.Parser.html#method.version_format
 [create-gh-release-action]: https://github.com/taiki-e/create-gh-release-action
+[keepachangelog]: https://keepachangelog.com
+[semver]: https://semver.org
 
 ## License
 
