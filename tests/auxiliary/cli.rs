@@ -71,9 +71,8 @@ impl AssertOutput {
         line_separated(pats, |pat| {
             if !self.stderr.contains(pat) {
                 panic!(
-                    "assertion failed: `self.stderr.contains(..)`:\n\nEXPECTED:\n{0}\n{1}\n{0}\n\nACTUAL:\n{0}\n{2}\n{0}\n",
+                    "assertion failed: `self.stderr.contains(..)`:\n\nEXPECTED:\n{0}\n{pat}\n{0}\n\nACTUAL:\n{0}\n{1}\n{0}\n",
                     "-".repeat(60),
-                    pat,
                     self.stderr
                 );
             }
@@ -87,9 +86,8 @@ impl AssertOutput {
         line_separated(pats, |pat| {
             if self.stderr.contains(pat) {
                 panic!(
-                    "assertion failed: `!self.stderr.contains(..)`:\n\nEXPECTED:\n{0}\n{1}\n{0}\n\nACTUAL:\n{0}\n{2}\n{0}\n",
+                    "assertion failed: `!self.stderr.contains(..)`:\n\nEXPECTED:\n{0}\n{pat}\n{0}\n\nACTUAL:\n{0}\n{1}\n{0}\n",
                     "-".repeat(60),
-                    pat,
                     self.stderr
                 );
             }
@@ -109,9 +107,8 @@ impl AssertOutput {
         line_separated(pats, |pat| {
             if !self.stdout.contains(pat) {
                 panic!(
-                    "assertion failed: `self.stdout.contains(..)`:\n\nEXPECTED:\n{0}\n{1}\n{0}\n\nACTUAL:\n{0}\n{2}\n{0}\n",
+                    "assertion failed: `self.stdout.contains(..)`:\n\nEXPECTED:\n{0}\n{pat}\n{0}\n\nACTUAL:\n{0}\n{1}\n{0}\n",
                     "-".repeat(60),
-                    pat,
                     self.stdout
                 );
             }
@@ -125,9 +122,8 @@ impl AssertOutput {
         line_separated(pats, |pat| {
             if self.stdout.contains(pat) {
                 panic!(
-                    "assertion failed: `!self.stdout.contains(..)`:\n\nEXPECTED:\n{0}\n{1}\n{0}\n\nACTUAL:\n{0}\n{2}\n{0}\n",
+                    "assertion failed: `!self.stdout.contains(..)`:\n\nEXPECTED:\n{0}\n{pat}\n{0}\n\nACTUAL:\n{0}\n{1}\n{0}\n",
                     "-".repeat(60),
-                    pat,
                     self.stdout
                 );
             }
