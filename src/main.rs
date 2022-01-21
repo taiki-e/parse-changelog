@@ -60,10 +60,10 @@ impl Args {
                 Short('t') | Long("title") if !title => title = true,
                 Long("json") if !json => json = true,
                 Long("version-format") if version_format.is_none() => {
-                    version_format = Some(parser.value()?.parse()?)
+                    version_format = Some(parser.value()?.parse()?);
                 }
                 Long("prefix-format") | Long("prefix") if prefix_format.is_none() => {
-                    prefix_format = Some(parser.value()?.parse()?)
+                    prefix_format = Some(parser.value()?.parse()?);
                 }
                 Short('h') | Long("help") => {
                     print!("{}", USAGE);

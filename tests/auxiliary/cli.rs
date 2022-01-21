@@ -4,6 +4,7 @@ use std::{
     process::{Command, ExitStatus},
 };
 
+use anyhow::Context as _;
 use easy_ext::ext;
 
 pub fn parse_changelog<O: AsRef<OsStr>>(args: impl AsRef<[O]>) -> Command {
@@ -17,7 +18,7 @@ pub fn parse_changelog<O: AsRef<OsStr>>(args: impl AsRef<[O]>) -> Command {
 impl Command {
     #[track_caller]
     pub fn assert_output(&mut self) -> AssertOutput {
-        let output = self.output().unwrap_or_else(|e| panic!("could not execute process: {}", e));
+        let output = self.output().context("could not execute process").unwrap();
         AssertOutput {
             stdout: String::from_utf8_lossy(&output.stdout).into_owned(),
             stderr: String::from_utf8_lossy(&output.stderr).into_owned(),
