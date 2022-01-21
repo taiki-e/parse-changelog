@@ -1,6 +1,6 @@
 [package]
 name = "parse-changelog"
-version = "0.4.6"
+version = "0.4.7"
 edition = "2018"
 rust-version = "1.51"
 license = "Apache-2.0 OR MIT"
