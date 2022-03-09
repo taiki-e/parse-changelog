@@ -32,7 +32,7 @@ Prebuilt binaries are available for macOS, Linux (gnu and musl), and Windows (st
 
 #### Via Homebrew
 
-You can install parse-changelog using [Homebrew tap on macOS and Linux](https://github.com/taiki-e/homebrew-tap/blob/main/Formula/parse-changelog.rb):
+You can install parse-changelog using [Homebrew tap on macOS and Linux](https://github.com/taiki-e/homebrew-tap/blob/HEAD/Formula/parse-changelog.rb):
 
 ```sh
 brew install taiki-e/tap/parse-changelog
