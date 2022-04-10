@@ -1,3 +1,5 @@
+#![allow(clippy::drop_non_drop)]
+
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use parse_changelog::{parse, parse_iter, Parser};
 
