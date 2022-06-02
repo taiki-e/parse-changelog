@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.4.8] - 2022-06-02
+
 - Distribute prebuilt binaries for aarch64 macOS. ([#21](https://github.com/taiki-e/parse-changelog/pull/21))
 
 ## [0.4.7] - 2022-01-21
@@ -112,7 +114,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.4.7...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.4.8...HEAD
+[0.4.8]: https://github.com/taiki-e/parse-changelog/compare/v0.4.7...v0.4.8
 [0.4.7]: https://github.com/taiki-e/parse-changelog/compare/v0.4.6...v0.4.7
 [0.4.6]: https://github.com/taiki-e/parse-changelog/compare/v0.4.5...v0.4.6
 [0.4.5]: https://github.com/taiki-e/parse-changelog/compare/v0.4.4...v0.4.5
