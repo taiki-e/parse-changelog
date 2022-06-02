@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Distribute prebuilt binaries for aarch64 macOS. ([#21](https://github.com/taiki-e/parse-changelog/pull/21))
+
 ## [0.4.7] - 2022-01-21
 
 - Distribute prebuilt binaries for aarch64 Linux (gnu and musl).
