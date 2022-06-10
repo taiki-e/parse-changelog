@@ -101,8 +101,6 @@ jobs:
         with:
           persist-credentials: false
       - uses: taiki-e/github-actions/install-rust@main
-        with:
-          component: rustfmt
       - run: tools/gen.sh
       - run: git add -N . && git diff --exit-code
 

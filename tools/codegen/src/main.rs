@@ -3,10 +3,9 @@
 use std::{
     collections::BTreeSet,
     path::{Path, PathBuf},
-    process::Command,
 };
 
-use anyhow::{bail, Result};
+use anyhow::Result;
 use fs_err as fs;
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
@@ -38,24 +37,9 @@ fn header() -> String {
     .into()
 }
 
-fn write(path: &Path, contents: &TokenStream) -> Result<()> {
-    let contents = &contents.to_string();
-
-    let tmpdir = tempfile::tempdir()?;
-    let tmpfile = &tmpdir.path().join("generated");
-    fs::write(tmpfile, &contents)?;
-    fs::copy(workspace_root().join(".rustfmt.toml"), tmpdir.path().join(".rustfmt.toml"))?;
-
-    let status = Command::new("rustfmt")
-        .arg(tmpfile)
-        .args(&["--config", "normalize_doc_attributes=true,format_macro_matchers=true"])
-        .status()?;
-    if !status.success() {
-        bail!("rustfmt didn't exit successfully");
-    }
-
+fn write(path: &Path, contents: TokenStream) -> Result<()> {
     let mut out = header().into_bytes();
-    out.append(&mut fs::read(tmpfile)?);
+    out.extend_from_slice(prettyplease::unparse(&syn::parse2(contents).unwrap()).as_bytes());
     if path.is_file() && fs::read(&path)? == out {
         return Ok(());
     }
@@ -130,7 +114,7 @@ fn gen_assert_impl() -> Result<()> {
             #tokens
         };
     };
-    write(&out_dir.join("assert_impl.rs"), &out)?;
+    write(&out_dir.join("assert_impl.rs"), out)?;
 
     Ok(())
 }
