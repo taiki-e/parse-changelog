@@ -117,8 +117,9 @@ fn try_main() -> Result<()> {
     let changelog = parser.parse(&text)?;
 
     if args.json {
-        let mut stdout = io::stdout();
-        serde_json::to_writer(stdout.lock(), &changelog)?;
+        let stdout = io::stdout();
+        let mut stdout = stdout.lock();
+        serde_json::to_writer(&mut stdout, &changelog)?;
         stdout.flush()?;
         return Ok(());
     }
@@ -133,7 +134,8 @@ fn try_main() -> Result<()> {
         &changelog[0]
     };
     let text = if args.title { release.title } else { release.notes };
-    let mut stdout = io::stdout();
+    let stdout = io::stdout();
+    let mut stdout = stdout.lock();
     stdout.write_all(text.as_bytes())?;
     stdout.write_all(b"\n")?;
     stdout.flush()?;
