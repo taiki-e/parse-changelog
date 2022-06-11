@@ -38,6 +38,17 @@ You can install parse-changelog using [Homebrew tap on macOS and Linux](https://
 brew install taiki-e/tap/parse-changelog
 ```
 
+#### Via MPR (Debian/Ubuntu)
+You can install [parse-changelog from the MPR](https://mpr.makedeb.org/parse-changelog):
+
+```sh
+git clone 'https://mpr.makedeb.org/parse-changelog'
+cd parse-changelog/
+makedeb -si
+```
+
+Note: The MPR package is maintained by the community, not the maintainer of parse-changelog.
+
 #### On GitHub Actions
 
 You can use [taiki-e/install-action](https://github.com/taiki-e/install-action) to install prebuilt binaries on Linux, macOS, and Windows.
