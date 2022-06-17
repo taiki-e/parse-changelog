@@ -7,7 +7,7 @@ publish = false
 [dev-dependencies]
 parse-changelog = { path = "..", default-features = false }
 
-criterion = { default-features = false, git = "https://github.com/taiki-e/criterion.rs.git", rev = "94d7b8b" } # https://github.com/bheisler/criterion.rs/pull/496 + patches to reduce deps more
+criterion = { default-features = false, git = "https://github.com/taiki-e/criterion.rs.git", branch = "dev" } # https://github.com/bheisler/criterion.rs/pull/496 + patches to reduce deps more
 
 [[bench]]
 name = "parse"
