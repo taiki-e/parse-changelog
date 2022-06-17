@@ -54,7 +54,7 @@ You can also install parse-changelog from the Prebuilt-MPR, which provides autom
 sudo apt install parse-changelog
 ```
 
-Note: The MPR package is maintained by the community, not the maintainer of parse-changelog.
+Note: The MPR/Prebuilt-MPR packages are maintained by the community, not the maintainer of parse-changelog.
 
 #### On GitHub Actions
 
