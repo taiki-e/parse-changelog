@@ -47,6 +47,13 @@ cd parse-changelog/
 makedeb -si
 ```
 
+##### Via Prebuilt-MPR
+You can also install parse-changelog from the Prebuilt-MPR, which provides automatic upgrades directly via APT. First [set up the Prebuilt-MPR on your system](https://docs.makedeb.org/prebuilt-mpr/getting-started), and then run the following:
+
+```sh
+sudo apt install parse-changelog
+```
+
 Note: The MPR package is maintained by the community, not the maintainer of parse-changelog.
 
 #### On GitHub Actions
