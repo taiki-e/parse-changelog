@@ -39,7 +39,7 @@ brew install taiki-e/tap/parse-changelog
 ```
 
 #### Via MPR (Debian/Ubuntu)
-You can install [parse-changelog from the MPR](https://mpr.makedeb.org/parse-changelog):
+You can install [parse-changelog from the MPR](https://mpr.makedeb.org/packages/parse-changelog):
 
 ```sh
 git clone 'https://mpr.makedeb.org/parse-changelog'
