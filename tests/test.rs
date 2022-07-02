@@ -251,12 +251,12 @@ fn rust() {
 fn pin_project() {
     let text = include_str!("fixtures/pin-project.md");
     let changelog = parse(text).unwrap();
-    assert_eq!(changelog.len(), 69);
+    assert_eq!(changelog.len(), 70);
     assert_diff("tests/fixtures/pin-project-1.0.0.md", changelog["1.0.0"].notes);
 
     // empty prefix format
     let changelog = Parser::new().prefix_format("").unwrap().parse(text).unwrap();
-    assert_eq!(changelog.len(), 69);
+    assert_eq!(changelog.len(), 70);
     assert_diff("tests/fixtures/pin-project-1.0.0.md", changelog["1.0.0"].notes);
 }
 
