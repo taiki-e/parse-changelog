@@ -56,7 +56,7 @@ struct ReleaseOwned {
 #[test]
 fn json() {
     let text = parse_changelog(["tests/fixtures/rust.md", "--json"]).assert_success().stdout;
-    let changelog: ChangelogOwned = serde_json::from_str(&*text).unwrap();
+    let changelog: ChangelogOwned = serde_json::from_str(&text).unwrap();
     assert_eq!(changelog.len(), 72);
 }
 
