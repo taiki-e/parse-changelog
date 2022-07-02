@@ -454,7 +454,7 @@ impl<'a, 'r> ParseIter<'a, 'r> {
         static DEFAULT_PREFIX_FORMAT: Lazy<Regex> =
             Lazy::new(|| Regex::new(r"^(v|Version |Release )?").unwrap());
         static DEFAULT_VERSION_FORMAT: Lazy<Regex> =
-            Lazy::new(|| Regex::new(r"^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?$").unwrap());
+            Lazy::new(|| Regex::new(r"^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?$|^Unreleased$").unwrap());
 
         Self {
             version_format: version_format.unwrap_or(&DEFAULT_VERSION_FORMAT),
