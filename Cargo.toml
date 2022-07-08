@@ -16,6 +16,11 @@ Simple changelog parser, written in Rust.
 all-features = true
 targets = ["x86_64-unknown-linux-gnu"]
 
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/v{ version }/{ name }-{ target }.tar.gz"
+bin-dir = "{ bin }{ binary-ext }"
+pkg-fmt = "tgz"
+
 [workspace]
 resolver = "2"
 members = ["bench", "tools/codegen"]
