@@ -131,7 +131,13 @@ fn try_main() -> Result<()> {
             bail!("not found release note for '{}'", version);
         }
     } else {
-        &changelog[0]
+        let (entry_key, entry_value) = changelog.first().unwrap();
+
+        if entry_key != &"Unreleased" || changelog.len() == 1 {
+            entry_value
+        } else {
+            &changelog[1]
+        }
     };
     let text = if args.title { release.title } else { release.notes };
     let stdout = io::stdout();
