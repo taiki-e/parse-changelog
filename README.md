@@ -32,13 +32,31 @@ Prebuilt binaries are available for macOS, Linux (gnu and musl), and Windows (st
 
 #### Via Homebrew
 
-You can install parse-changelog using [Homebrew tap on macOS and Linux](https://github.com/taiki-e/homebrew-tap/blob/HEAD/Formula/parse-changelog.rb):
+You can install [parse-changelog using Homebrew tap on macOS and Linux](https://github.com/taiki-e/homebrew-tap/blob/HEAD/Formula/parse-changelog.rb):
 
 ```sh
 brew install taiki-e/tap/parse-changelog
 ```
 
+#### Via Scoop (Windows)
+
+You can install [parse-changelog using Scoop](https://github.com/taiki-e/scoop-bucket/blob/HEAD/bucket/parse-changelog.json):
+
+```sh
+scoop bucket add taiki-e https://github.com/taiki-e/scoop-bucket
+scoop install parse-changelog
+```
+
+#### Via cargo-binstall
+
+You can install parse-changelog using [cargo-binstall](https://github.com/ryankurte/cargo-binstall):
+
+```sh
+cargo binstall parse-changelog
+```
+
 #### Via MPR (Debian/Ubuntu)
+
 You can install [parse-changelog from the MPR](https://mpr.makedeb.org/packages/parse-changelog):
 
 ```sh
@@ -48,6 +66,7 @@ makedeb -si
 ```
 
 ##### Via Prebuilt-MPR
+
 You can also install parse-changelog from the Prebuilt-MPR, which provides automatic upgrades directly via APT. First [set up the Prebuilt-MPR on your system](https://docs.makedeb.org/prebuilt-mpr/getting-started), and then run the following:
 
 ```sh

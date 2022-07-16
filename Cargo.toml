@@ -1,6 +1,6 @@
 [package]
 name = "parse-changelog"
-version = "0.4.8" #publish:version
+version = "0.4.9" #publish:version
 edition = "2021"
 rust-version = "1.56"
 license = "Apache-2.0 OR MIT"
@@ -15,6 +15,11 @@ Simple changelog parser, written in Rust.
 [package.metadata.docs.rs]
 all-features = true
 targets = ["x86_64-unknown-linux-gnu"]
+
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/v{ version }/{ name }-{ target }.tar.gz"
+bin-dir = "{ bin }{ binary-ext }"
+pkg-fmt = "tgz"
 
 [workspace]
 resolver = "2"
