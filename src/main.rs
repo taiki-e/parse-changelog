@@ -136,7 +136,11 @@ fn try_main() -> Result<()> {
         if entry_key != &"Unreleased" {
             entry_value
         } else {
-            changelog.get(1).context("not found release; to get 'Unreleased' section specify release explicitly: `parse-changelog <path> Unreleased`")
+            (
+                changelog.get_index(1).context(
+                    format!("not found release; to get 'Unreleased' section specify release explicitly: `parse-changelog {} Unreleased`", args.path)
+                )?
+            ).1
         }
     };
     let text = if args.title { release.title } else { release.notes };
