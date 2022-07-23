@@ -137,7 +137,7 @@ fn try_main() -> Result<()> {
             entry_value
         } else {
             (
-                changelog.get_index(1).context(
+                changelog.get_index(1).with_context(||
                     format!("not found release; to get 'Unreleased' section specify release explicitly: `parse-changelog {} Unreleased`", args.path)
                 )?
             ).1
