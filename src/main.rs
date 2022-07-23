@@ -133,14 +133,14 @@ fn try_main() -> Result<()> {
     } else {
         let (entry_key, entry_value) = changelog.first().context("not found release")?;
 
-        if entry_key != &"Unreleased" {
-            entry_value
-        } else {
+        if entry_key == &"Unreleased" {
             (
                 changelog.get_index(1).with_context(||
                     format!("not found release; to get 'Unreleased' section specify release explicitly: `parse-changelog {} Unreleased`", args.path)
                 )?
             ).1
+        } else {
+            entry_value
         }
     };
     let text = if args.title { release.title } else { release.notes };
