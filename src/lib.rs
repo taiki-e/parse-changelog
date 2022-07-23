@@ -176,12 +176,8 @@
     single_use_lifetimes,
     unreachable_pub
 )]
-#![warn(
-    clippy::default_trait_access,
-    clippy::exhaustive_enums,
-    clippy::exhaustive_structs,
-    clippy::wildcard_imports
-)]
+#![warn(clippy::exhaustive_enums, clippy::exhaustive_structs, clippy::pedantic)]
+#![allow(clippy::cast_possible_truncation, clippy::must_use_candidate)]
 
 #[cfg(doctest)]
 // https://github.com/rust-lang/rust/issues/82768

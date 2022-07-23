@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 #![warn(rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
-#![warn(clippy::default_trait_access, clippy::wildcard_imports)]
+#![warn(clippy::pedantic)]
 
 use std::{
     fs,
@@ -62,7 +62,7 @@ impl Args {
                 Long("version-format") if version_format.is_none() => {
                     version_format = Some(parser.value()?.parse()?);
                 }
-                Long("prefix-format") | Long("prefix") if prefix_format.is_none() => {
+                Long("prefix-format" | "prefix") if prefix_format.is_none() => {
                     prefix_format = Some(parser.value()?.parse()?);
                 }
                 Short('h') | Long("help") => {
