@@ -265,7 +265,7 @@ fn cargo() {
     let changelog = Parser::new()
         .prefix_format("Cargo ")
         .unwrap()
-        .version_format(r"^\d+\.\d+")
+        .version_format(r"^[0-9]+\.[0-9]+")
         .unwrap()
         .parse(include_str!("fixtures/cargo.md"))
         .unwrap();

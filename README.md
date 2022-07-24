@@ -9,6 +9,8 @@
 Simple changelog parser, written in Rust.
 
 - [Installation](#installation)
+  - [CLI](#cli)
+  - [Library](#library)
 - [Usage (CLI)](#usage-cli)
 - [Usage (Library)](#usage-library)
 - [Supported Format](#supported-format)
@@ -19,17 +21,20 @@ Simple changelog parser, written in Rust.
 
 ### CLI
 
+<!-- omit in toc -->
 #### From source
 
 ```sh
 cargo install parse-changelog
 ```
 
+<!-- omit in toc -->
 #### From prebuilt binaries
 
 You can download prebuilt binaries from the [Release page](https://github.com/taiki-e/parse-changelog/releases).
 Prebuilt binaries are available for macOS, Linux (gnu and musl), and Windows (static executable).
 
+<!-- omit in toc -->
 #### Via Homebrew
 
 You can install [parse-changelog using Homebrew tap on macOS and Linux](https://github.com/taiki-e/homebrew-tap/blob/HEAD/Formula/parse-changelog.rb):
@@ -38,6 +43,7 @@ You can install [parse-changelog using Homebrew tap on macOS and Linux](https://
 brew install taiki-e/tap/parse-changelog
 ```
 
+<!-- omit in toc -->
 #### Via Scoop (Windows)
 
 You can install [parse-changelog using Scoop](https://github.com/taiki-e/scoop-bucket/blob/HEAD/bucket/parse-changelog.json):
@@ -47,6 +53,7 @@ scoop bucket add taiki-e https://github.com/taiki-e/scoop-bucket
 scoop install parse-changelog
 ```
 
+<!-- omit in toc -->
 #### Via cargo-binstall
 
 You can install parse-changelog using [cargo-binstall](https://github.com/ryankurte/cargo-binstall):
@@ -55,6 +62,7 @@ You can install parse-changelog using [cargo-binstall](https://github.com/ryanku
 cargo binstall parse-changelog
 ```
 
+<!-- omit in toc -->
 #### Via MPR (Debian/Ubuntu)
 
 You can install [parse-changelog from the MPR](https://mpr.makedeb.org/packages/parse-changelog):
@@ -65,6 +73,7 @@ cd parse-changelog/
 makedeb -si
 ```
 
+<!-- omit in toc -->
 ##### Via Prebuilt-MPR
 
 You can also install parse-changelog from the Prebuilt-MPR, which provides automatic upgrades directly via APT. First [set up the Prebuilt-MPR on your system](https://docs.makedeb.org/prebuilt-mpr/getting-started), and then run the following:
@@ -75,6 +84,7 @@ sudo apt install parse-changelog
 
 Note: The MPR/Prebuilt-MPR packages are maintained by the community, not the maintainer of parse-changelog.
 
+<!-- omit in toc -->
 #### On GitHub Actions
 
 You can use [taiki-e/install-action](https://github.com/taiki-e/install-action) to install prebuilt binaries on Linux, macOS, and Windows.
@@ -135,6 +145,7 @@ OPTIONS:
 
 </details>
 
+<!-- omit in toc -->
 ### Example: Get Rust's release notes
 
 Get the release note for version 1.46.0 from [Rust's release notes](https://github.com/rust-lang/rust/blob/master/RELEASES.md):
@@ -146,6 +157,7 @@ curl -fsSL https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md \
 
 [*output of the above command.*](tests/fixtures/rust-1.46.0.md)
 
+<!-- omit in toc -->
 ### Example: Get Cargo's changelog
 
 In [Cargo's changelog](https://github.com/rust-lang/cargo/blob/master/CHANGELOG.md),
@@ -155,7 +167,7 @@ format `parse-changelog` don't support by default, so use `--prefix` and
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/rust-lang/cargo/master/CHANGELOG.md \
-  | parse-changelog --prefix 'Cargo ' --version-format '^\d+\.\d+$' - 1.50
+  | parse-changelog --prefix 'Cargo ' --version-format '^[0-9]+\.[0-9]+$' - 1.50
 ```
 
 [*output of the above command.*](tests/fixtures/cargo-1.50.md)
@@ -164,6 +176,7 @@ curl -fsSL https://raw.githubusercontent.com/rust-lang/cargo/master/CHANGELOG.md
 the same as [`Parser::version_format`]. See documentation of those methods for
 more information.
 
+<!-- omit in toc -->
 ### Example: Create a new GitHub release from changelog
 
 With [GitHub CLI](https://cli.github.com/manual/gh_release_create):
@@ -227,6 +240,7 @@ that have the title of each release starts with the version format based on
 [Semantic Versioning][semver]. (e.g., [Keep a Changelog][keepachangelog]'s
 changelog format.)
 
+<!-- omit in toc -->
 ### Headings
 
 The heading for each release must be Atx-style (1-6 `#`) or
@@ -255,6 +269,7 @@ Setext-style headings:
 -----
 ```
 
+<!-- omit in toc -->
 ### Titles
 
 The title of each release must start with a text or a link text (text with
@@ -271,6 +286,7 @@ description...
 description...
 ```
 
+<!-- omit in toc -->
 #### Prefixes
 
 You can include characters before the version as prefix.
@@ -285,6 +301,7 @@ allowed as prefixes.
 
 To customize the prefix format, use the [`Parser::prefix_format`] method (library) or `--prefix-format` option (CLI).
 
+<!-- omit in toc -->
 #### Versions
 
 ```text
@@ -297,11 +314,12 @@ The default version format is based on [Semantic Versioning][semver].
 This is parsed by using the following regular expression:
 
 ```text
-^\d+\.\d+\.\d+(-[\w\.-]+)?(\+[\w\.-]+)?$
+^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$|^Unreleased$
 ```
 
 To customize the version format, use the [`Parser::version_format`] method (library) or `--version-format` option (CLI).
 
+<!-- omit in toc -->
 #### Suffixes
 
 You can freely include characters after the version.

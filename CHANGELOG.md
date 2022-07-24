@@ -10,6 +10,12 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Change the default version format to accept the 'Unreleased' section as a valid changelog entry. ([#25](https://github.com/taiki-e/parse-changelog/pull/25), thanks @hwittenborn)
+
+  Note that this does not change the behavior of CLI when the version is not specified. To get the 'Unreleased' section in the CLI, you need to explicitly specify 'Unreleased' as the version.
+
+- Change the default version format to more strictly adhered to semver. Previous default version format accepted versions that are invalid as semver, such as leading zero in major, minor, or patch version.
+
 ## [0.4.9] - 2022-07-08
 
 - Add metadata for cargo binstall.
