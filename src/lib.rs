@@ -142,6 +142,8 @@
 //! ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$|^Unreleased$
 //! ```
 //!
+//! **Note:** To get the 'Unreleased' section in the CLI, you need to explicitly specify 'Unreleased' as the version.
+//!
 //! To customize the version format, use the [`Parser::version_format`] method.
 //!
 //! ### Suffixes
@@ -319,6 +321,8 @@ impl Parser {
     /// ```text
     /// ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$|^Unreleased$
     /// ```
+    ///
+    /// **Note:** To get the 'Unreleased' section in the CLI, you need to explicitly specify 'Unreleased' as the version.
     ///
     /// # Errors
     ///
