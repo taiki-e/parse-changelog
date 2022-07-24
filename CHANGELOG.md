@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.5.0] - 2022-07-24
+
 - Change the default version format to accept the 'Unreleased' section as a valid changelog entry. ([#25](https://github.com/taiki-e/parse-changelog/pull/25), thanks @hwittenborn)
 
   Note that this does not change the behavior of CLI when the version is not specified. To get the 'Unreleased' section in the CLI, you need to explicitly specify 'Unreleased' as the version.
@@ -124,7 +126,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.4.9...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/taiki-e/parse-changelog/compare/v0.4.9...v0.5.0
 [0.4.9]: https://github.com/taiki-e/parse-changelog/compare/v0.4.8...v0.4.9
 [0.4.8]: https://github.com/taiki-e/parse-changelog/compare/v0.4.7...v0.4.8
 [0.4.7]: https://github.com/taiki-e/parse-changelog/compare/v0.4.6...v0.4.7
