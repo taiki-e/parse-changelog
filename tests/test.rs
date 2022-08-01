@@ -111,9 +111,9 @@ fn failure() {
         assert!(parse(changelog).unwrap_err().is_parse());
     }
 
-    Parser::new().prefix_format("").unwrap();
-    Parser::new().prefix_format("  ").unwrap();
-    Parser::new().prefix_format("\t\n").unwrap();
+    assert!(Parser::new().prefix_format("").is_ok());
+    assert!(Parser::new().prefix_format("  ").is_ok());
+    assert!(Parser::new().prefix_format("\t\n").is_ok());
     let e = Parser::new().prefix_format(r"\/").unwrap_err();
     assert!(e.is_format());
     assert!(e.source().is_some());
