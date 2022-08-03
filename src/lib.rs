@@ -178,7 +178,15 @@
     single_use_lifetimes,
     unreachable_pub
 )]
-#![warn(clippy::exhaustive_enums, clippy::exhaustive_structs, clippy::pedantic)]
+#![warn(
+    clippy::pedantic,
+    // lints for public library
+    clippy::alloc_instead_of_core,
+    clippy::exhaustive_enums,
+    clippy::exhaustive_structs,
+    clippy::std_instead_of_alloc,
+    clippy::std_instead_of_core,
+)]
 #![allow(clippy::cast_possible_truncation, clippy::must_use_candidate)]
 
 #[cfg(doctest)]
@@ -193,7 +201,7 @@ mod assert_impl;
 
 mod error;
 
-use std::mem;
+use core::mem;
 
 use indexmap::IndexMap;
 use memchr::memmem;

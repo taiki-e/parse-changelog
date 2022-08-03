@@ -1,6 +1,6 @@
-use std::fmt;
+use core::fmt;
 
-pub(crate) type Result<T, E = Error> = std::result::Result<T, E>;
+pub(crate) type Result<T, E = Error> = core::result::Result<T, E>;
 
 /// An error that occurred during parsing changelog or configuring the parser.
 #[derive(Debug)]
