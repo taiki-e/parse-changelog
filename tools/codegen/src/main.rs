@@ -31,6 +31,9 @@ fn header() -> String {
         ".\n",
         "// It is not intended for manual editing.\n",
         "\n",
+        // rust-analyzer does not respect outer attribute (#[rustfmt::skip]) on
+        // a module without a body. So use inner attribute under cfg(rustfmt).
+        "#![cfg_attr(rustfmt, rustfmt::skip)]\n",
         "#![allow(clippy::wildcard_imports)]\n",
         "\n",
     )
