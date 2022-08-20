@@ -25,7 +25,7 @@ Simple changelog parser, written in Rust.
 #### From source
 
 ```sh
-cargo install parse-changelog
+cargo +stable install parse-changelog
 ```
 
 <!-- omit in toc -->
@@ -33,6 +33,18 @@ cargo install parse-changelog
 
 You can download prebuilt binaries from the [Release page](https://github.com/taiki-e/parse-changelog/releases).
 Prebuilt binaries are available for macOS, Linux (gnu and musl), and Windows (static executable).
+
+<details>
+<summary>Example of script to download parse-changelog</summary>
+
+```sh
+# Get host target
+host=$(rustc -Vv | grep host | sed 's/host: //')
+# Download binary and install to $HOME/.cargo/bin
+curl -LsSf https://github.com/taiki-e/parse-changelog/releases/latest/download/parse-changelog-$host.tar.gz | tar xzf - -C $HOME/.cargo/bin
+```
+
+</details>
 
 <!-- omit in toc -->
 #### Via Homebrew
