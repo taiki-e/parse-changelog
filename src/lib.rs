@@ -297,12 +297,12 @@ pub struct Parser {
     /// Version format. e.g., "0.1.0" in "# v0.1.0 (2020-01-01)".
     ///
     /// If `None`, `DEFAULT_VERSION_FORMAT` is used.
-    version: Option<Regex>,
+    version_format: Option<Regex>,
     /// Prefix format. e.g., "v" in "# v0.1.0 (2020-01-01)", "Version " in
     /// "# Version 0.1.0 (2020-01-01)".
     ///
     /// If `None`, `DEFAULT_PREFIX_FORMAT` is used.
-    prefix: Option<Regex>,
+    prefix_format: Option<Regex>,
 }
 
 impl Parser {
@@ -350,7 +350,7 @@ impl Parser {
         if format.trim().is_empty() {
             return Err(Error::format("empty or whitespace version format"));
         }
-        self.version = Some(Regex::new(format).map_err(Error::new)?);
+        self.version_format = Some(Regex::new(format).map_err(Error::new)?);
         Ok(self)
     }
 
@@ -390,7 +390,7 @@ impl Parser {
     ///
     /// [regex]: https://docs.rs/regex
     pub fn prefix_format(&mut self, format: &str) -> Result<&mut Self> {
-        self.prefix = Some(Regex::new(format).map_err(Error::new)?);
+        self.prefix_format = Some(Regex::new(format).map_err(Error::new)?);
         Ok(self)
     }
 
@@ -433,7 +433,7 @@ impl Parser {
     ///
     /// [`parse`]: Self::parse
     pub fn parse_iter<'a, 'r>(&'r self, text: &'a str) -> ParseIter<'a, 'r> {
-        ParseIter::new(text, self.version.as_ref(), self.prefix.as_ref())
+        ParseIter::new(text, self.version_format.as_ref(), self.prefix_format.as_ref())
     }
 }
 
