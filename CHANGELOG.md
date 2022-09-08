@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.5.1] - 2022-09-08
+
 - Fix bug in handling of link in title.
 
 - Improve performance for pathological inputs.
@@ -130,7 +132,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/taiki-e/parse-changelog/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/taiki-e/parse-changelog/compare/v0.4.9...v0.5.0
 [0.4.9]: https://github.com/taiki-e/parse-changelog/compare/v0.4.8...v0.4.9
 [0.4.8]: https://github.com/taiki-e/parse-changelog/compare/v0.4.7...v0.4.8
