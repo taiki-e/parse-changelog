@@ -338,3 +338,11 @@ fn fuzz() {
         }
     }
 }
+
+#[test]
+fn pathological_fake_heading() {
+    let text = &"#".repeat(1024 * 1024 * 128);
+    let now = std::time::Instant::now();
+    parse(text).unwrap_err();
+    eprintln!("{:?}", now.elapsed());
+}

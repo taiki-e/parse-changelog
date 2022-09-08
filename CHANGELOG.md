@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 - Fix bug in handling of link in title.
 
+- Improve performance for pathological inputs.
+
 ## [0.5.0] - 2022-07-24
 
 - Change the default version format to accept the 'Unreleased' section as a valid changelog entry. ([#25](https://github.com/taiki-e/parse-changelog/pull/25), thanks @hwittenborn)
