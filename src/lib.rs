@@ -195,6 +195,9 @@
 const _README: () = ();
 
 #[cfg(test)]
+mod tests;
+
+#[cfg(test)]
 #[path = "gen/assert_impl.rs"]
 mod assert_impl;
 
@@ -452,19 +455,19 @@ pub struct ParseIter<'a, 'r> {
 const OPEN: &[u8] = b"<!--";
 const CLOSE: &[u8] = b"-->";
 
+static DEFAULT_PREFIX_FORMAT: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"^(v|Version |Release )?").unwrap());
+static DEFAULT_VERSION_FORMAT: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$|^Unreleased$")
+    .unwrap()
+});
+
 impl<'a, 'r> ParseIter<'a, 'r> {
     fn new(
         text: &'a str,
         version_format: Option<&'r Regex>,
         prefix_format: Option<&'r Regex>,
     ) -> Self {
-        static DEFAULT_PREFIX_FORMAT: Lazy<Regex> =
-            Lazy::new(|| Regex::new(r"^(v|Version |Release )?").unwrap());
-        static DEFAULT_VERSION_FORMAT: Lazy<Regex> = Lazy::new(|| {
-            Regex::new(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$|^Unreleased$")
-                .unwrap()
-        });
-
         Self {
             version_format: version_format.unwrap_or(&DEFAULT_VERSION_FORMAT),
             prefix_format: prefix_format.unwrap_or(&DEFAULT_PREFIX_FORMAT),
@@ -577,11 +580,7 @@ impl<'a> Iterator for ParseIter<'a, '_> {
             }
 
             debug_assert!(release_note_start.is_none());
-            let mut unlinked = unlink(heading.text);
-            if let Some(m) = self.prefix_format.find(unlinked) {
-                unlinked = &unlinked[m.end()..];
-            }
-            let version = unlink(unlinked.split(char::is_whitespace).next().unwrap());
+            let version = extract_version_from_title(heading.text, self.prefix_format);
             if !self.version_format.is_match(version) {
                 // Ignore non-release sections that have the same heading
                 // levels as release sections.
@@ -743,11 +742,57 @@ fn trim(s: &str) -> &str {
     }
 }
 
+fn extract_version_from_title<'a>(mut text: &'a str, prefix_format: &Regex) -> &'a str {
+    // Remove link from prefix
+    // [Version 1.0.0 2022-01-01]
+    // ^
+    text = text.strip_prefix('[').unwrap_or(text);
+    // Remove prefix
+    // Version 1.0.0 2022-01-01]
+    // ^^^^^^^^
+    if let Some(m) = prefix_format.find(text) {
+        text = &text[m.end()..];
+    }
+    // Remove whitespace after the version and the strings following it
+    // 1.0.0 2022-01-01]
+    //      ^^^^^^^^^^^^
+    text = text.split(char::is_whitespace).next().unwrap();
+    // Remove link from version
+    // Version [1.0.0 2022-01-01]
+    //         ^
+    // [Version 1.0.0] 2022-01-01
+    //               ^
+    // Version [1.0.0] 2022-01-01
+    //         ^     ^
+    unlink(text)
+}
+
 /// If a leading `[` or trailing `]` exists, returns a string with it removed.
+///
+/// # Note
 ///
 /// This is not a full "unlink" on markdown, but this is enough as this crate
 /// does not parse a string at the end of headings.
 fn unlink(mut s: &str) -> &str {
+    // [1.0.0]
+    // ^
     s = s.strip_prefix('[').unwrap_or(s);
-    s.strip_suffix(']').unwrap_or(s)
+    if let Some(pos) = s.find(']') {
+        // 1.0.0]
+        //      ^
+        if pos + 1 == s.len() {
+            return &s[..pos];
+        }
+        let l = &s[pos + 1..];
+        // 1.0.0](link)
+        //      ^^^^^^^
+        // 1.0.0][link]
+        //      ^^^^^^^
+        if l.starts_with('(') && l.find(')').map_or(false, |pos| pos + 1 == l.len())
+            || l.starts_with('[') && l.find(']').map_or(false, |pos| pos + 1 == l.len())
+        {
+            return &s[..pos];
+        }
+    }
+    s
 }
