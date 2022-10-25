@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Distribute prebuilt binaries for aarch64 Windows.
+
 ## [0.5.1] - 2022-09-08
 
 - Fix bug in handling of link in title.
