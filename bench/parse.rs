@@ -1,6 +1,8 @@
 #![allow(clippy::drop_non_drop)]
 
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use std::hint::black_box;
+
+use criterion::{criterion_group, criterion_main, Criterion};
 use parse_changelog::{parse, parse_iter, Parser};
 
 fn parse_changelog_atx(c: &mut Criterion) {
