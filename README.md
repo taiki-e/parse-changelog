@@ -4,7 +4,7 @@
 [![docs.rs](https://img.shields.io/badge/docs.rs-parse--changelog-blue?style=flat-square&logo=docs.rs)](https://docs.rs/parse-changelog)
 [![license](https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue?style=flat-square)](#license)
 [![rustc](https://img.shields.io/badge/rustc-1.56+-blue?style=flat-square&logo=rust)](https://www.rust-lang.org)
-[![build status](https://img.shields.io/github/workflow/status/taiki-e/parse-changelog/CI/main?style=flat-square&logo=github)](https://github.com/taiki-e/parse-changelog/actions)
+[![build status](https://img.shields.io/github/actions/workflow/status/taiki-e/parse-changelog/ci.yml?branch=main&style=flat-square&logo=github)](https://github.com/taiki-e/parse-changelog/actions)
 
 Simple changelog parser, written in Rust.
 
