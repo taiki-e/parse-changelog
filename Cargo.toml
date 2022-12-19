@@ -25,6 +25,9 @@ pkg-fmt = "tgz"
 resolver = "2"
 members = ["bench", "tools/codegen"]
 
+[lib]
+doc-scrape-examples = false
+
 [[bin]]
 name = "parse-changelog"
 required-features = ["default"]
