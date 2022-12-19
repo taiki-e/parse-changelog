@@ -61,7 +61,6 @@ impl fmt::Display for Error {
     }
 }
 
-#[allow(clippy::std_instead_of_core)] // core::error::Error requires 1.65
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match &self.0 {
