@@ -112,7 +112,7 @@ To use this crate as a library, add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-parse-changelog = { version = "0.4", default-features = false }
+parse-changelog = { version = "0.5", default-features = false }
 ```
 
 Note: When using this crate as a library, we recommend disabling the default
