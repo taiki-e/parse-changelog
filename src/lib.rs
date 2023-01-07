@@ -1,167 +1,169 @@
-//! Simple changelog parser, written in Rust.
-//!
-//! # Examples
-//!
-//! ```rust
-//! let changelog = "\
-//! ## 0.1.2 - 2020-03-01
-//!
-//! - Bug fixes.
-//!
-//! ## 0.1.1 - 2020-02-01
-//!
-//! - Added `Foo`.
-//! - Added `Bar`.
-//!
-//! ## 0.1.0 - 2020-01-01
-//!
-//! Initial release
-//! ";
-//!
-//! // Parse changelog.
-//! let changelog = parse_changelog::parse(changelog).unwrap();
-//!
-//! // Get the latest release.
-//! assert_eq!(changelog[0].version, "0.1.2");
-//! assert_eq!(changelog[0].title, "0.1.2 - 2020-03-01");
-//! assert_eq!(changelog[0].notes, "- Bug fixes.");
-//!
-//! // Get the specified release.
-//! assert_eq!(changelog["0.1.0"].title, "0.1.0 - 2020-01-01");
-//! assert_eq!(changelog["0.1.0"].notes, "Initial release");
-//! assert_eq!(changelog["0.1.1"].title, "0.1.1 - 2020-02-01");
-//! assert_eq!(
-//!     changelog["0.1.1"].notes,
-//!     "- Added `Foo`.\n\
-//!      - Added `Bar`."
-//! );
-//! ```
-//!
-//! The key of the map returned does not include prefixes such as
-//! "v", "Version ", etc.
-//!
-//! ```rust
-//! let changelog_a = "\
-//! ## Version 0.1.0 - 2020-01-01
-//! Initial release
-//! ";
-//! let changelog_b = "\
-//! ## v0.1.0 - 2020-02-01
-//! Initial release
-//! ";
-//!
-//! let changelog_a = parse_changelog::parse(changelog_a).unwrap();
-//! let changelog_b = parse_changelog::parse(changelog_b).unwrap();
-//! // Not `changelog_a["Version 0.1.0"]`
-//! assert_eq!(changelog_a["0.1.0"].version, "0.1.0");
-//! assert_eq!(changelog_a["0.1.0"].title, "Version 0.1.0 - 2020-01-01");
-//! assert_eq!(changelog_a["0.1.0"].notes, "Initial release");
-//! // Not `changelog_b["v0.1.0"]`
-//! assert_eq!(changelog_b["0.1.0"].version, "0.1.0");
-//! assert_eq!(changelog_b["0.1.0"].title, "v0.1.0 - 2020-02-01");
-//! assert_eq!(changelog_b["0.1.0"].notes, "Initial release");
-//! ```
-//!
-//! # Supported Format
-//!
-//! By default, this crate is intended to support markdown-based changelogs
-//! that have the title of each release starts with the version format based on
-//! [Semantic Versioning][semver]. (e.g., [Keep a Changelog][keepachangelog]'s
-//! changelog format.)
-//!
-//! ## Headings
-//!
-//! The heading for each release must be Atx-style (1-6 `#`) or
-//! Setext-style (`=` or `-` in a line under text), and the heading levels
-//! must match with other releases.
-//!
-//! Atx-style headings:
-//!
-//! ```markdown
-//! ## 0.1.0
-//! ```
-//!
-//! ```markdown
-//! ### 0.1.0
-//! ```
-//!
-//! Setext-style headings:
-//!
-//! ```markdown
-//! 0.1.0
-//! =====
-//! ```
-//!
-//! ```markdown
-//! 0.1.0
-//! -----
-//! ```
-//!
-//! ## Titles
-//!
-//! The title of each release must start with a text or a link text (text with
-//! `[` and `]`) that starts with a valid [version format](#versions) or
-//! [prefix format](#prefixes). For example:
-//!
-//! ```markdown
-//! ## [0.2.0]
-//!
-//! description...
-//!
-//! ## 0.1.0
-//!
-//! description...
-//! ```
-//!
-//! ### Prefixes
-//!
-//! You can include characters before the version as prefix.
-//!
-//! ```text
-//! ### Version 0.1.0
-//!    ^^^^^^^^
-//! ```
-//!
-//! By default only "v", "Version ", "Release ", and "" (no prefix) are
-//! allowed as prefixes.
-//!
-//! To customize the prefix format, use the [`Parser::prefix_format`] method.
-//!
-//! ### Versions
-//!
-//! ```text
-//! ### v0.1.0 -- 2020-01-01
-//!     ^^^^^
-//! ```
-//!
-//! The default version format is based on [Semantic Versioning][semver].
-//!
-//! This is parsed by using the following regular expression:
-//!
-//! ```text
-//! ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$|^Unreleased$
-//! ```
-//!
-//! **Note:** To get the 'Unreleased' section in the CLI, you need to explicitly specify 'Unreleased' as the version.
-//!
-//! To customize the version format, use the [`Parser::version_format`] method.
-//!
-//! ### Suffixes
-//!
-//! You can freely include characters after the version.
-//!
-//! ```text
-//! ## 0.1.0 - 2020-01-01
-//!        ^^^^^^^^^^^^^
-//! ```
-//!
-//! # Optional features
-//!
-//! - **`serde`** — Implements [`serde::Serialize`] trait for parse-changelog types.
-//!
-//! [`serde::Serialize`]: https://docs.rs/serde/1/serde/trait.Serialize.html
-//! [keepachangelog]: https://keepachangelog.com
-//! [semver]: https://semver.org
+/*!
+Simple changelog parser, written in Rust.
+
+# Examples
+
+```rust
+let changelog = "\
+## 0.1.2 - 2020-03-01
+
+- Bug fixes.
+
+## 0.1.1 - 2020-02-01
+
+- Added `Foo`.
+- Added `Bar`.
+
+## 0.1.0 - 2020-01-01
+
+Initial release
+";
+
+// Parse changelog.
+let changelog = parse_changelog::parse(changelog).unwrap();
+
+// Get the latest release.
+assert_eq!(changelog[0].version, "0.1.2");
+assert_eq!(changelog[0].title, "0.1.2 - 2020-03-01");
+assert_eq!(changelog[0].notes, "- Bug fixes.");
+
+// Get the specified release.
+assert_eq!(changelog["0.1.0"].title, "0.1.0 - 2020-01-01");
+assert_eq!(changelog["0.1.0"].notes, "Initial release");
+assert_eq!(changelog["0.1.1"].title, "0.1.1 - 2020-02-01");
+assert_eq!(
+    changelog["0.1.1"].notes,
+    "- Added `Foo`.\n\
+     - Added `Bar`."
+);
+```
+
+The key of the map returned does not include prefixes such as
+"v", "Version ", etc.
+
+```rust
+let changelog_a = "\
+## Version 0.1.0 - 2020-01-01
+Initial release
+";
+let changelog_b = "\
+## v0.1.0 - 2020-02-01
+Initial release
+";
+
+let changelog_a = parse_changelog::parse(changelog_a).unwrap();
+let changelog_b = parse_changelog::parse(changelog_b).unwrap();
+// Not `changelog_a["Version 0.1.0"]`
+assert_eq!(changelog_a["0.1.0"].version, "0.1.0");
+assert_eq!(changelog_a["0.1.0"].title, "Version 0.1.0 - 2020-01-01");
+assert_eq!(changelog_a["0.1.0"].notes, "Initial release");
+// Not `changelog_b["v0.1.0"]`
+assert_eq!(changelog_b["0.1.0"].version, "0.1.0");
+assert_eq!(changelog_b["0.1.0"].title, "v0.1.0 - 2020-02-01");
+assert_eq!(changelog_b["0.1.0"].notes, "Initial release");
+```
+
+# Supported Format
+
+By default, this crate is intended to support markdown-based changelogs
+that have the title of each release starts with the version format based on
+[Semantic Versioning][semver]. (e.g., [Keep a Changelog][keepachangelog]'s
+changelog format.)
+
+## Headings
+
+The heading for each release must be Atx-style (1-6 `#`) or
+Setext-style (`=` or `-` in a line under text), and the heading levels
+must match with other releases.
+
+Atx-style headings:
+
+```markdown
+## 0.1.0
+```
+
+```markdown
+### 0.1.0
+```
+
+Setext-style headings:
+
+```markdown
+0.1.0
+=====
+```
+
+```markdown
+0.1.0
+-----
+```
+
+## Titles
+
+The title of each release must start with a text or a link text (text with
+`[` and `]`) that starts with a valid [version format](#versions) or
+[prefix format](#prefixes). For example:
+
+```markdown
+## [0.2.0]
+
+description...
+
+## 0.1.0
+
+description...
+```
+
+### Prefixes
+
+You can include characters before the version as prefix.
+
+```text
+### Version 0.1.0
+   ^^^^^^^^
+```
+
+By default only "v", "Version ", "Release ", and "" (no prefix) are
+allowed as prefixes.
+
+To customize the prefix format, use the [`Parser::prefix_format`] method.
+
+### Versions
+
+```text
+### v0.1.0 -- 2020-01-01
+    ^^^^^
+```
+
+The default version format is based on [Semantic Versioning][semver].
+
+This is parsed by using the following regular expression:
+
+```text
+^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$|^Unreleased$
+```
+
+**Note:** To get the 'Unreleased' section in the CLI, you need to explicitly specify 'Unreleased' as the version.
+
+To customize the version format, use the [`Parser::version_format`] method.
+
+### Suffixes
+
+You can freely include characters after the version.
+
+```text
+## 0.1.0 - 2020-01-01
+       ^^^^^^^^^^^^^
+```
+
+# Optional features
+
+- **`serde`** — Implements [`serde::Serialize`] trait for parse-changelog types.
+
+[`serde::Serialize`]: https://docs.rs/serde/1/serde/trait.Serialize.html
+[keepachangelog]: https://keepachangelog.com
+[semver]: https://semver.org
+*/
 
 #![doc(test(
     no_crate_inject,
