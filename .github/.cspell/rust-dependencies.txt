@@ -6,6 +6,7 @@ cell
 changelog
 criterion
 easy
+ignore
 indexmap
 json
 lexopt
@@ -18,4 +19,3 @@ proc
 quote
 regex
 serde
-walkdir
