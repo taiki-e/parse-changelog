@@ -4,11 +4,55 @@
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
 
+#![allow(clippy::std_instead_of_alloc, clippy::std_instead_of_core)]
+#[allow(unused_imports)]
+use core::marker::PhantomPinned;
+/// `Send` & `!Sync`
+#[allow(dead_code)]
+struct NotSync(core::cell::Cell<()>);
+/// `!Send` & `!Sync`
+#[allow(dead_code)]
+struct NotSendSync(std::rc::Rc<()>);
+/// `!UnwindSafe`
+#[allow(dead_code)]
+struct NotUnwindSafe(&'static mut ());
+/// `!RefUnwindSafe`
+#[allow(dead_code)]
+struct NotRefUnwindSafe(core::cell::UnsafeCell<()>);
+#[allow(dead_code)]
+fn assert_send<T: ?Sized + Send>() {}
+#[allow(dead_code)]
+fn assert_sync<T: ?Sized + Sync>() {}
+#[allow(dead_code)]
+fn assert_unpin<T: ?Sized + Unpin>() {}
+#[allow(dead_code)]
+fn assert_unwind_safe<T: ?Sized + std::panic::UnwindSafe>() {}
+#[allow(dead_code)]
+fn assert_ref_unwind_safe<T: ?Sized + std::panic::RefUnwindSafe>() {}
 const _: fn() = || {
-    fn assert_auto_traits<T: ?Sized + Send + Sync + Unpin>() {}
-    assert_auto_traits::<crate::error::Error>();
-    assert_auto_traits::<crate::Changelog<'_>>();
-    assert_auto_traits::<crate::Release<'_>>();
-    assert_auto_traits::<crate::Parser>();
-    assert_auto_traits::<crate::ParseIter<'_, '_>>();
+    assert_send::<crate::error::Error>();
+    assert_sync::<crate::error::Error>();
+    assert_unpin::<crate::error::Error>();
+    assert_unwind_safe::<crate::error::Error>();
+    assert_ref_unwind_safe::<crate::error::Error>();
+    assert_send::<crate::Changelog<'_>>();
+    assert_sync::<crate::Changelog<'_>>();
+    assert_unpin::<crate::Changelog<'_>>();
+    assert_unwind_safe::<crate::Changelog<'_>>();
+    assert_ref_unwind_safe::<crate::Changelog<'_>>();
+    assert_send::<crate::Release<'_>>();
+    assert_sync::<crate::Release<'_>>();
+    assert_unpin::<crate::Release<'_>>();
+    assert_unwind_safe::<crate::Release<'_>>();
+    assert_ref_unwind_safe::<crate::Release<'_>>();
+    assert_send::<crate::Parser>();
+    assert_sync::<crate::Parser>();
+    assert_unpin::<crate::Parser>();
+    assert_unwind_safe::<crate::Parser>();
+    assert_ref_unwind_safe::<crate::Parser>();
+    assert_send::<crate::ParseIter<'_, '_>>();
+    assert_sync::<crate::ParseIter<'_, '_>>();
+    assert_unpin::<crate::ParseIter<'_, '_>>();
+    assert_unwind_safe::<crate::ParseIter<'_, '_>>();
+    assert_ref_unwind_safe::<crate::ParseIter<'_, '_>>();
 };

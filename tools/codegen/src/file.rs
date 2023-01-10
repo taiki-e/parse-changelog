@@ -40,14 +40,22 @@ fn header(function_name: &str) -> String {
 
 #[track_caller]
 pub fn write(function_name: &str, path: &Path, contents: TokenStream) -> Result<()> {
+    write_raw(function_name, path, format_tokens(contents))
+}
+
+pub fn format_tokens(contents: TokenStream) -> String {
+    prettyplease::unparse(
+        &syn::parse2(contents.clone()).unwrap_or_else(|e| panic!("{e} in:\n---\n{contents}\n---")),
+    )
+    .replace("crate ::", "crate::")
+    .replace(" < ", "<")
+    .replace(" >", ">")
+}
+
+#[track_caller]
+pub fn write_raw(function_name: &str, path: &Path, contents: impl AsRef<[u8]>) -> Result<()> {
     let mut out = header(function_name).into_bytes();
-    out.extend_from_slice(
-        prettyplease::unparse(
-            &syn::parse2(contents.clone())
-                .unwrap_or_else(|e| panic!("{e} in:\n---\n{contents}\n---")),
-        )
-        .as_bytes(),
-    );
+    out.extend_from_slice(contents.as_ref());
     if path.is_file() && fs::read(path)? == out {
         return Ok(());
     }
