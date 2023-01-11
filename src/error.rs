@@ -76,6 +76,8 @@ impl From<regex::Error> for ErrorKind {
     }
 }
 
-// Note: These implementations are intentionally not-exist to prevent dependency
+// Note: Do not implement From<ThirdPartyErrorType> to prevent dependency
 // updates from becoming breaking changes.
-// impl From<regex::Error> for Error
+// Implementing `From<StdErrorType>` should also be avoided whenever possible,
+// as it would be a breaking change to remove the implementation if the
+// conversion is no longer needed due to changes in the internal implementation.
