@@ -135,7 +135,7 @@ jobs:
       - name: Install Rust
         run: rustup toolchain add nightly --no-self-update && rustup default nightly
       - uses: dtolnay/install@cargo-fuzz
-      - run: cargo install afl --debug
+      - run: cargo install afl --debug --locked
       - run: cargo fuzz build
       - run: cargo afl build
         working-directory: fuzz/afl

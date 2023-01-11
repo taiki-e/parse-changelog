@@ -25,7 +25,7 @@ Simple changelog parser, written in Rust.
 #### From source
 
 ```sh
-cargo +stable install parse-changelog
+cargo +stable install parse-changelog --locked
 ```
 
 <!-- omit in toc -->
