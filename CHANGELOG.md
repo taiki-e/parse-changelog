@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Distribute prebuilt macOS universal binary.
+
 ## [0.5.2] - 2022-10-25
 
 - Distribute prebuilt binaries for aarch64 Windows.
