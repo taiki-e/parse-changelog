@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.5.3] - 2023-01-11
+
 - Distribute prebuilt macOS universal binary.
 
 ## [0.5.2] - 2022-10-25
@@ -138,7 +140,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.5.2...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.5.3...HEAD
+[0.5.3]: https://github.com/taiki-e/parse-changelog/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/taiki-e/parse-changelog/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/taiki-e/parse-changelog/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/taiki-e/parse-changelog/compare/v0.4.9...v0.5.0
