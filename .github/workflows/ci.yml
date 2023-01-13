@@ -138,7 +138,9 @@ jobs:
           persist-credentials: false
       - name: Install Rust
         run: rustup toolchain add nightly --no-self-update && rustup default nightly
-      - uses: dtolnay/install@cargo-fuzz
+      - uses: taiki-e/cache-cargo-install-action@v1
+        with:
+          tool: cargo-fuzz
       - run: cargo install afl --debug --locked
       - run: cargo fuzz build
       - run: cargo afl build
