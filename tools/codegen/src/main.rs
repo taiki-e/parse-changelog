@@ -324,6 +324,7 @@ fn gen_assert_impl() -> Result<()> {
     Ok(())
 }
 
+#[must_use]
 struct ItemVisitor<F> {
     module: Vec<syn::PathSegment>,
     f: F,
