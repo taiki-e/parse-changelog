@@ -1,6 +1,5 @@
 binstall
 keepachangelog
-libfuzzer
 makedeb
 memmem
 setext
