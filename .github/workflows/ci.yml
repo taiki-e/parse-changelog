@@ -142,10 +142,11 @@ jobs:
       - uses: taiki-e/cache-cargo-install-action@v1
         with:
           tool: cargo-fuzz
-      - run: cargo install afl --debug --locked
+      # - run: cargo install afl --debug --locked
       - run: cargo fuzz build
-      - run: cargo afl build
-        working-directory: fuzz/afl
+      # TODO: AFL LLVM runtime is not built with Rust rustc-1.69.0-nightly-8996ea9, run `cargo install --force afl` to build it.
+      # - run: cargo afl build
+      #   working-directory: fuzz/afl
 
   # ALL THE PREVIOUS JOBS NEEDS TO BE ADDED TO THE `needs` SECTION OF THIS JOB!
 
