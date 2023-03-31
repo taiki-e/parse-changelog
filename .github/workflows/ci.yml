@@ -70,7 +70,7 @@ jobs:
       - uses: taiki-e/install-action@cargo-minimal-versions
       - run: echo "RUSTFLAGS=${RUSTFLAGS} -C target-feature=+crt-static" >>"${GITHUB_ENV}"
         if: startsWith(matrix.os, 'windows')
-      - run: cargo test --workspace --all-features
+      - run: cargo test --workspace --all-features --exclude parse-changelog-internal-codegen
       - run: cargo hack build --workspace --ignore-private --feature-powerset --no-dev-deps --lib
       - run: cargo minimal-versions build --workspace --all-features --ignore-private
 
