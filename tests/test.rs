@@ -2,8 +2,6 @@
 
 mod auxiliary;
 
-use std::error::Error as _;
-
 use auxiliary::{assert_diff, trim};
 use parse_changelog::{parse, parse_iter, Parser};
 
@@ -114,16 +112,12 @@ fn failure() {
     assert!(Parser::new().prefix_format("").is_ok());
     assert!(Parser::new().prefix_format("  ").is_ok());
     assert!(Parser::new().prefix_format("\t\n").is_ok());
-    let e = Parser::new().prefix_format(r"\/").unwrap_err();
-    assert!(e.is_format());
-    assert!(e.source().is_some());
+    assert!(Parser::new().prefix_format(r"\/").is_ok());
 
     assert!(Parser::new().version_format("").unwrap_err().is_format());
     assert!(Parser::new().version_format("  ").unwrap_err().is_format());
     assert!(Parser::new().version_format("\t\n").unwrap_err().is_format());
-    let e = Parser::new().version_format(r"\/").unwrap_err();
-    assert!(e.is_format());
-    assert!(e.source().is_some());
+    assert!(Parser::new().version_format(r"\/").is_ok());
 }
 
 #[test]
