@@ -192,8 +192,7 @@ You can freely include characters after the version.
 #![allow(clippy::cast_possible_truncation, clippy::must_use_candidate)]
 
 #[cfg(doctest)]
-// https://github.com/rust-lang/rust/issues/82768
-#[cfg_attr(doctest, cfg_attr(doctest, doc = include_str!("../README.md")))]
+#[doc = include_str!("../README.md")]
 const _README: () = ();
 
 #[cfg(test)]
