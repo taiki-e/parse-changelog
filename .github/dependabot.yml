@@ -7,3 +7,18 @@ updates:
     commit-message:
       prefix: ''
     labels: []
+  # crates with [workspace] table are not recognized by the above 'directory: /'
+  - package-ecosystem: cargo
+    directory: /fuzz
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: ''
+    labels: []
+  - package-ecosystem: cargo
+    directory: /fuzz/afl
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: ''
+    labels: []
