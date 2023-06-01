@@ -276,6 +276,7 @@ fn link() {
 }
 
 #[test]
+#[cfg_attr(miri, ignore)] // Miri is too slow
 fn rust() {
     let text = include_str!("fixtures/rust.md");
     let map = parse(text).unwrap();
@@ -295,6 +296,7 @@ fn rust() {
 }
 
 #[test]
+#[cfg_attr(miri, ignore)] // Miri is too slow
 fn pin_project() {
     let text = include_str!("fixtures/pin-project.md");
     let changelog = parse(text).unwrap();
@@ -308,6 +310,7 @@ fn pin_project() {
 }
 
 #[test]
+#[cfg_attr(miri, ignore)] // Miri is too slow
 fn cargo() {
     let changelog = Parser::new()
         .prefix_format("Cargo ")
@@ -334,6 +337,7 @@ fn fuzz() {
 }
 
 #[test]
+#[cfg_attr(miri, ignore)] // Miri is too slow
 fn pathological_fake_heading() {
     let text = &"#".repeat(1024 * 1024 * 128);
     let now = std::time::Instant::now();
