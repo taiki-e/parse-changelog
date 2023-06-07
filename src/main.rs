@@ -29,6 +29,7 @@ ARGS:
 
 OPTIONS:
     -t, --title                       Returns title instead of notes
+        --title-no-link               Similar to --title, but remove links from title
         --json                        Returns JSON representation of all releases in changelog
         --version-format <PATTERN>    Specify version format
         --prefix-format <PATTERN>     Specify prefix format [aliases: prefix]
@@ -40,6 +41,7 @@ struct Args {
     path: String,
     release: Option<String>,
     title: bool,
+    title_no_link: bool,
     json: bool,
     version_format: Option<String>,
     prefix_format: Option<String>,
@@ -50,6 +52,7 @@ impl Args {
         let mut path = None;
         let mut release = None;
         let mut title = false;
+        let mut title_no_link = false;
         let mut json = false;
         let mut version_format = None;
         let mut prefix_format = None;
@@ -57,7 +60,8 @@ impl Args {
         let mut parser = lexopt::Parser::from_env();
         while let Some(arg) = parser.next()? {
             match arg {
-                Short('t') | Long("title") if !title => title = true,
+                Short('t') | Long("title") if !title && !title_no_link => title = true,
+                Long("title-no-link") if !title && !title_no_link => title_no_link = true,
                 Long("json") if !json => json = true,
                 Long("version-format") if version_format.is_none() => {
                     version_format = Some(parser.value()?.parse()?);
@@ -84,7 +88,7 @@ impl Args {
             None => bail!("no changelog path specified"),
         };
 
-        Ok(Self { path, release, title, json, version_format, prefix_format })
+        Ok(Self { path, release, title, title_no_link, json, version_format, prefix_format })
     }
 }
 
@@ -143,7 +147,13 @@ fn try_main() -> Result<()> {
             entry_value
         }
     };
-    let text = if args.title { release.title } else { release.notes };
+    let text = if args.title {
+        release.title.into()
+    } else if args.title_no_link {
+        release.title_no_link()
+    } else {
+        release.notes.into()
+    };
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
     stdout.write_all(text.as_bytes())?;

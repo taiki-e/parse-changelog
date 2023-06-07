@@ -10,6 +10,14 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+### CLI
+
+- Add `--title-no-link` flag. This is similar to `--title`, but removes links from the title. ([#33](https://github.com/taiki-e/parse-changelog/pull/33))
+
+### Library
+
+- Add `Release::title_no_link` method. ([#33](https://github.com/taiki-e/parse-changelog/pull/33))
+
 ## [0.5.3] - 2023-01-11
 
 - Distribute prebuilt macOS universal binary.

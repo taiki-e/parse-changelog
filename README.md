@@ -147,6 +147,7 @@ ARGS:
 
 OPTIONS:
     -t, --title                       Returns title instead of notes
+        --title-no-link               Similar to --title, but remove links from title
         --json                        Returns JSON representation of all releases in changelog
         --version-format <PATTERN>    Specify version format
         --prefix-format <PATTERN>     Specify prefix format [aliases: prefix]
