@@ -186,7 +186,7 @@ You can freely include characters after the version.
     clippy::alloc_instead_of_core,
     clippy::exhaustive_enums,
     clippy::exhaustive_structs,
-    clippy::std_instead_of_alloc,
+    // clippy::std_instead_of_alloc,
     clippy::std_instead_of_core,
 )]
 #![allow(clippy::cast_possible_truncation, clippy::must_use_candidate)]
@@ -205,6 +205,7 @@ mod assert_impl;
 mod error;
 
 use core::mem;
+use std::borrow::Cow;
 
 use indexmap::IndexMap;
 use memchr::memmem;
@@ -283,13 +284,23 @@ pub struct Release<'a> {
     ///    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
     /// ```
     ///
-    /// Note that leading and trailing [whitespaces](char::is_whitespace) have
-    /// been removed.
+    /// Note:
+    /// - Leading and trailing [whitespaces](char::is_whitespace) have been removed.
+    /// - This retains links in the title. Use [`title_no_link`](Self::title_no_link)
+    ///   if you want to use the title with links removed.
     pub title: &'a str,
     /// The descriptions of this release.
     ///
     /// Note that leading and trailing newlines have been removed.
     pub notes: &'a str,
+}
+
+impl<'a> Release<'a> {
+    /// Returns the title of this release with link removed.
+    #[must_use]
+    pub fn title_no_link(&self) -> Cow<'a, str> {
+        full_unlink(self.title)
+    }
 }
 
 /// A changelog parser.
@@ -581,7 +592,7 @@ impl<'a> Iterator for ParseIter<'a, '_> {
             }
 
             debug_assert!(release_note_start.is_none());
-            let version = extract_version_from_title(heading.text, self.prefix_format);
+            let version = extract_version_from_title(heading.text, self.prefix_format).0;
             if !self.version_format.is_match(version) {
                 // Ignore non-release sections that have the same heading
                 // levels as release sections.
@@ -743,7 +754,7 @@ fn trim(s: &str) -> &str {
     }
 }
 
-fn extract_version_from_title<'a>(mut text: &'a str, prefix_format: &Regex) -> &'a str {
+fn extract_version_from_title<'a>(mut text: &'a str, prefix_format: &Regex) -> (&'a str, &'a str) {
     // Remove link from prefix
     // [Version 1.0.0 2022-01-01]
     // ^
@@ -768,13 +779,12 @@ fn extract_version_from_title<'a>(mut text: &'a str, prefix_format: &Regex) -> &
     unlink(text)
 }
 
-/// If a leading `[` or trailing `]` exists, returns a string with it removed.
+/// Remove a link from the given markdown text.
 ///
 /// # Note
 ///
-/// This is not a full "unlink" on markdown, but this is enough as this crate
-/// does not parse a string at the end of headings.
-fn unlink(mut s: &str) -> &str {
+/// This is not a full "unlink" on markdown. See `full_unlink` for "full" version.
+fn unlink(mut s: &str) -> (&str, &str) {
     // [1.0.0]
     // ^
     s = s.strip_prefix('[').unwrap_or(s);
@@ -782,18 +792,42 @@ fn unlink(mut s: &str) -> &str {
         // 1.0.0]
         //      ^
         if pos + 1 == s.len() {
-            return &s[..pos];
+            return (&s[..pos], "");
         }
-        let l = &s[pos + 1..];
+        let remaining = &s[pos + 1..];
         // 1.0.0](link)
         //      ^^^^^^^
         // 1.0.0][link]
         //      ^^^^^^^
-        if l.starts_with('(') && l.find(')').map_or(false, |pos| pos + 1 == l.len())
-            || l.starts_with('[') && l.find(']').map_or(false, |pos| pos + 1 == l.len())
-        {
-            return &s[..pos];
+        for (open, close) in [('(', ')'), ('[', ']')] {
+            if remaining.starts_with(open) {
+                if let Some(r_pos) = remaining.find(close) {
+                    if r_pos + 1 == remaining.len() {
+                        return (&s[..pos], "");
+                    }
+                    return (&s[..pos], &remaining[r_pos + 1..]);
+                }
+            }
         }
+        return (&s[..pos], remaining);
     }
-    s
+    (s, "")
+}
+
+/// Remove links from the given markdown text.
+fn full_unlink(s: &str) -> Cow<'_, str> {
+    let mut remaining = s;
+    let mut buf = String::with_capacity(remaining.len());
+    while let Some(pos) = remaining.find('[') {
+        buf.push_str(&remaining[..pos]);
+        let (t, r) = unlink(&remaining[pos..]);
+        buf.push_str(t);
+        remaining = r;
+    }
+    if buf.is_empty() {
+        remaining.into()
+    } else {
+        buf.push_str(remaining);
+        buf.into()
+    }
 }
