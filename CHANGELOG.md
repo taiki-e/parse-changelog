@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.6.0] - 2023-06-26
+
 - Update `indexmap` to 2.0.
 
   **Note:** This raises the minimum supported Rust version of this crate from Rust 1.56 to Rust 1.64.
@@ -154,7 +156,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.5.4...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/taiki-e/parse-changelog/compare/v0.5.4...v0.6.0
 [0.5.4]: https://github.com/taiki-e/parse-changelog/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/taiki-e/parse-changelog/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/taiki-e/parse-changelog/compare/v0.5.1...v0.5.2
