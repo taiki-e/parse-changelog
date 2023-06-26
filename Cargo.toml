@@ -2,7 +2,7 @@
 name = "parse-changelog"
 version = "0.5.4"
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.64"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/taiki-e/parse-changelog"
 keywords = ["changelog", "parser"]
@@ -36,11 +36,11 @@ required-features = ["default"]
 # When using this crate as a library, we recommend disabling the default features.
 default = ["anyhow", "lexopt", "serde", "serde_json"]
 # Implements serde::Serialize trait for parse-changelog types.
-serde = ["serde-crate", "indexmap/serde-1"]
+serde = ["serde-crate", "indexmap/serde"]
 
 # Note: indexmap and serde are public dependencies.
 [dependencies]
-indexmap = { version = "1.6.1", features = ["std"] }
+indexmap = "2"
 memchr = "2.4"
 once_cell = "1"
 regex = "1.3"

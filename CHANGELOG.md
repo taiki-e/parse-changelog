@@ -10,6 +10,10 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Update `indexmap` to 2.0.
+
+  **Note:** This raises the minimum supported Rust version of this crate from Rust 1.56 to Rust 1.64.
+
 ## [0.5.4] - 2023-06-07
 
 ### CLI
