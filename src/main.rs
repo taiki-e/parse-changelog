@@ -70,7 +70,7 @@ impl Args {
                     prefix_format = Some(parser.value()?.parse()?);
                 }
                 Short('h') | Long("help") => {
-                    print!("{}", USAGE);
+                    print!("{USAGE}");
                     std::process::exit(0);
                 }
                 Short('V') | Long("version") => {
@@ -94,7 +94,7 @@ impl Args {
 
 fn main() {
     if let Err(e) = try_main() {
-        eprintln!("error: {:#}", e);
+        eprintln!("error: {e:#}");
         std::process::exit(1)
     }
 }
