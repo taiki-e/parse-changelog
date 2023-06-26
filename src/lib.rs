@@ -264,8 +264,7 @@ pub fn parse_iter(text: &str) -> ParseIter<'_, 'static> {
 /// A release note for a version.
 #[allow(single_use_lifetimes)] // https://github.com/rust-lang/rust/issues/69952
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "serde", derive(serde_crate::Serialize))]
-#[cfg_attr(feature = "serde", serde(crate = "serde_crate"))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
 #[non_exhaustive]
 pub struct Release<'a> {
     /// The version of this release.

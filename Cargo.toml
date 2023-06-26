@@ -36,7 +36,7 @@ required-features = ["default"]
 # When using this crate as a library, we recommend disabling the default features.
 default = ["anyhow", "lexopt", "serde", "serde_json"]
 # Implements serde::Serialize trait for parse-changelog types.
-serde = ["serde-crate", "indexmap/serde"]
+serde = ["dep:serde", "indexmap/serde"]
 
 # Note: indexmap and serde are public dependencies.
 [dependencies]
@@ -47,7 +47,7 @@ regex = "1.3"
 
 anyhow = { version = "1.0.34", optional = true }
 lexopt = { version = "0.3", optional = true }
-serde-crate = { package = "serde", version = "1.0.103", optional = true, features = ["derive"] }
+serde = { version = "1.0.103", optional = true, features = ["derive"] }
 serde_json = { version = "1", optional = true }
 
 [dev-dependencies]

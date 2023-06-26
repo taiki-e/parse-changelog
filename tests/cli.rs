@@ -46,8 +46,7 @@ fn success() {
 
 type ChangelogOwned = IndexMap<String, ReleaseOwned>;
 
-#[derive(Debug, PartialEq, serde_crate::Deserialize)]
-#[serde(crate = "serde_crate")]
+#[derive(Debug, PartialEq, serde::Deserialize)]
 struct ReleaseOwned {
     version: String,
     title: String,
