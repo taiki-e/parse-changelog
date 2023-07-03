@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Fix build error from dependency when built with `-Z minimal-versions`.
+
 ## [0.6.0] - 2023-06-26
 
 - Update `indexmap` to 2.0.
