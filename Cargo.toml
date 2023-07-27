@@ -6,7 +6,7 @@ rust-version = "1.64"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/taiki-e/parse-changelog"
 keywords = ["changelog", "parser"]
-categories = ["command-line-utilities", "parser-implementations", "text-processing"]
+categories = ["command-line-utilities", "parser-implementations"]
 exclude = ["/.*", "/tools"]
 description = """
 Simple changelog parser, written in Rust.
