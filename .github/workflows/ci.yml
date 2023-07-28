@@ -101,11 +101,9 @@ jobs:
           persist-credentials: false
       - name: Install Rust
         run: rustup update stable --no-self-update
-      - run: rustup target add ${{ matrix.target }}
       - uses: taiki-e/setup-cross-toolchain-action@v1
         with:
           target: ${{ matrix.target }}
-        if: matrix.os == '' || startsWith(matrix.os, 'ubuntu')
       - run: echo "RUSTFLAGS=${RUSTFLAGS} -C target-feature=+crt-static" >>"${GITHUB_ENV}"
         if: endsWith(matrix.target, 'windows-msvc')
       - run: cargo build --target ${{ matrix.target }}
@@ -131,18 +129,6 @@ jobs:
           RUSTDOCFLAGS: ${{ env.RUSTDOCFLAGS }} -Z randomize-layout
           RUSTFLAGS: ${{ env.RUSTFLAGS }} -Z randomize-layout
 
-  codegen:
-    runs-on: ubuntu-20.04
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          persist-credentials: false
-      - name: Install Rust
-        run: rustup toolchain add nightly --no-self-update && rustup default nightly
-      - run: tools/gen.sh
-      - run: git add -N . && git diff --exit-code
-
   fuzz:
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -159,3 +145,15 @@ jobs:
       - run: cargo fuzz build
       - run: cargo afl build
         working-directory: fuzz/afl
+
+  codegen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+      - name: Install Rust
+        run: rustup toolchain add nightly --no-self-update && rustup default nightly
+      - run: tools/gen.sh
+      - run: git add -N . && git diff --exit-code
