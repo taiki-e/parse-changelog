@@ -3,6 +3,7 @@ use core::fmt;
 pub(crate) type Result<T, E = Error> = core::result::Result<T, E>;
 
 /// An error that occurred during parsing changelog or configuring the parser.
+// TODO: in next breaking, add PhantomData<Box<dyn fmt::Display + Send + Sync>> to make error type !UnwindSafe & !RefUnwindSafe for forward compatibility.
 #[derive(Debug)]
 pub struct Error(ErrorKind);
 
