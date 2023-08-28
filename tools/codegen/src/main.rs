@@ -19,8 +19,8 @@ fn main() -> Result<()> {
 }
 
 fn gen_assert_impl() -> Result<()> {
-    const NOT_SEND: &[&str] = &[];
-    const NOT_SYNC: &[&str] = &[];
+    const NOT_SEND: &[&str] = &["ParseIter"];
+    const NOT_SYNC: &[&str] = &["ParseIter"];
     const NOT_UNPIN: &[&str] = &[];
     const NOT_UNWIND_SAFE: &[&str] = &[];
     const NOT_REF_UNWIND_SAFE: &[&str] = &[];
