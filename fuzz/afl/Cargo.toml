@@ -10,7 +10,7 @@ resolver = "2"
 [dependencies]
 parse-changelog = { path = "../..", default-features = false }
 
-afl = "0.13"
+afl = "0.14"
 
 [[bin]]
 name = "parse"

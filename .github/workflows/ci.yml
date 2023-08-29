@@ -141,7 +141,7 @@ jobs:
       - uses: taiki-e/cache-cargo-install-action@v1
         with:
           tool: cargo-fuzz
-      - run: cargo install afl --debug --locked
+      - run: cargo install cargo-afl --debug --locked
       - run: cargo fuzz build
       - run: cargo afl build
         working-directory: fuzz/afl
