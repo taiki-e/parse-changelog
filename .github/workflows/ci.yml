@@ -125,7 +125,8 @@ jobs:
         run: rustup toolchain add nightly --no-self-update --component miri && rustup default nightly
       - run: cargo miri test --workspace --all-features $EXCLUDE
         env:
-          MIRIFLAGS: -Zmiri-strict-provenance -Zmiri-symbolic-alignment-check -Zmiri-disable-isolation
+          # We cannot use -Zmiri-symbolic-alignment-check due to memchr 2.6.0 bug.
+          MIRIFLAGS: -Zmiri-strict-provenance -Zmiri-disable-isolation
           RUSTDOCFLAGS: ${{ env.RUSTDOCFLAGS }} -Z randomize-layout
           RUSTFLAGS: ${{ env.RUSTFLAGS }} -Z randomize-layout
 
