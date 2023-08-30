@@ -68,7 +68,7 @@ scoop install parse-changelog
 <!-- omit in toc -->
 #### Via cargo-binstall
 
-You can install parse-changelog using [cargo-binstall](https://github.com/ryankurte/cargo-binstall):
+You can install parse-changelog using [cargo-binstall](https://github.com/cargo-bins/cargo-binstall):
 
 ```sh
 cargo binstall parse-changelog
