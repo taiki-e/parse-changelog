@@ -15,10 +15,3 @@ updates:
     commit-message:
       prefix: ''
     labels: []
-  - package-ecosystem: cargo
-    directory: /fuzz/afl
-    schedule:
-      interval: daily
-    commit-message:
-      prefix: ''
-    labels: []

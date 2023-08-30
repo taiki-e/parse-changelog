@@ -1,3 +1,7 @@
+# libfuzzer
 artifacts
 corpus
 coverage
+
+# afl
+out

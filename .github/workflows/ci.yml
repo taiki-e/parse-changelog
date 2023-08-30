@@ -142,10 +142,12 @@ jobs:
       - uses: taiki-e/cache-cargo-install-action@v1
         with:
           tool: cargo-fuzz
-      - run: cargo install cargo-afl --debug --locked
-      - run: cargo fuzz build
-      - run: cargo afl build
-        working-directory: fuzz/afl
+      - uses: taiki-e/cache-cargo-install-action@v1
+        with:
+          tool: cargo-afl
+      - run: cargo fuzz build --features libfuzzer
+      - run: cargo afl build --features afl
+        working-directory: fuzz
 
   codegen:
     runs-on: ubuntu-latest

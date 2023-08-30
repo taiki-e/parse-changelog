@@ -1,5 +1,5 @@
 [package]
-name = "fuzz-libfuzzer"
+name = "fuzz"
 version = "0.0.0"
 edition = "2021"
 publish = false
@@ -10,10 +10,14 @@ cargo-fuzz = true
 [workspace]
 resolver = "2"
 
+[features]
+libfuzzer = ["libfuzzer-sys"]
+
 [dependencies]
 parse-changelog = { path = "..", default-features = false }
 
-libfuzzer-sys = "0.4"
+libfuzzer-sys = { version = "0.4", optional = true }
+afl = { version = "0.14", optional = true }
 
 [[bin]]
 name = "parse"
