@@ -54,4 +54,6 @@ serde_json = { version = "1", optional = true }
 easy-ext = "1"
 
 [profile.release]
+codegen-units = 1
+lto = true
 strip = "symbols"
