@@ -14,36 +14,6 @@ fn assert_unpin<T: ?Sized + Unpin>() {}
 fn assert_unwind_safe<T: ?Sized + std::panic::UnwindSafe>() {}
 #[allow(dead_code)]
 fn assert_ref_unwind_safe<T: ?Sized + std::panic::RefUnwindSafe>() {}
-#[allow(unused_macros)]
-macro_rules! assert_not_send {
-    ($ty:ty) => {
-        static_assertions::assert_not_impl_all!($ty : Send);
-    };
-}
-#[allow(unused_macros)]
-macro_rules! assert_not_sync {
-    ($ty:ty) => {
-        static_assertions::assert_not_impl_all!($ty : Sync);
-    };
-}
-#[allow(unused_macros)]
-macro_rules! assert_not_unpin {
-    ($ty:ty) => {
-        static_assertions::assert_not_impl_all!($ty : Unpin);
-    };
-}
-#[allow(unused_macros)]
-macro_rules! assert_not_unwind_safe {
-    ($ty:ty) => {
-        static_assertions::assert_not_impl_all!($ty : std::panic::UnwindSafe);
-    };
-}
-#[allow(unused_macros)]
-macro_rules! assert_not_ref_unwind_safe {
-    ($ty:ty) => {
-        static_assertions::assert_not_impl_all!($ty : std::panic::RefUnwindSafe);
-    };
-}
 const _: fn() = || {
     assert_send::<crate::error::Error>();
     assert_sync::<crate::error::Error>();
@@ -65,8 +35,8 @@ const _: fn() = || {
     assert_unpin::<crate::Parser>();
     assert_unwind_safe::<crate::Parser>();
     assert_ref_unwind_safe::<crate::Parser>();
-    assert_not_send!(crate::ParseIter<'_, '_>);
-    assert_not_sync!(crate::ParseIter<'_, '_>);
+    assert_send::<crate::ParseIter<'_, '_>>();
+    assert_sync::<crate::ParseIter<'_, '_>>();
     assert_unpin::<crate::ParseIter<'_, '_>>();
     assert_unwind_safe::<crate::ParseIter<'_, '_>>();
     assert_ref_unwind_safe::<crate::ParseIter<'_, '_>>();
