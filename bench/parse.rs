@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
 #![allow(clippy::drop_non_drop)]
 
 use std::hint::black_box;

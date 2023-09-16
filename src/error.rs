@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
 use core::fmt;
 
 pub(crate) type Result<T, E = Error> = core::result::Result<T, E>;

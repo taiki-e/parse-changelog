@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
 /*
 # Run with libFuzzer
 cargo fuzz run --release --features libfuzzer parse
