@@ -4,4 +4,3 @@ makedeb
 memmem
 setext
 unparse
-whitespaces
