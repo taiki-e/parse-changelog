@@ -1,3 +1,4 @@
+<!-- markdownlint-disable -->
 - [Remove deprecated `#[project]`, `#[project_ref]`, and `#[project_replace]` attributes.](https://github.com/taiki-e/pin-project/pull/265)
 
   Name the projected type by passing an argument with the same name as the method to the `#[pin_project]` attribute instead:

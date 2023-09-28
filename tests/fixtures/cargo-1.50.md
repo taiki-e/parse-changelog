@@ -1,3 +1,4 @@
+<!-- markdownlint-disable -->
 [8662ab42...HEAD](https://github.com/rust-lang/cargo/compare/8662ab42...HEAD)
 
 ### Added

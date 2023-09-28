@@ -8,6 +8,7 @@ Copyright & License:
 - https://github.com/taiki-e/pin-project/blob/v1.0.8/LICENSE-APACHE
 - https://github.com/taiki-e/pin-project/blob/v1.0.8/LICENSE-MIT
 -->
+<!-- markdownlint-disable -->
 
 # Changelog
 
@@ -55,6 +56,7 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [1.0.0] - 2020-10-13
 
+<!-- markdownlint-disable -->
 - [Remove deprecated `#[project]`, `#[project_ref]`, and `#[project_replace]` attributes.](https://github.com/taiki-e/pin-project/pull/265)
 
   Name the projected type by passing an argument with the same name as the method to the `#[pin_project]` attribute instead:

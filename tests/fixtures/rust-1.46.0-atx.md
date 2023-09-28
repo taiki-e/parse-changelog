@@ -1,3 +1,4 @@
+<!-- markdownlint-disable -->
 ## Language
 - [`if`, `match`, and `loop` expressions can now be used in const functions.][72437]
 - [Additionally you are now also able to coerce and cast to slices (`&[T]`) in

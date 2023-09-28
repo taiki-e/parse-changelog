@@ -8,6 +8,7 @@ Copyright & License:
 - https://github.com/rust-lang/rust/blob/1.48.0/LICENSE-APACHE
 - https://github.com/rust-lang/rust/blob/1.48.0/LICENSE-MIT
 -->
+<!-- markdownlint-disable -->
 
 # Version 1.48.0 (2020-11-19)
 
@@ -269,6 +270,7 @@ The following previously stable APIs have now been made const.
 
 # Version 1.46.0 (2020-08-27)
 
+<!-- markdownlint-disable -->
 ## Language
 - [`if`, `match`, and `loop` expressions can now be used in const functions.][72437]
 - [Additionally you are now also able to coerce and cast to slices (`&[T]`) in

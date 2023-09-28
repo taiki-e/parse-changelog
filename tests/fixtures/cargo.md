@@ -8,10 +8,12 @@ Copyright & License:
 - https://github.com/rust-lang/cargo/blob/0.51.0/LICENSE-APACHE
 - https://github.com/rust-lang/cargo/blob/0.51.0/LICENSE-MIT
 -->
+<!-- markdownlint-disable -->
 
 # Changelog
 
 ## Cargo 1.50 (2021-02-11)
+<!-- markdownlint-disable -->
 [8662ab42...HEAD](https://github.com/rust-lang/cargo/compare/8662ab42...HEAD)
 
 ### Added
