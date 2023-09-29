@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Relax the minimum supported Rust version from Rust 1.64 to Rust 1.63.
+
 ## [0.6.2] - 2023-08-06
 
 - Update crates.io categories.
