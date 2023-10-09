@@ -202,11 +202,10 @@ mod assert_impl;
 mod error;
 
 use core::mem;
-use std::borrow::Cow;
+use std::{borrow::Cow, sync::OnceLock};
 
 use indexmap::IndexMap;
 use memchr::memmem;
-use once_cell::sync::OnceCell;
 use regex::Regex;
 
 pub use crate::error::Error;
@@ -464,11 +463,11 @@ const OPEN: &[u8] = b"<!--";
 const CLOSE: &[u8] = b"-->";
 
 fn default_prefix_format() -> &'static Regex {
-    static DEFAULT_PREFIX_FORMAT: OnceCell<Regex> = OnceCell::new();
+    static DEFAULT_PREFIX_FORMAT: OnceLock<Regex> = OnceLock::new();
     DEFAULT_PREFIX_FORMAT.get_or_init(|| Regex::new(r"^(v|Version |Release )?").unwrap())
 }
 fn default_version_format() -> &'static Regex {
-    static DEFAULT_VERSION_FORMAT: OnceCell<Regex> = OnceCell::new();
+    static DEFAULT_VERSION_FORMAT: OnceLock<Regex> = OnceLock::new();
     DEFAULT_VERSION_FORMAT.get_or_init(|| {
         Regex::new(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$|^Unreleased$")
         .unwrap()
