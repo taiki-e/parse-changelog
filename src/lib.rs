@@ -482,8 +482,8 @@ impl<'a, 'r> ParseIter<'a, 'r> {
         prefix_format: Option<&'r Regex>,
     ) -> Self {
         Self {
-            version_format: version_format.unwrap_or(&DEFAULT_VERSION_FORMAT),
-            prefix_format: prefix_format.unwrap_or(&DEFAULT_PREFIX_FORMAT),
+            version_format: version_format.unwrap_or_else(|| &DEFAULT_VERSION_FORMAT),
+            prefix_format: prefix_format.unwrap_or_else(|| &DEFAULT_PREFIX_FORMAT),
             find_open: memmem::Finder::new(OPEN),
             find_close: memmem::Finder::new(CLOSE),
             lines: Lines::new(text),
