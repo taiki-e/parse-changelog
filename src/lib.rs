@@ -211,7 +211,7 @@ use std::borrow::Cow;
 
 use indexmap::IndexMap;
 use memchr::memmem;
-use once_cell::sync::Lazy;
+use once_cell::sync::OnceCell;
 use regex::Regex;
 
 pub use crate::error::Error;
@@ -468,12 +468,17 @@ pub struct ParseIter<'a, 'r> {
 const OPEN: &[u8] = b"<!--";
 const CLOSE: &[u8] = b"-->";
 
-static DEFAULT_PREFIX_FORMAT: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"^(v|Version |Release )?").unwrap());
-static DEFAULT_VERSION_FORMAT: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$|^Unreleased$")
-    .unwrap()
-});
+fn default_prefix_format() -> &'static Regex {
+    static DEFAULT_PREFIX_FORMAT: OnceCell<Regex> = OnceCell::new();
+    DEFAULT_PREFIX_FORMAT.get_or_init(|| Regex::new(r"^(v|Version |Release )?").unwrap())
+}
+fn default_version_format() -> &'static Regex {
+    static DEFAULT_VERSION_FORMAT: OnceCell<Regex> = OnceCell::new();
+    DEFAULT_VERSION_FORMAT.get_or_init(|| {
+        Regex::new(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$|^Unreleased$")
+        .unwrap()
+    })
+}
 
 impl<'a, 'r> ParseIter<'a, 'r> {
     fn new(
@@ -482,8 +487,8 @@ impl<'a, 'r> ParseIter<'a, 'r> {
         prefix_format: Option<&'r Regex>,
     ) -> Self {
         Self {
-            version_format: version_format.unwrap_or_else(|| &DEFAULT_VERSION_FORMAT),
-            prefix_format: prefix_format.unwrap_or_else(|| &DEFAULT_PREFIX_FORMAT),
+            version_format: version_format.unwrap_or_else(|| default_version_format()),
+            prefix_format: prefix_format.unwrap_or_else(|| default_prefix_format()),
             find_open: memmem::Finder::new(OPEN),
             find_close: memmem::Finder::new(CLOSE),
             lines: Lines::new(text),

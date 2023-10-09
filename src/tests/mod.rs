@@ -5,7 +5,7 @@ use super::*;
 #[test]
 fn test_extract_version_from_title() {
     fn version(s: &str) -> (&str, &str) {
-        extract_version_from_title(s, &DEFAULT_PREFIX_FORMAT)
+        extract_version_from_title(s, default_prefix_format())
     }
 
     assert_eq!(version("[1.0.0]"), ("1.0.0", ""));
