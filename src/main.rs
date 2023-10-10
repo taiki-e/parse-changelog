@@ -84,10 +84,7 @@ impl Args {
             }
         }
 
-        let path = match path {
-            Some(path) => path,
-            None => bail!("no changelog path specified"),
-        };
+        let Some(path) = path else { bail!("no changelog path specified") };
 
         Ok(Self { path, release, title, title_no_link, json, version_format, prefix_format })
     }
