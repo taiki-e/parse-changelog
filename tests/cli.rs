@@ -8,6 +8,7 @@ mod auxiliary;
 
 use auxiliary::{parse_changelog, CommandExt};
 use indexmap::IndexMap;
+use serde_derive::Deserialize;
 
 #[test]
 fn failures() {
@@ -48,7 +49,7 @@ fn success() {
 
 type ChangelogOwned = IndexMap<String, ReleaseOwned>;
 
-#[derive(Debug, PartialEq, serde::Deserialize)]
+#[derive(Debug, PartialEq, Deserialize)]
 struct ReleaseOwned {
     version: String,
     title: String,

@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Improve compile time.
+
 ## [0.6.3] - 2023-09-29
 
 - Relax the minimum supported Rust version from Rust 1.64 to Rust 1.63.
