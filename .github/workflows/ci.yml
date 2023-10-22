@@ -75,7 +75,7 @@ jobs:
         if: startsWith(matrix.os, 'windows')
       - run: cargo test --workspace --all-features $EXCLUDE
       - run: cargo hack build --workspace --no-private --feature-powerset --no-dev-deps --lib
-      - run: cargo minimal-versions build --workspace --no-private --all-features
+      - run: cargo minimal-versions build --workspace --no-private --detach-path-deps=skip-exact --all-features
 
   miri:
     runs-on: ubuntu-latest
