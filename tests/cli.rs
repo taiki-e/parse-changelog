@@ -6,7 +6,7 @@
 
 mod auxiliary;
 
-use auxiliary::{parse_changelog, CommandExt};
+use auxiliary::cli::*;
 use indexmap::IndexMap;
 use serde_derive::Deserialize;
 

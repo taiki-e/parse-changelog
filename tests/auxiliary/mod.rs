@@ -3,7 +3,7 @@
 #![allow(dead_code, unused_macros)]
 
 #[cfg(feature = "default")]
-mod cli;
+pub mod cli;
 
 use std::{
     env, fs,
@@ -12,9 +12,6 @@ use std::{
     process::{Command, Stdio},
     str,
 };
-
-#[cfg(feature = "default")]
-pub use self::cli::*;
 
 pub fn trim(s: &str) -> &str {
     let mut cnt = 0;
