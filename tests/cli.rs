@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 #![cfg(feature = "default")]
-#![warn(rust_2018_idioms, single_use_lifetimes)]
 #![cfg(not(miri))] // Miri doesn't support pipe2 (inside std::process::Command::output)
 
 mod auxiliary;

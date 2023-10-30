@@ -7,9 +7,6 @@ publish = false
 [package.metadata]
 cargo-fuzz = true
 
-[workspace]
-resolver = "2"
-
 [features]
 libfuzzer = ["libfuzzer-sys"]
 
@@ -24,6 +21,9 @@ name = "parse"
 path = "parse.rs"
 test = false
 doc = false
+
+[workspace]
+resolver = "2"
 
 [profile.release]
 debug = true

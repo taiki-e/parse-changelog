@@ -176,10 +176,6 @@ You can freely include characters after the version.
 ))]
 #![forbid(unsafe_code)]
 #![warn(
-    rust_2018_idioms,
-    single_use_lifetimes,
-    unreachable_pub,
-    clippy::pedantic,
     // Lints that may help when writing public library.
     missing_debug_implementations,
     missing_docs,
@@ -264,7 +260,6 @@ pub fn parse_iter(text: &str) -> ParseIter<'_, 'static> {
 }
 
 /// A release note for a version.
-#[allow(single_use_lifetimes)] // https://github.com/rust-lang/rust/issues/69952
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde_derive::Serialize))]
 #[non_exhaustive]

@@ -13,3 +13,6 @@ criterion = { default-features = false, git = "https://github.com/taiki-e/criter
 name = "parse"
 path = "parse.rs"
 harness = false
+
+[lints]
+workspace = true

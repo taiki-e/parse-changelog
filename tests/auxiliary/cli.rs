@@ -9,7 +9,7 @@ use std::{
 use anyhow::Context as _;
 use easy_ext::ext;
 
-pub fn parse_changelog<O: AsRef<OsStr>>(args: impl AsRef<[O]>) -> Command {
+pub(crate) fn parse_changelog<O: AsRef<OsStr>>(args: impl AsRef<[O]>) -> Command {
     let mut cmd = Command::new(env!("CARGO_BIN_EXE_parse-changelog"));
     cmd.current_dir(env!("CARGO_MANIFEST_DIR"));
     cmd.args(args.as_ref());
@@ -19,7 +19,7 @@ pub fn parse_changelog<O: AsRef<OsStr>>(args: impl AsRef<[O]>) -> Command {
 #[ext(CommandExt)]
 impl Command {
     #[track_caller]
-    pub fn assert_output(&mut self) -> AssertOutput {
+    pub(crate) fn assert_output(&mut self) -> AssertOutput {
         let output = self.output().context("could not execute process").unwrap();
         AssertOutput {
             stdout: String::from_utf8_lossy(&output.stdout).into_owned(),
@@ -29,7 +29,7 @@ impl Command {
     }
 
     #[track_caller]
-    pub fn assert_success(&mut self) -> AssertOutput {
+    pub(crate) fn assert_success(&mut self) -> AssertOutput {
         let output = self.assert_output();
         if !output.status.success() {
             panic!(
@@ -43,7 +43,7 @@ impl Command {
     }
 
     #[track_caller]
-    pub fn assert_failure(&mut self) -> AssertOutput {
+    pub(crate) fn assert_failure(&mut self) -> AssertOutput {
         let output = self.assert_output();
         if output.status.success() {
             panic!(
@@ -57,10 +57,10 @@ impl Command {
     }
 }
 
-pub struct AssertOutput {
-    pub stdout: String,
-    pub stderr: String,
-    pub status: ExitStatus,
+pub(crate) struct AssertOutput {
+    pub(crate) stdout: String,
+    pub(crate) stderr: String,
+    pub(crate) status: ExitStatus,
 }
 
 fn line_separated(lines: &str) -> impl Iterator<Item = &'_ str> {
@@ -70,7 +70,7 @@ fn line_separated(lines: &str) -> impl Iterator<Item = &'_ str> {
 impl AssertOutput {
     /// Receives a line(`\n`)-separated list of patterns and asserts whether stderr contains each pattern.
     #[track_caller]
-    pub fn stderr_contains(&self, pats: &str) -> &Self {
+    pub(crate) fn stderr_contains(&self, pats: &str) -> &Self {
         for pat in line_separated(pats) {
             if !self.stderr.contains(pat) {
                 panic!(
@@ -85,7 +85,7 @@ impl AssertOutput {
 
     /// Receives a line(`\n`)-separated list of patterns and asserts whether stdout contains each pattern.
     #[track_caller]
-    pub fn stderr_not_contains(&self, pats: &str) -> &Self {
+    pub(crate) fn stderr_not_contains(&self, pats: &str) -> &Self {
         for pat in line_separated(pats) {
             if self.stderr.contains(pat) {
                 panic!(
@@ -99,14 +99,14 @@ impl AssertOutput {
     }
 
     #[track_caller]
-    pub fn stdout_eq(&self, s: &str) -> &Self {
+    pub(crate) fn stdout_eq(&self, s: &str) -> &Self {
         assert_eq!(self.stdout.trim(), s.trim());
         self
     }
 
     /// Receives a line(`\n`)-separated list of patterns and asserts whether stdout contains each pattern.
     #[track_caller]
-    pub fn stdout_contains(&self, pats: &str) -> &Self {
+    pub(crate) fn stdout_contains(&self, pats: &str) -> &Self {
         for pat in line_separated(pats) {
             if !self.stdout.contains(pat) {
                 panic!(
@@ -121,7 +121,7 @@ impl AssertOutput {
 
     /// Receives a line(`\n`)-separated list of patterns and asserts whether stdout contains each pattern.
     #[track_caller]
-    pub fn stdout_not_contains(&self, pats: &str) -> &Self {
+    pub(crate) fn stdout_not_contains(&self, pats: &str) -> &Self {
         for pat in line_separated(pats) {
             if self.stdout.contains(pat) {
                 panic!(

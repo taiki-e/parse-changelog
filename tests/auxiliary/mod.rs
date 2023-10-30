@@ -3,7 +3,7 @@
 #![allow(dead_code, unused_macros)]
 
 #[cfg(feature = "default")]
-pub mod cli;
+pub(crate) mod cli;
 
 use std::{
     env, fs,
@@ -13,7 +13,7 @@ use std::{
     str,
 };
 
-pub fn trim(s: &str) -> &str {
+pub(crate) fn trim(s: &str) -> &str {
     let mut cnt = 0;
     while s[cnt..].starts_with(' ') {
         cnt += 1;
@@ -27,7 +27,7 @@ pub fn trim(s: &str) -> &str {
 }
 
 #[track_caller]
-pub fn assert_diff(expected_path: impl AsRef<Path>, actual: impl AsRef<str>) {
+pub(crate) fn assert_diff(expected_path: impl AsRef<Path>, actual: impl AsRef<str>) {
     let actual = actual.as_ref();
     let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
     let manifest_dir =

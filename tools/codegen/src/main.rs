@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-#![warn(rust_2018_idioms, single_use_lifetimes)]
-#![allow(clippy::match_on_vec_items, clippy::needless_pass_by_value)]
+#![allow(clippy::match_on_vec_items, clippy::needless_pass_by_value, clippy::wildcard_imports)]
 
 #[macro_use]
 mod file;
@@ -69,12 +68,11 @@ fn gen_assert_impl() -> Result<()> {
                 visited_types.insert(path_string.clone());
 
                 let has_generics = generics.type_params().count() != 0;
-                if generics.const_params().count() != 0 {
-                    panic!(
-                        "gen_assert_impl doesn't support const generics yet; \
-                        skipped `{path_string}`"
-                    );
-                }
+                assert_eq!(
+                    generics.const_params().count(),
+                    0,
+                    "gen_assert_impl doesn't support const generics yet; skipped `{path_string}`"
+                );
 
                 let lt = generics.lifetimes().map(|_| quote! { '_ }).collect::<Vec<_>>();
                 if has_generics {
@@ -169,10 +167,10 @@ fn gen_assert_impl() -> Result<()> {
                         });
                     }
                 } else {
-                    let lt = if !lt.is_empty() {
-                        quote! { <#(#lt),*> }
-                    } else {
+                    let lt = if lt.is_empty() {
                         quote! {}
+                    } else {
+                        quote! { <#(#lt),*> }
                     };
                     if NOT_SEND.contains(&path_string.as_str()) {
                         use_macros = true;
