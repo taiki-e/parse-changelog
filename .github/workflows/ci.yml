@@ -105,8 +105,9 @@ jobs:
       - uses: taiki-e/cache-cargo-install-action@v1
         with:
           tool: cargo-fuzz
-      # We cannot use cache for cargo-afl because afl.rs requires the cargo-afl binary and afl library to be built with the same compiler version.
-      - run: cargo install cargo-afl --debug --locked
+      - uses: taiki-e/cache-cargo-install-action@v1
+        with:
+          tool: cargo-afl
       - run: cargo fuzz build --features libfuzzer
       - run: cargo afl build --features afl
         working-directory: fuzz
