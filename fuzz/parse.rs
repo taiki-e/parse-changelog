@@ -1,12 +1,19 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 /*
-# Run with libFuzzer
-cargo fuzz run --release --features libfuzzer parse
+Run with libFuzzer:
 
-# Run with AFL++
+```sh
+cargo fuzz run --release --features libfuzzer parse
+```
+
+Run with AFL++:
+
+```sh
+cd fuzz
 cargo afl build --release --features afl
 cargo afl fuzz -i seeds/parse -o out target/release/parse
+```
 */
 
 #![cfg_attr(feature = "libfuzzer", no_main)]
