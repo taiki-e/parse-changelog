@@ -537,6 +537,7 @@ impl<'a> Iterator for ParseIter<'a, '_> {
     fn next(&mut self) -> Option<Self::Item> {
         // If `true`, we are in a code block ("```").
         let mut on_code_block = false;
+        // TODO: nested case?
         // If `true`, we are in a comment (`<!--` and `-->`).
         let mut on_comment = false;
         let mut release_note_start = None;
