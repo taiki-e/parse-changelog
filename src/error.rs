@@ -45,11 +45,13 @@ impl Error {
     }
 
     /// Returns `true` if this error is that occurred during configuring the parser.
+    #[must_use]
     pub fn is_format(&self) -> bool {
         matches!(self.0, ErrorKind::Format(..) | ErrorKind::Regex(..))
     }
 
     /// Returns `true` if this error is that occurred during parsing changelog.
+    #[must_use]
     pub fn is_parse(&self) -> bool {
         matches!(self.0, ErrorKind::Parse(..))
     }

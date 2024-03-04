@@ -177,6 +177,7 @@ You can freely include characters after the version.
 #![forbid(unsafe_code)]
 #![warn(
     // Lints that may help when writing public library.
+    missing_debug_implementations,
     missing_docs,
     clippy::alloc_instead_of_core,
     clippy::exhaustive_enums,
@@ -186,7 +187,6 @@ You can freely include characters after the version.
     // clippy::std_instead_of_alloc,
     clippy::std_instead_of_core,
 )]
-#![allow(clippy::must_use_candidate)]
 
 #[cfg(doctest)]
 #[doc = include_str!("../README.md")]
@@ -314,6 +314,7 @@ pub struct Parser {
 
 impl Parser {
     /// Creates a new changelog parser.
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
@@ -721,7 +722,7 @@ fn heading<'a>(line: &'a str, lines: &mut Lines<'a>) -> Option<Heading<'a>> {
         if level < 7 && line.as_bytes().get(level).map_or(true, |&b| b == b' ') {
             return Some(Heading {
                 text: line.get(level + 1..).unwrap_or_default().trim(),
-                #[allow(clippy::cast_possible_truncation)] // level is < 7
+                #[allow(clippy::cast_possible_truncation)] // false positive: level is < 7: https://github.com/rust-lang/rust-clippy/issues/7486
                 level: level as _,
                 style: HeadingStyle::Atx,
             });
