@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.6.5] - 2024-03-05
+
 - Add `#[must_use]` to `Parser::new` and `Error::is_*`.
 
 ## [0.6.4] - 2023-10-18
@@ -174,7 +176,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.6.4...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.6.5...HEAD
+[0.6.5]: https://github.com/taiki-e/parse-changelog/compare/v0.6.4...v0.6.5
 [0.6.4]: https://github.com/taiki-e/parse-changelog/compare/v0.6.3...v0.6.4
 [0.6.3]: https://github.com/taiki-e/parse-changelog/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/taiki-e/parse-changelog/compare/v0.6.1...v0.6.2
