@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Add `#[must_use]` to `Parser::new` and `Error::is_*`.
+
 ## [0.6.4] - 2023-10-18
 
 - Improve compile time.
