@@ -1,3 +1,4 @@
+acvf
 binstall
 keepachangelog
 makedeb

@@ -85,6 +85,8 @@ jobs:
       - run: cargo minimal-versions build --workspace --no-private --detach-path-deps=skip-exact --all-features --direct
 
   fuzz:
+    env:
+      FUZZ_MAX_TOTAL_TIME: 60 # 1 minute
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -97,8 +99,45 @@ jobs:
       # We cannot use cache for cargo-afl because afl.rs requires the cargo-afl binary and afl library to be built with the same compiler version.
       - run: cargo install cargo-afl --debug --locked
       - run: cargo fuzz build --features libfuzzer
-      - run: cargo afl build --features afl
+      - run: cargo afl build --release --features afl
         working-directory: fuzz
+      # On scheduled job, run fuzzer $FUZZ_MAX_TOTAL_TIME seconds per target.
+      # TODO: This is currently skipped for libfuzzer due to https://github.com/rust-fuzz/cargo-fuzz/issues/270.
+      - name: Cache AFL++ output
+        uses: actions/cache@v4
+        with:
+          path: fuzz/out
+          key: afl-out-${{ github.run_id }}
+          restore-keys: afl-out-
+        if: github.event_name == 'schedule'
+      - name: Fuzzing with AFL++
+        run: |
+          set -eEuxo pipefail
+          echo 'core' | sudo tee /proc/sys/kernel/core_pattern
+          for target in $(ls | grep '.*\.rs$' | sed 's/\.rs$//'); do
+            cargo afl fuzz -i "seeds/${target}" -o "out/${target}" -V "${FUZZ_MAX_TOTAL_TIME}" "target/release/${target}"
+            rmdir "out/${target}"/default/crashes &>/dev/null || true
+            rmdir "out/${target}"/default/hangs &>/dev/null || true
+            if [[ -d "out/${target}"/default/crashes ]] || [[ -d "out/${target}"/default/hangs ]]; then
+              exit 1
+            fi
+          done
+        working-directory: fuzz
+        if: github.event_name == 'schedule'
+      - name: Archive artifacts
+        run: |
+          set -eEuxo pipefail
+          if [[ -d out ]]; then
+            tar acvf ../afl-artifacts.tar.xz out
+          fi
+        working-directory: fuzz
+        if: failure() && github.event_name == 'schedule'
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-artifacts
+          path: afl-artifacts.tar.xz
+        if: failure() && github.event_name == 'schedule'
 
   codegen:
     runs-on: ubuntu-latest

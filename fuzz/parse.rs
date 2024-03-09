@@ -12,7 +12,7 @@ Run with AFL++:
 ```sh
 cd fuzz
 cargo afl build --release --features afl
-cargo afl fuzz -i seeds/parse -o out target/release/parse
+cargo afl fuzz -i seeds/parse -o out/parse target/release/parse
 ```
 */
 
