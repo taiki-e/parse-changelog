@@ -128,7 +128,7 @@ jobs:
         run: |
           set -eEuxo pipefail
           if [[ -d out ]]; then
-            tar acvf ../afl-artifacts.tar.xz out
+            tar acvf ../afl-artifacts.tar.gz out
           fi
         working-directory: fuzz
         if: failure() && github.event_name == 'schedule'
@@ -136,7 +136,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: fuzz-artifacts
-          path: afl-artifacts.tar.xz
+          path: afl-artifacts.tar.gz
         if: failure() && github.event_name == 'schedule'
 
   codegen:
