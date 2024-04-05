@@ -10,6 +10,10 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Remove dependency on `once_cell`.
+
+  **Note:** This raises the minimum supported Rust version of this crate from Rust 1.65 to Rust 1.70.
+
 ## [0.6.5] - 2024-03-05
 
 - Add `#[must_use]` to `Parser::new` and `Error::is_*`.
