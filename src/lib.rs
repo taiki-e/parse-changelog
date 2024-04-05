@@ -700,7 +700,7 @@ struct Heading<'a> {
     style: HeadingStyle,
 }
 
-#[derive(Eq, PartialEq)]
+#[derive(PartialEq)]
 enum HeadingStyle {
     /// Atx-style headings use 1-6 `#` characters at the start of the line,
     /// corresponding to header levels 1-6.
