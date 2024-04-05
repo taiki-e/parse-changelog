@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.6.6] - 2024-04-05
+
 - Remove dependency on `once_cell`.
 
   **Note:** This raises the minimum supported Rust version of this crate from Rust 1.65 to Rust 1.70.
@@ -180,7 +182,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.6.5...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.6.6...HEAD
+[0.6.6]: https://github.com/taiki-e/parse-changelog/compare/v0.6.5...v0.6.6
 [0.6.5]: https://github.com/taiki-e/parse-changelog/compare/v0.6.4...v0.6.5
 [0.6.4]: https://github.com/taiki-e/parse-changelog/compare/v0.6.3...v0.6.4
 [0.6.3]: https://github.com/taiki-e/parse-changelog/compare/v0.6.2...v0.6.3
