@@ -722,7 +722,7 @@ fn heading<'a>(line: &'a str, lines: &mut Lines<'a>) -> Option<Heading<'a>> {
             return Some(Heading {
                 text: line.get(level + 1..).unwrap_or_default().trim(),
                 #[allow(clippy::cast_possible_truncation)] // false positive: level is < 7: https://github.com/rust-lang/rust-clippy/issues/7486
-                level: level as _,
+                level: level as u8,
                 style: HeadingStyle::Atx,
             });
         }
