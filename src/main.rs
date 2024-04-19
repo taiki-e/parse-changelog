@@ -87,6 +87,14 @@ impl Args {
 
         Ok(Self { path, release, title, title_no_link, json, version_format, prefix_format })
     }
+
+    fn path_for_msg(&self) -> &str {
+        if self.path == "-" {
+            "changelog"
+        } else {
+            &self.path
+        }
+    }
 }
 
 fn main() {
@@ -115,7 +123,15 @@ fn try_main() -> Result<()> {
         fs::read_to_string(&args.path).with_context(|| format!("failed to read {}", args.path))?
     };
 
-    let changelog = parser.parse(&text)?;
+    let changelog = match parser.parse(&text) {
+        Ok(changelog) => changelog,
+        Err(e) => {
+            if e.is_parse() {
+                bail!("{e} in {}", args.path_for_msg());
+            }
+            return Err(e.into());
+        }
+    };
 
     if args.json {
         let stdout = io::stdout();
@@ -129,17 +145,21 @@ fn try_main() -> Result<()> {
         if let Some(release) = changelog.get(version) {
             release
         } else {
-            bail!("not found release note for '{}'", version);
+            bail!("not found release note for '{version}' in {}", args.path_for_msg());
         }
     } else {
-        let (entry_key, entry_value) = changelog.first().context("not found release")?;
-
+        let (entry_key, entry_value) = changelog.first().unwrap(); // unwrap is okay as Parser::parse returns an error if changelog is empty.
         if entry_key == &"Unreleased" {
-            (
-                changelog.get_index(1).with_context(||
-                    format!("not found release; to get 'Unreleased' section specify release explicitly: `parse-changelog {} Unreleased`", args.path)
-                )?
-            ).1
+            changelog
+                .get_index(1)
+                .with_context(|| {
+                    format!(
+                        "not found release; to get 'Unreleased' section specify release \
+                         explicitly: `parse-changelog {} Unreleased`",
+                        args.path
+                    )
+                })?
+                .1
         } else {
             entry_value
         }

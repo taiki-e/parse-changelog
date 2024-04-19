@@ -17,11 +17,11 @@ fn failures() {
 
     parse_changelog(["tests/fixtures/pin-project.md", "0.0.0"])
         .assert_failure()
-        .stderr_contains("not found release note for '0.0.0'");
+        .stderr_contains("not found release note for '0.0.0' in tests/fixtures/pin-project.md");
 
     parse_changelog(["tests/fixtures/cargo.md", "1.50", "--prefix", "Cargo "])
         .assert_failure()
-        .stderr_contains("no release was found");
+        .stderr_contains("no release note was found in tests/fixtures/cargo.md");
 }
 
 #[test]

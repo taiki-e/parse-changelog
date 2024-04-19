@@ -237,7 +237,7 @@ pub type Changelog<'a> = IndexMap<&'a str, Release<'a>>;
 /// Returns an error if any of the following:
 ///
 /// - There are multiple release notes for one version.
-/// - No release was found. This usually means that the changelog isn't
+/// - No release note was found. This usually means that the changelog isn't
 ///   written in the supported format.
 pub fn parse(text: &str) -> Result<Changelog<'_>> {
     Parser::new().parse(text)
@@ -411,7 +411,7 @@ impl Parser {
     /// Returns an error if any of the following:
     ///
     /// - There are multiple release notes for one version.
-    /// - No release was found. This usually means that the changelog isn't
+    /// - No release note was found. This usually means that the changelog isn't
     ///   written in the supported format, or that the specified format is wrong
     ///   if you specify your own format.
     pub fn parse<'a>(&self, text: &'a str) -> Result<Changelog<'a>> {
@@ -425,7 +425,7 @@ impl Parser {
             }
         }
         if map.is_empty() {
-            return Err(Error::parse("no release was found"));
+            return Err(Error::parse("no release note was found"));
         }
         Ok(map)
     }

@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Diagnostic improvements.
+
 ## [0.6.6] - 2024-04-05
 
 - Remove dependency on `once_cell`.
