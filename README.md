@@ -49,7 +49,7 @@ curl --proto '=https' --tlsv1.2 -fsSL https://github.com/taiki-e/parse-changelog
 <!-- omit in toc -->
 #### Via Homebrew
 
-You can install [parse-changelog using Homebrew tap on macOS and Linux](https://github.com/taiki-e/homebrew-tap/blob/HEAD/Formula/parse-changelog.rb):
+You can install parse-changelog from the [Homebrew tap maintained by us](https://github.com/taiki-e/homebrew-tap/blob/HEAD/Formula/parse-changelog.rb) (x86_64/aarch64 macOS, x86_64/aarch64 Linux):
 
 ```sh
 brew install taiki-e/tap/parse-changelog
@@ -58,7 +58,7 @@ brew install taiki-e/tap/parse-changelog
 <!-- omit in toc -->
 #### Via Scoop (Windows)
 
-You can install [parse-changelog using Scoop](https://github.com/taiki-e/scoop-bucket/blob/HEAD/bucket/parse-changelog.json):
+You can install parse-changelog from the [Scoop bucket maintained by us](https://github.com/taiki-e/scoop-bucket/blob/HEAD/bucket/parse-changelog.json):
 
 ```sh
 scoop bucket add taiki-e https://github.com/taiki-e/scoop-bucket
