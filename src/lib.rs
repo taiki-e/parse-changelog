@@ -162,7 +162,7 @@ You can freely include characters after the version.
 
 - **`serde`** — Implements [`serde::Serialize`] trait for parse-changelog types.
 
-[`serde::Serialize`]: https://docs.rs/serde/1/serde/trait.Serialize.html
+[`serde::Serialize`]: https://docs.rs/serde/latest/serde/trait.Serialize.html
 [keepachangelog]: https://keepachangelog.com
 [semver]: https://semver.org
 */

@@ -346,8 +346,8 @@ You can freely include characters after the version.
 
 - [create-gh-release-action]: GitHub Action for creating GitHub Releases based on changelog. (Using this crate for changelog parsing.)
 
-[`Parser::prefix_format`]: https://docs.rs/parse-changelog/0.4/parse_changelog/struct.Parser.html#method.prefix_format
-[`Parser::version_format`]: https://docs.rs/parse-changelog/0.4/parse_changelog/struct.Parser.html#method.version_format
+[`Parser::prefix_format`]: https://docs.rs/parse-changelog/latest/parse_changelog/struct.Parser.html#method.prefix_format
+[`Parser::version_format`]: https://docs.rs/parse-changelog/latest/parse_changelog/struct.Parser.html#method.version_format
 [create-gh-release-action]: https://github.com/taiki-e/create-gh-release-action
 [keepachangelog]: https://keepachangelog.com
 [semver]: https://semver.org
