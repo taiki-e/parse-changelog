@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 - Diagnostic improvements.
 
+- Documentation improvements.
+
 ## [0.6.6] - 2024-04-05
 
 - Remove dependency on `once_cell`.
