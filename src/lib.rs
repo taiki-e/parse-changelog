@@ -81,11 +81,11 @@ must match with other releases.
 Atx-style headings:
 
 ```markdown
-## 0.1.0
+# 0.1.0
 ```
 
 ```markdown
-### 0.1.0
+## 0.1.0
 ```
 
 Setext-style headings:
@@ -107,11 +107,11 @@ The title of each release must start with a text or a link text (text with
 [prefix format](#prefixes). For example:
 
 ```markdown
-## [0.2.0]
+# [0.2.0]
 
 description...
 
-## 0.1.0
+# 0.1.0
 
 description...
 ```
@@ -121,7 +121,7 @@ description...
 You can include characters before the version as prefix.
 
 ```text
-### Version 0.1.0
+## Version 0.1.0
    ^^^^^^^^
 ```
 
@@ -133,7 +133,7 @@ To customize the prefix format, use the [`Parser::prefix_format`] method.
 ### Versions
 
 ```text
-### v0.1.0 -- 2020-01-01
+## v0.1.0 -- 2020-01-01
     ^^^^^
 ```
 
@@ -154,7 +154,7 @@ To customize the version format, use the [`Parser::version_format`] method.
 You can freely include characters after the version.
 
 ```text
-## 0.1.0 - 2020-01-01
+# 0.1.0 - 2020-01-01
        ^^^^^^^^^^^^^
 ```
 
@@ -268,7 +268,7 @@ pub struct Release<'a> {
     /// The version of this release.
     ///
     /// ```text
-    /// ### Version 0.1.0 -- 2020-01-01
+    /// ## Version 0.1.0 -- 2020-01-01
     ///            ^^^^^
     /// ```
     ///
@@ -277,7 +277,7 @@ pub struct Release<'a> {
     /// The title of this release.
     ///
     /// ```text
-    /// ### Version 0.1.0 -- 2020-01-01
+    /// ## Version 0.1.0 -- 2020-01-01
     ///    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
     /// ```
     ///
@@ -324,7 +324,7 @@ impl Parser {
     /// Sets the version format.
     ///
     /// ```text
-    /// ### v0.1.0 -- 2020-01-01
+    /// ## v0.1.0 -- 2020-01-01
     ///     ^^^^^
     /// ```
     ///
@@ -371,12 +371,12 @@ impl Parser {
     /// characters). For example:
     ///
     /// ```text
-    /// ### Version 0.1.0 -- 2020-01-01
+    /// ## Version 0.1.0 -- 2020-01-01
     ///    ^^^^^^^^
     /// ```
     ///
     /// ```text
-    /// ### v0.1.0 -- 2020-01-01
+    /// ## v0.1.0 -- 2020-01-01
     ///    ^
     /// ```
     ///
