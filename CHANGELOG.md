@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.6.8] - 2024-04-20
+
 - Documentation improvements.
 
 ## [0.6.7] - 2024-04-19
@@ -190,7 +192,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.6.7...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.6.8...HEAD
+[0.6.8]: https://github.com/taiki-e/parse-changelog/compare/v0.6.7...v0.6.8
 [0.6.7]: https://github.com/taiki-e/parse-changelog/compare/v0.6.6...v0.6.7
 [0.6.6]: https://github.com/taiki-e/parse-changelog/compare/v0.6.5...v0.6.6
 [0.6.5]: https://github.com/taiki-e/parse-changelog/compare/v0.6.4...v0.6.5
