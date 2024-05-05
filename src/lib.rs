@@ -187,6 +187,7 @@ You can freely include characters after the version.
     // clippy::std_instead_of_alloc,
     clippy::std_instead_of_core,
 )]
+#![cfg_attr(test, allow(unexpected_cfgs))] // https://github.com/rust-lang/rust/issues/124735
 
 #[cfg(doctest)]
 #[doc = include_str!("../README.md")]
