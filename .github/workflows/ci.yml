@@ -65,10 +65,10 @@ jobs:
           - rust: beta
           - rust: nightly
           - rust: nightly
-            os: macos-11
+            os: macos-latest
           - rust: nightly
-            os: windows-2019
-    runs-on: ${{ matrix.os || 'ubuntu-20.04' }}
+            os: windows-latest
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     timeout-minutes: 60
     steps:
       - uses: taiki-e/checkout-action@v1
@@ -77,8 +77,6 @@ jobs:
       - run: rustup toolchain add nightly --no-self-update
       - uses: taiki-e/install-action@cargo-hack
       - uses: taiki-e/install-action@cargo-minimal-versions
-      - run: echo "RUSTFLAGS=${RUSTFLAGS} -C target-feature=+crt-static" >>"${GITHUB_ENV}"
-        if: startsWith(matrix.os, 'windows')
       - run: cargo test --workspace --all-features $EXCLUDE
       - run: cargo hack build --workspace --no-private --feature-powerset --no-dev-deps --lib
       - run: cargo minimal-versions build --workspace --no-private --detach-path-deps=skip-exact --all-features
