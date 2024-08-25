@@ -6,12 +6,14 @@
 pub(crate) mod cli;
 
 use std::{
-    env, fs,
+    env,
     io::Write,
     path::Path,
     process::{Command, Stdio},
     str,
 };
+
+use fs_err as fs;
 
 pub(crate) fn trim(s: &str) -> &str {
     let mut cnt = 0;
@@ -27,24 +29,31 @@ pub(crate) fn trim(s: &str) -> &str {
 }
 
 #[track_caller]
-pub(crate) fn assert_diff(expected_path: impl AsRef<Path>, actual: impl AsRef<str>) {
+pub(crate) fn assert_diff(expected_path: impl AsRef<Path>, actual: impl AsRef<[u8]>) {
     let actual = actual.as_ref();
     let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
-    let manifest_dir =
-        manifest_dir.strip_prefix(env::current_dir().unwrap()).unwrap_or(manifest_dir);
     let expected_path = &manifest_dir.join(expected_path);
-    let expected = fs::read_to_string(expected_path).unwrap();
-    if expected.trim() != actual.trim() {
-        let mut child = Command::new("git")
-            .args(["--no-pager", "diff", "--no-index", "--"])
-            .arg(expected_path)
-            .arg("-")
-            .stdin(Stdio::piped())
-            .spawn()
-            .unwrap();
-        child.stdin.as_mut().unwrap().write_all(actual.as_bytes()).unwrap();
-        assert!(!child.wait().unwrap().success());
-        // patch -p1 <<'EOF' ... EOF
-        panic!("assertion failed; please run test locally and commit resulting changes, or apply above diff as patch");
+    if !expected_path.is_file() {
+        fs::create_dir_all(expected_path.parent().unwrap()).unwrap();
+        fs::write(expected_path, "").unwrap();
+    }
+    let expected = fs::read(expected_path).unwrap();
+    // TODO: remove trim_ascii
+    if expected.trim_ascii() != actual.trim_ascii() {
+        if env::var_os("CI").is_some() {
+            let mut child = Command::new("git")
+                .args(["--no-pager", "diff", "--no-index", "--"])
+                .arg(expected_path)
+                .arg("-")
+                .stdin(Stdio::piped())
+                .spawn()
+                .unwrap();
+            child.stdin.as_mut().unwrap().write_all(actual).unwrap();
+            assert!(!child.wait().unwrap().success());
+            // patch -p1 <<'EOF' ... EOF
+            panic!("assertion failed; please run test locally and commit resulting changes, or apply above diff as patch");
+        } else {
+            fs::write(expected_path, actual).unwrap();
+        }
     }
 }
