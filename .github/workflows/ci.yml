@@ -27,7 +27,7 @@ env:
 
 defaults:
   run:
-    shell: bash
+    shell: bash --noprofile --norc -CeEuxo pipefail {0}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
@@ -73,11 +73,11 @@ jobs:
     steps:
       - uses: taiki-e/checkout-action@v1
       - name: Install Rust
-        run: rustup toolchain add ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
+        run: rustup toolchain add "${{ matrix.rust }}" --no-self-update && rustup default "${{ matrix.rust }}"
       - run: rustup toolchain add nightly --no-self-update
       - uses: taiki-e/install-action@cargo-hack
       - uses: taiki-e/install-action@cargo-minimal-versions
-      - run: cargo test --workspace --all-features $EXCLUDE
+      - run: cargo test --workspace --all-features ${EXCLUDE}
       - run: cargo hack build --workspace --no-private --feature-powerset --no-dev-deps --lib
       - run: cargo minimal-versions build --workspace --no-private --detach-path-deps=skip-exact --all-features
       - run: cargo minimal-versions build --workspace --no-private --detach-path-deps=skip-exact --all-features --direct
@@ -110,13 +110,13 @@ jobs:
         if: github.event_name == 'schedule'
       - name: Fuzzing with AFL++
         run: |
-          set -eEuxo pipefail
-          echo 'core' | sudo tee /proc/sys/kernel/core_pattern
-          for target in $(ls | grep '.*\.rs$' | sed 's/\.rs$//'); do
+          sudo tee -- /proc/sys/kernel/core_pattern >/dev/null <<<core
+          # shellcheck disable=SC2010
+          for target in $(ls | grep -E '\.rs$' | sed -E 's/\.rs$//'); do
             cargo afl fuzz -i "seeds/${target}" -o "out/${target}" -V "${FUZZ_MAX_TOTAL_TIME}" "target/release/${target}"
-            rmdir "out/${target}"/default/crashes &>/dev/null || true
-            rmdir "out/${target}"/default/hangs &>/dev/null || true
-            if [[ -d "out/${target}"/default/crashes ]] || [[ -d "out/${target}"/default/hangs ]]; then
+            rmdir -- "out/${target}/default/crashes" 2>/dev/null || true
+            rmdir -- "out/${target}/default/hangs" 2>/dev/null || true
+            if [[ -d "out/${target}/default/crashes" ]] || [[ -d "out/${target}/default/hangs" ]]; then
               exit 1
             fi
           done
@@ -124,7 +124,6 @@ jobs:
         if: github.event_name == 'schedule'
       - name: Archive artifacts
         run: |
-          set -eEuxo pipefail
           if [[ -d out ]]; then
             tar acvf ../afl-artifacts.tar.gz out
           fi
