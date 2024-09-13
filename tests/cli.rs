@@ -15,13 +15,27 @@ fn failures() {
         .assert_failure()
         .stderr_contains("no changelog path specified");
 
+    parse_changelog(["tests/fixtures/pin-project.md", "0.0.0", "0.0.1"])
+        .assert_failure()
+        .stderr_contains(r#"unexpected argument "0.0.1""#);
+
+    parse_changelog(["tests/fixtures/pin-project.md", "0.0.0", "--title", "--title-no-link"])
+        .assert_failure()
+        .stderr_contains("--title may not be used together with --title-no-link");
+
+    parse_changelog(["tests/fixtures/pin-project.md", "0.0.0", "--title", "--title"])
+        .assert_failure()
+        .stderr_contains(
+            "the argument '--title' was provided more than once, but cannot be used multiple times",
+        );
+
     parse_changelog(["tests/fixtures/pin-project.md", "0.0.0"])
         .assert_failure()
         .stderr_contains("not found release note for '0.0.0' in tests/fixtures/pin-project.md");
 
     parse_changelog(["tests/fixtures/cargo.md", "1.50", "--prefix", "Cargo "])
         .assert_failure()
-        .stderr_contains("error: not found release note for '1.50' in tests/fixtures/cargo.md");
+        .stderr_contains("not found release note for '1.50' in tests/fixtures/cargo.md");
 }
 
 #[test]
@@ -29,6 +43,12 @@ fn success() {
     parse_changelog(["tests/fixtures/pin-project.md", "1.0.0"])
         .assert_success()
         .stdout_eq(include_str!("fixtures/pin-project-1.0.0.md"));
+    parse_changelog(["tests/fixtures/pin-project.md", "1.0.0", "--title"])
+        .assert_success()
+        .stdout_eq("[1.0.0] - 2020-10-13");
+    parse_changelog(["tests/fixtures/pin-project.md", "1.0.0", "--title-no-link"])
+        .assert_success()
+        .stdout_eq("1.0.0 - 2020-10-13");
 
     parse_changelog(["tests/fixtures/rust.md", "1.46.0"])
         .assert_success()

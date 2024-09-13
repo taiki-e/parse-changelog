@@ -49,6 +49,25 @@ struct Args {
 
 impl Args {
     fn parse() -> Result<Self> {
+        fn format_arg(arg: &lexopt::Arg<'_>) -> String {
+            match arg {
+                Long(flag) => format!("--{flag}"),
+                Short(flag) => format!("-{flag}"),
+                Value(val) => val.parse().unwrap(),
+            }
+        }
+        #[cold]
+        #[inline(never)]
+        fn multi_arg(flag: &lexopt::Arg<'_>) -> Result<()> {
+            let flag = &format_arg(flag);
+            bail!("the argument '{flag}' was provided more than once, but cannot be used multiple times");
+        }
+        #[cold]
+        #[inline(never)]
+        fn conflicts(a: &str, b: &str) -> Result<()> {
+            bail!("{a} may not be used together with {b}");
+        }
+
         let mut path = None;
         let mut release = None;
         let mut title = false;
@@ -59,16 +78,27 @@ impl Args {
 
         let mut parser = lexopt::Parser::from_env();
         while let Some(arg) = parser.next()? {
+            macro_rules! parse_flag {
+                ($flag:ident $(,)?) => {{
+                    if std::mem::replace(&mut $flag, true) {
+                        multi_arg(&arg)?;
+                    }
+                }};
+            }
+            macro_rules! parse_opt {
+                ($opt:ident $(,)?) => {{
+                    if $opt.is_some() {
+                        multi_arg(&arg)?;
+                    }
+                    $opt = Some(parser.value()?.parse()?);
+                }};
+            }
             match arg {
-                Short('t') | Long("title") if !title && !title_no_link => title = true,
-                Long("title-no-link") if !title && !title_no_link => title_no_link = true,
-                Long("json") if !json => json = true,
-                Long("version-format") if version_format.is_none() => {
-                    version_format = Some(parser.value()?.parse()?);
-                }
-                Long("prefix-format" | "prefix") if prefix_format.is_none() => {
-                    prefix_format = Some(parser.value()?.parse()?);
-                }
+                Short('t') | Long("title") => parse_flag!(title),
+                Long("title-no-link") => parse_flag!(title_no_link),
+                Long("json") => parse_flag!(json),
+                Long("version-format") => parse_opt!(version_format),
+                Long("prefix-format" | "prefix") => parse_opt!(prefix_format),
                 Short('h') | Long("help") => {
                     print!("{USAGE}");
                     std::process::exit(0);
@@ -84,6 +114,9 @@ impl Args {
         }
 
         let Some(path) = path else { bail!("no changelog path specified") };
+        if title && title_no_link {
+            conflicts("--title", "--title-no-link")?;
+        }
 
         Ok(Self { path, release, title, title_no_link, json, version_format, prefix_format })
     }
