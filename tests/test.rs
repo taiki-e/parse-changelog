@@ -277,50 +277,49 @@ fn link() {
 
 #[test]
 #[cfg_attr(miri, ignore)] // Miri is too slow
-fn rust() {
-    let text = include_str!("fixtures/rust.md");
-    let map = parse(text).unwrap();
-    assert_eq!(map.len(), 72);
-    assert_diff("tests/fixtures/rust-1.46.0.md", map["1.46.0"].notes);
-    let vec: Vec<_> = parse_iter(text).collect();
-    assert_eq!(vec.len(), 72);
-    assert_eq!(vec[2], map["1.46.0"]);
-
-    let text = include_str!("fixtures/rust-atx.md");
-    let map = parse(text).unwrap();
-    assert_eq!(map.len(), 72);
-    assert_diff("tests/fixtures/rust-1.46.0-atx.md", map["1.46.0"].notes);
-    let vec: Vec<_> = parse_iter(text).collect();
-    assert_eq!(vec.len(), 72);
-    assert_eq!(vec[2], map["1.46.0"]);
-}
-
-#[test]
-#[cfg_attr(miri, ignore)] // Miri is too slow
 fn pin_project() {
     let text = include_str!("fixtures/pin-project.md");
     let changelog = parse(text).unwrap();
-    assert_eq!(changelog.len(), 70);
+    assert_eq!(changelog.len(), 82);
     assert_diff("tests/fixtures/pin-project-1.0.0.md", changelog["1.0.0"].notes);
 
     // empty prefix format
     let changelog = Parser::new().prefix_format("").unwrap().parse(text).unwrap();
-    assert_eq!(changelog.len(), 70);
+    assert_eq!(changelog.len(), 82);
     assert_diff("tests/fixtures/pin-project-1.0.0.md", changelog["1.0.0"].notes);
 }
+#[test]
+#[cfg_attr(miri, ignore)] // Miri is too slow
+fn rust() {
+    let text = include_str!("fixtures/rust.md");
+    let map = parse(text).unwrap();
+    assert_eq!(map.len(), 116);
+    assert_diff("tests/fixtures/rust-1.46.0.md", map["1.46.0"].notes);
+    let vec: Vec<_> = parse_iter(text).collect();
+    assert_eq!(vec.len(), map.len());
+    assert_eq!(vec[46], map["1.46.0"]);
 
+    let text = include_str!("fixtures/rust-atx.md");
+    let map = parse(text).unwrap();
+    assert_eq!(map.len(), 116);
+    assert_diff("tests/fixtures/rust-1.46.0-atx.md", map["1.46.0"].notes);
+    let vec: Vec<_> = parse_iter(text).collect();
+    assert_eq!(vec.len(), map.len());
+    assert_eq!(vec[46], map["1.46.0"]);
+}
 #[test]
 #[cfg_attr(miri, ignore)] // Miri is too slow
 fn cargo() {
     let changelog = Parser::new()
         .prefix_format("Cargo ")
         .unwrap()
-        .version_format(r"^[0-9]+\.[0-9]+")
+        .version_format(r"^[0-9]+\.[0-9]+(\.[0-9])?$")
         .unwrap()
         .parse(include_str!("fixtures/cargo.md"))
         .unwrap();
-    assert_eq!(changelog.len(), 21);
+    assert_eq!(changelog.len(), 54);
     assert_diff("tests/fixtures/cargo-1.50.md", changelog["1.50"].notes);
+    assert_diff("tests/fixtures/cargo-1.77.1.md", changelog["1.77.1"].notes);
 }
 
 // Regression tests for bugs caught by fuzzing.

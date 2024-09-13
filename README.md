@@ -172,13 +172,13 @@ curl -fsSL https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md \
 ### Example: Get Cargo's changelog
 
 In [Cargo's changelog](https://github.com/rust-lang/cargo/blob/master/CHANGELOG.md),
-the title starts with "Cargo ", and the patch version is omitted. This is a
+the title starts with "Cargo ", and the patch version is omitted if zero. This is a
 format `parse-changelog` don't support by default, so use `--prefix` and
 `--version-format` to specify a custom format. For example:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/rust-lang/cargo/master/CHANGELOG.md \
-  | parse-changelog --prefix 'Cargo ' --version-format '^[0-9]+\.[0-9]+$' - 1.50
+  | parse-changelog --prefix 'Cargo ' --version-format '^[0-9]+\.[0-9]+(\.[0-9])?$' - 1.50
 ```
 
 [*output of the above command.*](tests/fixtures/cargo-1.50.md)

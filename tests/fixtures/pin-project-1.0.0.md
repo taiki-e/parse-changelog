@@ -1,4 +1,6 @@
 <!-- markdownlint-disable -->
+**Note:** This release has been yanked because it [failed to compile with syn 1.0.84 and later](https://github.com/taiki-e/pin-project/commit/ddcd88079ba2d82857c365f2a3543ad146ade54c).
+
 - [Remove deprecated `#[project]`, `#[project_ref]`, and `#[project_replace]` attributes.](https://github.com/taiki-e/pin-project/pull/265)
 
   Name the projected type by passing an argument with the same name as the method to the `#[pin_project]` attribute instead:
@@ -34,4 +36,4 @@ Changes since the 1.0.0-alpha.1 release:
 
 - [Fix drop order of pinned fields in `project_replace`.](https://github.com/taiki-e/pin-project/pull/287)
 
-- Update minimal version of `syn` to 1.0.44
+- Update minimal version of `syn` to 1.0.44.

@@ -21,7 +21,7 @@ fn failures() {
 
     parse_changelog(["tests/fixtures/cargo.md", "1.50", "--prefix", "Cargo "])
         .assert_failure()
-        .stderr_contains("no release note was found in tests/fixtures/cargo.md");
+        .stderr_contains("error: not found release note for '1.50' in tests/fixtures/cargo.md");
 }
 
 #[test]
@@ -34,13 +34,17 @@ fn success() {
         .assert_success()
         .stdout_eq(include_str!("fixtures/rust-1.46.0.md"));
 
+    parse_changelog(["tests/fixtures/rust-atx.md", "1.46.0"])
+        .assert_success()
+        .stdout_eq(include_str!("fixtures/rust-1.46.0-atx.md"));
+
     parse_changelog([
         "tests/fixtures/cargo.md",
         "1.50",
         "--prefix",
         "Cargo ",
         "--version-format",
-        r"^[0-9]+\.[0-9]+$",
+        r"^[0-9]+\.[0-9]+(\.[0-9])?$",
     ])
     .assert_success()
     .stdout_eq(include_str!("fixtures/cargo-1.50.md"));
@@ -57,9 +61,30 @@ struct ReleaseOwned {
 
 #[test]
 fn json() {
+    let text = parse_changelog(["tests/fixtures/pin-project.md", "--json"]).assert_success().stdout;
+    let changelog: ChangelogOwned = serde_json::from_str(&text).unwrap();
+    assert_eq!(changelog.len(), 82);
+
     let text = parse_changelog(["tests/fixtures/rust.md", "--json"]).assert_success().stdout;
     let changelog: ChangelogOwned = serde_json::from_str(&text).unwrap();
-    assert_eq!(changelog.len(), 72);
+    assert_eq!(changelog.len(), 116);
+
+    let text = parse_changelog(["tests/fixtures/rust-atx.md", "--json"]).assert_success().stdout;
+    let changelog: ChangelogOwned = serde_json::from_str(&text).unwrap();
+    assert_eq!(changelog.len(), 116);
+
+    let text = parse_changelog([
+        "tests/fixtures/cargo.md",
+        "--json",
+        "--prefix",
+        "Cargo ",
+        "--version-format",
+        r"^[0-9]+\.[0-9]+(\.[0-9])?$",
+    ])
+    .assert_success()
+    .stdout;
+    let changelog: ChangelogOwned = serde_json::from_str(&text).unwrap();
+    assert_eq!(changelog.len(), 54);
 }
 
 #[test]
