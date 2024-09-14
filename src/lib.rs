@@ -187,6 +187,8 @@ You can freely include characters after the version.
     // clippy::std_instead_of_alloc,
     clippy::std_instead_of_core,
 )]
+// docs.rs only (cfg is enabled by docs.rs, not build script)
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 #[cfg(doctest)]
 #[doc = include_str!("../README.md")]
@@ -199,6 +201,7 @@ mod tests;
 #[path = "gen/assert_impl.rs"]
 mod assert_impl;
 #[cfg(feature = "serde")]
+#[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
 #[path = "gen/serde.rs"]
 mod serde_impl;
 
