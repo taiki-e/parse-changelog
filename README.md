@@ -49,7 +49,7 @@ curl --proto '=https' --tlsv1.2 -fsSL https://github.com/taiki-e/parse-changelog
 <!-- omit in toc -->
 #### Via Homebrew
 
-You can install parse-changelog from the [Homebrew tap maintained by us](https://github.com/taiki-e/homebrew-tap/blob/HEAD/Formula/parse-changelog.rb) (x86_64/aarch64 macOS, x86_64/aarch64 Linux):
+You can install parse-changelog from the [Homebrew tap maintained by us](https://github.com/taiki-e/homebrew-tap/blob/HEAD/Formula/parse-changelog.rb) (x86_64/AArch64 macOS, x86_64/AArch64 Linux):
 
 ```sh
 brew install taiki-e/tap/parse-changelog

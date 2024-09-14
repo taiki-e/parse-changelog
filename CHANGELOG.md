@@ -10,6 +10,20 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Performance improvements. ([#37](https://github.com/taiki-e/parse-changelog/pull/37))
+
+- Remove dependency on `serde_derive`.
+
+- Documentation improvements.
+
+### CLI
+
+- Distribute prebuilt binaries for x86_64 FreeBSD and illumos.
+
+- Diagnostic improvements.
+
+- Disable quick-install fallback of cargo-binstall.
+
 ## [0.6.8] - 2024-04-20
 
 - Documentation improvements.
@@ -68,7 +82,7 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [0.5.2] - 2022-10-25
 
-- Distribute prebuilt binaries for aarch64 Windows.
+- Distribute prebuilt binaries for AArch64 Windows.
 
 ## [0.5.1] - 2022-09-08
 
@@ -90,11 +104,11 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [0.4.8] - 2022-06-02
 
-- Distribute prebuilt binaries for aarch64 macOS. ([#21](https://github.com/taiki-e/parse-changelog/pull/21))
+- Distribute prebuilt binaries for AArch64 macOS. ([#21](https://github.com/taiki-e/parse-changelog/pull/21))
 
 ## [0.4.7] - 2022-01-21
 
-- Distribute prebuilt binaries for aarch64 Linux (gnu and musl).
+- Distribute prebuilt binaries for AArch64 Linux (gnu and musl).
 
 ## [0.4.6] - 2022-01-03
 
@@ -116,19 +130,19 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [0.4.3] - 2021-07-24
 
-- [Fix bug in parsing of heading.](https://github.com/taiki-e/parse-changelog/pull/13)
+- Fix bug in parsing of heading. ([#13](https://github.com/taiki-e/parse-changelog/pull/13))
 
 ## [0.4.2] - 2021-07-22
 
-- [Performance improvements.](https://github.com/taiki-e/parse-changelog/pull/11)
+- Performance improvements. ([#11](https://github.com/taiki-e/parse-changelog/pull/11))
 
 ### CLI
 
-- [Add `--json` flag to return JSON representation of changelog.](https://github.com/taiki-e/parse-changelog/pull/12)
+- Add `--json` flag to return JSON representation of changelog. ([#12](https://github.com/taiki-e/parse-changelog/pull/12))
 
 ### Library
 
-- [Add `serde` optional feature.](https://github.com/taiki-e/parse-changelog/pull/12)
+- Add `serde` optional feature. ([#12](https://github.com/taiki-e/parse-changelog/pull/12))
 
 ## [0.4.1] - 2021-07-22
 
@@ -136,15 +150,15 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [0.4.0] - 2021-07-22
 
-- [Fix bug in parsing of atx style heading.](https://github.com/taiki-e/parse-changelog/pull/9)
+- Fix bug in parsing of atx style heading. ([#9](https://github.com/taiki-e/parse-changelog/pull/9))
 
-- [Performance improvements.](https://github.com/taiki-e/parse-changelog/pull/8)
+- Performance improvements. ([#8](https://github.com/taiki-e/parse-changelog/pull/8))
 
 ### Library
 
-- [Change `Release::notes` field from `String` to `&str`.](https://github.com/taiki-e/parse-changelog/pull/8)
+- Change `Release::notes` field from `String` to `&str`. ([#8](https://github.com/taiki-e/parse-changelog/pull/8))
 
-- [Add `parse_iter` for partial parsing changelog.](https://github.com/taiki-e/parse-changelog/pull/9)
+- Add `parse_iter` for partial parsing changelog. ([#9](https://github.com/taiki-e/parse-changelog/pull/9))
 
 - Implement `PartialEq` and `Eq` for `Release`.
 
@@ -178,9 +192,9 @@ No public API changes from 0.2.1.
 
 ### CLI
 
-- [Add `--title` option.](https://github.com/taiki-e/parse-changelog/pull/1)
+- Add `--title` option. ([#1](https://github.com/taiki-e/parse-changelog/pull/1))
 
-- [Add support for standard input.](https://github.com/taiki-e/parse-changelog/pull/1)
+- Add support for standard input. ([#1](https://github.com/taiki-e/parse-changelog/pull/1))
 
 ### Library
 
