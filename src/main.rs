@@ -149,7 +149,7 @@ fn try_main() -> Result<()> {
     }
 
     let text = if args.path == "-" {
-        let mut buf = String::new();
+        let mut buf = String::with_capacity(128);
         io::stdin().read_to_string(&mut buf).context("failed to read standard input")?;
         buf
     } else {
