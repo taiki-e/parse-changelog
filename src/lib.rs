@@ -357,7 +357,7 @@ impl Parser {
     /// [regex]: https://docs.rs/regex
     /// [semver]: https://semver.org
     pub fn version_format(&mut self, format: &str) -> Result<&mut Self> {
-        if format.trim().is_empty() {
+        if format.trim_start().is_empty() {
             return Err(Error::format("empty or whitespace version format"));
         }
         self.version_format = Some(Regex::new(format).map_err(Error::new)?);
@@ -556,7 +556,7 @@ impl<'a> Iterator for ParseIter<'a, '_> {
                 if on_code_block || on_comment { None } else { heading(line, &mut self.lines) };
             if heading.is_none() {
                 self.lines.next();
-                if trim(line).starts_with("```") {
+                if trim_start(line).starts_with("```") {
                     on_code_block = !on_code_block;
                 }
 
@@ -622,7 +622,7 @@ impl<'a> Iterator for ParseIter<'a, '_> {
                 self.lines.next();
             }
             while let Some((next, ..)) = self.lines.peek() {
-                if next.trim().is_empty() {
+                if next.trim_start().is_empty() {
                     // Skip newlines after a heading.
                     self.lines.next();
                 } else {
@@ -719,16 +719,16 @@ enum HeadingStyle {
 }
 
 fn heading<'a>(line: &'a str, lines: &mut Lines<'a>) -> Option<Heading<'a>> {
-    let line = trim(line);
-    if line.starts_with('#') {
-        let mut level = 0;
+    let line = trim_start(line);
+    if line.as_bytes().first() == Some(&b'#') {
+        let mut level = 1;
         while level <= 7 && line.as_bytes().get(level) == Some(&b'#') {
             level += 1;
         }
-        // https://pandoc.org/try/?params=%7B%22text%22%3A%22%23%23%23%23%23%23%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23%23%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23+%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23+a%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23+b%5Cn%22%2C%22to%22%3A%22html5%22%2C%22from%22%3A%22commonmark%22%2C%22standalone%22%3Afalse%2C%22embed-resources%22%3Afalse%2C%22table-of-contents%22%3Afalse%2C%22number-sections%22%3Afalse%2C%22citeproc%22%3Afalse%2C%22html-math-method%22%3A%22plain%22%2C%22wrap%22%3A%22auto%22%2C%22highlight-style%22%3Anull%2C%22files%22%3A%7B%7D%2C%22template%22%3Anull%7D
-        if level < 7 && line.as_bytes().get(level).map_or(true, |&b| b == b' ') {
+        // https://pandoc.org/try/?params=%7B%22text%22%3A%22%23%23%23%23%23%23%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23%23%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23+%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23%5Ct%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23+a%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23%5Cta%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23+b%5Cn%5Cn%22%2C%22to%22%3A%22html5%22%2C%22from%22%3A%22commonmark%22%2C%22standalone%22%3Afalse%2C%22embed-resources%22%3Afalse%2C%22table-of-contents%22%3Afalse%2C%22number-sections%22%3Afalse%2C%22citeproc%22%3Afalse%2C%22html-math-method%22%3A%22plain%22%2C%22wrap%22%3A%22auto%22%2C%22highlight-style%22%3Anull%2C%22files%22%3A%7B%7D%2C%22template%22%3Anull%7D
+        if level < 7 && line.as_bytes().get(level).map_or(true, |&b| matches!(b, b' ' | b'\t')) {
             return Some(Heading {
-                text: line.get(level + 1..).unwrap_or_default().trim(),
+                text: line.get(level + 1..).map(str::trim).unwrap_or_default(),
                 #[allow(clippy::cast_possible_truncation)] // false positive: level is < 7: https://github.com/rust-lang/rust-clippy/issues/7486
                 level: level as u8,
                 style: HeadingStyle::Atx,
@@ -736,32 +736,42 @@ fn heading<'a>(line: &'a str, lines: &mut Lines<'a>) -> Option<Heading<'a>> {
         }
     }
     if let Some((next, ..)) = lines.peek2() {
-        let next = trim(next);
-        if next.is_empty() {
-            None
-        } else if next.as_bytes().iter().all(|&b| b == b'=') {
-            Some(Heading { text: line, level: 1, style: HeadingStyle::Setext })
-        } else if next.as_bytes().iter().all(|&b| b == b'-') {
-            Some(Heading { text: line, level: 2, style: HeadingStyle::Setext })
-        } else {
-            None
+        let next = trim_start(next);
+        match next.as_bytes().first() {
+            Some(b'=') => {
+                if next[1..].trim_end().as_bytes().iter().all(|&b| b == b'=') {
+                    return Some(Heading {
+                        text: line.trim_end(),
+                        level: 1,
+                        style: HeadingStyle::Setext,
+                    });
+                }
+            }
+            Some(b'-') => {
+                if next[1..].trim_end().as_bytes().iter().all(|&b| b == b'-') {
+                    return Some(Heading {
+                        text: line.trim_end(),
+                        level: 2,
+                        style: HeadingStyle::Setext,
+                    });
+                }
+            }
+            _ => {}
         }
-    } else {
-        None
     }
+    None
 }
 
-fn trim(s: &str) -> &str {
+fn trim_start(s: &str) -> &str {
     let mut count = 0;
-    while count <= 4 && s.as_bytes().get(count) == Some(&b' ') {
+    while s.as_bytes().get(count) == Some(&b' ') {
         count += 1;
+        if count == 4 {
+            return s;
+        }
     }
     // Indents less than 4 are ignored.
-    if count < 4 {
-        s[count..].trim_end()
-    } else {
-        s.trim_end()
-    }
+    &s[count..]
 }
 
 fn extract_version_from_title<'a>(mut text: &'a str, prefix_format: &Regex) -> (&'a str, &'a str) {
@@ -798,7 +808,7 @@ fn unlink(mut s: &str) -> (&str, &str) {
     // [1.0.0]
     // ^
     s = s.strip_prefix('[').unwrap_or(s);
-    if let Some(pos) = s.find(']') {
+    if let Some(pos) = memchr::memchr(b']', s.as_bytes()) {
         // 1.0.0]
         //      ^
         if pos + 1 == s.len() {
@@ -809,13 +819,10 @@ fn unlink(mut s: &str) -> (&str, &str) {
         //      ^^^^^^^
         // 1.0.0][link]
         //      ^^^^^^^
-        for (open, close) in [('(', ')'), ('[', ']')] {
-            if remaining.starts_with(open) {
-                if let Some(r_pos) = remaining.find(close) {
-                    if r_pos + 1 == remaining.len() {
-                        return (&s[..pos], "");
-                    }
-                    return (&s[..pos], &remaining[r_pos + 1..]);
+        for (open, close) in [(b'(', b')'), (b'[', b']')] {
+            if remaining.as_bytes().first() == Some(&open) {
+                if let Some(r_pos) = memchr::memchr(close, &remaining.as_bytes()[1..]) {
+                    return (&s[..pos], &remaining[r_pos + 2..]);
                 }
             }
         }
@@ -827,17 +834,21 @@ fn unlink(mut s: &str) -> (&str, &str) {
 /// Remove links from the given markdown text.
 fn full_unlink(s: &str) -> Cow<'_, str> {
     let mut remaining = s;
-    let mut buf = String::with_capacity(remaining.len());
-    while let Some(pos) = remaining.find('[') {
-        buf.push_str(&remaining[..pos]);
-        let (t, r) = unlink(&remaining[pos..]);
-        buf.push_str(t);
-        remaining = r;
-    }
-    if buf.is_empty() {
-        remaining.into()
-    } else {
+    if let Some(mut pos) = memchr::memchr(b'[', remaining.as_bytes()) {
+        let mut buf = String::with_capacity(remaining.len());
+        loop {
+            buf.push_str(&remaining[..pos]);
+            let (t, r) = unlink(&remaining[pos..]);
+            buf.push_str(t);
+            remaining = r;
+            match memchr::memchr(b'[', remaining.as_bytes()) {
+                Some(p) => pos = p,
+                None => break,
+            }
+        }
         buf.push_str(remaining);
         buf.into()
+    } else {
+        remaining.into()
     }
 }
