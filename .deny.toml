@@ -17,7 +17,6 @@ build.include-workspace = false # covered by tools/tidy.sh
 build.include-archives = true
 build.allow-build-scripts = [
     { name = "anyhow" },
-    { name = "proc-macro2" }, # via serde_derive
     { name = "serde_json" },
     { name = "serde" },
 ]
@@ -31,7 +30,6 @@ private.ignore = true
 allow = [
     "Apache-2.0",
     "MIT",
-    "Unicode-DFS-2016", # unicode-ident
 ]
 
 # https://embarkstudios.github.io/cargo-deny/checks/sources/cfg.html

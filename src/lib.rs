@@ -198,6 +198,9 @@ mod tests;
 #[cfg(test)]
 #[path = "gen/assert_impl.rs"]
 mod assert_impl;
+#[cfg(feature = "serde")]
+#[path = "gen/serde.rs"]
+mod serde_impl;
 
 mod error;
 
@@ -262,7 +265,6 @@ pub fn parse_iter(text: &str) -> ParseIter<'_, 'static> {
 
 /// A release note for a version.
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "serde", derive(serde_derive::Serialize))]
 #[non_exhaustive]
 pub struct Release<'a> {
     /// The version of this release.

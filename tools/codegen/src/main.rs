@@ -11,6 +11,7 @@ use std::{
 };
 
 use fs_err as fs;
+use proc_macro2::Literal;
 use quote::{format_ident, quote, ToTokens};
 use syn::visit_mut::{self, VisitMut};
 
@@ -18,6 +19,80 @@ use crate::file::*;
 
 fn main() {
     gen_assert_impl();
+    gen_serde_impl();
+}
+
+fn gen_serde_impl() {
+    const FILES: &[&str] = &["src/lib.rs"];
+    const EXCLUDE: &[&str] = &["Parser", "ParseIter"];
+
+    let workspace_root = &workspace_root();
+
+    let mut tokens = quote! {
+        use serde::ser::{Serialize, SerializeStruct, Serializer};
+    };
+
+    let mut visited_types = HashSet::new();
+    for &f in FILES {
+        let s = fs::read_to_string(workspace_root.join(f)).unwrap();
+        let mut ast = syn::parse_file(&s).unwrap();
+
+        let module = if f.ends_with("lib.rs") {
+            vec![]
+        } else {
+            let name = format_ident!("{}", Path::new(f).file_stem().unwrap().to_string_lossy());
+            vec![name.into()]
+        };
+
+        ItemVisitor::new(module, |item, module| match item {
+            syn::Item::Struct(syn::ItemStruct { vis, ident, generics, fields, .. })
+                if matches!(vis, syn::Visibility::Public(..))
+                    && matches!(fields, syn::Fields::Named(..)) =>
+            {
+                let path_string = quote! { #(#module::)* #ident }.to_string().replace(' ', "");
+                visited_types.insert(path_string.clone());
+                if !EXCLUDE.contains(&path_string.as_str()) {
+                    assert_eq!(
+                        generics.type_params().count(),
+                        0,
+                        "gen_serde_impl doesn't support generics yet; consider excluding `{path_string}`"
+                    );
+                    assert_eq!(
+                        generics.const_params().count(),
+                        0,
+                        "gen_serde_impl doesn't support const generics yet; consider excluding `{path_string}`"
+                    );
+                    let num_fields = Literal::usize_unsuffixed(fields.len());
+                    let fields = fields.iter().map(|syn::Field { ident, .. }| {
+                        let name = ident.as_ref().unwrap().to_string();
+                        quote! { state.serialize_field(#name, &self.#ident)?; }
+                    });
+                    let name = ident.to_string();
+                    let lt = generics.lifetimes().map(|_| quote! { '_ });
+                    tokens.extend(quote! {
+                        impl Serialize for crate:: #(#module::)* #ident <#(#lt),*> {
+                            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+                            where
+                                S: Serializer,
+                            {
+                                let mut state = serializer.serialize_struct(#name, #num_fields)?;
+                                #(#fields)*
+                                state.end()
+                            }
+                        }
+                    });
+                }
+            }
+            _ => {}
+        })
+        .visit_file_mut(&mut ast);
+    }
+
+    for &t in EXCLUDE {
+        assert!(visited_types.contains(t), "unknown type `{t}` specified in EXCLUDE constant");
+    }
+
+    write(function_name!(), workspace_root.join("src/gen/serde.rs"), tokens).unwrap();
 }
 
 fn gen_assert_impl() {

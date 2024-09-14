@@ -5,3 +5,4 @@ makedeb
 memmem
 setext
 unparse
+unsuffixed
