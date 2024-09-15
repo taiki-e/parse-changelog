@@ -2,6 +2,7 @@
 // It is not intended for manual editing.
 
 globset
+honggfuzz
 indexmap
 lexopt
 libfuzzer

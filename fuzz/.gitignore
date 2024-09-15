@@ -1,8 +1,12 @@
-# libfuzzer
+# libFuzzer
 artifacts
 corpus
 coverage
 
-# afl
+# AFL++
 out/**
 !.gitkeep
+
+# Honggfuzz
+hfuzz_target
+hfuzz_workspace

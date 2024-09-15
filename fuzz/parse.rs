@@ -14,6 +14,16 @@ cd fuzz
 cargo afl build --release --features afl
 cargo afl fuzz -i seeds/parse -o out/parse target/release/parse
 ```
+
+Run with Honggfuzz:
+
+```sh
+cd fuzz
+HFUZZ_RUN_ARGS="${HFUZZ_RUN_ARGS:-} --exit_upon_crash" \
+    HFUZZ_BUILD_ARGS="${HFUZZ_BUILD_ARGS:-} --features honggfuzz" \
+    RUSTFLAGS="${RUSTFLAGS:-} -Z sanitizer=address" \
+    cargo hfuzz run parse
+```
 */
 
 #![cfg_attr(feature = "libfuzzer", no_main)]
@@ -21,25 +31,27 @@ cargo afl fuzz -i seeds/parse -o out/parse target/release/parse
 use parse_changelog::parse;
 
 #[cfg(any(
-    not(any(feature = "libfuzzer", feature = "afl")),
+    not(any(feature = "libfuzzer", feature = "afl", feature = "honggfuzz")),
     all(feature = "libfuzzer", feature = "afl"),
+    all(feature = "libfuzzer", feature = "honggfuzz"),
+    all(feature = "afl", feature = "honggfuzz"),
 ))]
-compile_error!("exactly one of 'libfuzzer' or 'afl' feature must be enabled");
+compile_error!("exactly one of 'libfuzzer' or 'afl' or 'honggfuzz' feature must be enabled");
 
 #[cfg(feature = "libfuzzer")]
-libfuzzer_sys::fuzz_target!(|text: &str| {
-    run(text);
-});
-
+libfuzzer_sys::fuzz_target!(|bytes| run(bytes));
 #[cfg(feature = "afl")]
 fn main() {
-    afl::fuzz!(|bytes: &[u8]| {
-        if let Ok(text) = std::str::from_utf8(bytes) {
-            run(text);
-        }
-    });
+    afl::fuzz!(|bytes| run(bytes));
+}
+#[cfg(feature = "honggfuzz")]
+fn main() {
+    loop {
+        honggfuzz::fuzz!(|bytes| { run(bytes) });
+    }
 }
 
-fn run(text: &str) {
+fn run(bytes: &[u8]) {
+    let Ok(text) = std::str::from_utf8(bytes) else { return };
     let _result = parse(text);
 }

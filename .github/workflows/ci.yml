@@ -91,16 +91,27 @@ jobs:
       - uses: taiki-e/checkout-action@v1
       - name: Install Rust
         run: rustup toolchain add nightly --no-self-update && rustup default nightly
+      - run: sudo apt-get -o Acquire::Retries=10 -qq update && sudo apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends binutils-dev libunwind8-dev
       - uses: taiki-e/cache-cargo-install-action@v2
         with:
           tool: cargo-fuzz
       # We cannot use cache for cargo-afl because afl.rs requires the cargo-afl binary and afl library to be built with the same compiler version.
       - run: cargo install cargo-afl --debug --locked
+      - uses: taiki-e/cache-cargo-install-action@v2
+        with:
+          # TODO: Pass --no-default-features
+          tool: honggfuzz
       - run: cargo fuzz build --features libfuzzer
       - run: cargo afl build --release --features afl
         working-directory: fuzz
+      - run: |
+          HFUZZ_BUILD_ARGS="--features honggfuzz" \
+            RUSTFLAGS="${RUSTFLAGS:-} -Z sanitizer=address" \
+            cargo hfuzz build
+        working-directory: fuzz
       # On scheduled job, run fuzzer $FUZZ_MAX_TOTAL_TIME seconds per target.
       # TODO: This is currently skipped for libfuzzer due to https://github.com/rust-fuzz/cargo-fuzz/issues/270.
+      # TODO: Honggfuzz
       - name: Cache AFL++ output
         uses: actions/cache@v4
         with:
