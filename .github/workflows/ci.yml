@@ -72,9 +72,9 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: taiki-e/checkout-action@v1
-      - name: Install Rust
-        run: rustup toolchain add "${{ matrix.rust }}" --no-self-update && rustup default "${{ matrix.rust }}"
-      - run: rustup toolchain add nightly --no-self-update
+      - uses: taiki-e/github-actions/install-rust@main
+        with:
+          toolchain: ${{ matrix.rust }}
       - uses: taiki-e/install-action@cargo-hack
       - uses: taiki-e/install-action@cargo-minimal-versions
       - run: cargo test --workspace --all-features ${EXCLUDE}
@@ -89,8 +89,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: taiki-e/checkout-action@v1
-      - name: Install Rust
-        run: rustup toolchain add nightly --no-self-update && rustup default nightly
+      - uses: taiki-e/github-actions/install-rust@nightly
       - run: sudo apt-get -o Acquire::Retries=10 -qq update && sudo apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends binutils-dev libunwind8-dev
       - uses: taiki-e/cache-cargo-install-action@v2
         with:
@@ -152,7 +151,6 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: taiki-e/checkout-action@v1
-      - name: Install Rust
-        run: rustup toolchain add nightly --no-self-update && rustup default nightly
+      - uses: taiki-e/github-actions/install-rust@nightly
       - run: tools/gen.sh
       - run: git add -N . && git diff --exit-code
