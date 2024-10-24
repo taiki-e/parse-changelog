@@ -6,7 +6,7 @@ edition = "2021"
 parse-changelog = { path = "..", default-features = false }
 
 criterion = { default-features = false, git = "https://github.com/taiki-e/criterion.rs.git", branch = "dev" } # reduce deps
-fs-err = "2"
+fs-err = "3"
 
 [[bench]]
 name = "parse"
