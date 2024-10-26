@@ -5,9 +5,10 @@
 
 mod auxiliary;
 
-use auxiliary::cli::*;
 use indexmap::IndexMap;
 use serde_derive::Deserialize;
+
+use self::auxiliary::cli::*;
 
 #[test]
 fn failures() {

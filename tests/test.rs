@@ -2,8 +2,9 @@
 
 mod auxiliary;
 
-use auxiliary::{assert_diff, trim};
 use parse_changelog::{parse, parse_iter, Parser};
+
+use self::auxiliary::{assert_diff, trim};
 
 #[test]
 fn success() {
