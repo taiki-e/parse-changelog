@@ -477,14 +477,18 @@ const CLOSE: &[u8] = b"-->";
 
 fn default_prefix_format() -> &'static Regex {
     static DEFAULT_PREFIX_FORMAT: OnceLock<Regex> = OnceLock::new();
-    DEFAULT_PREFIX_FORMAT.get_or_init(|| Regex::new(r"^(v|Version |Release )?").unwrap())
+    fn init() -> Regex {
+        Regex::new(r"^(v|Version |Release )?").unwrap()
+    }
+    DEFAULT_PREFIX_FORMAT.get_or_init(init)
 }
 fn default_version_format() -> &'static Regex {
     static DEFAULT_VERSION_FORMAT: OnceLock<Regex> = OnceLock::new();
-    DEFAULT_VERSION_FORMAT.get_or_init(|| {
+    fn init() -> Regex {
         Regex::new(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$|^Unreleased$")
-        .unwrap()
-    })
+            .unwrap()
+    }
+    DEFAULT_VERSION_FORMAT.get_or_init(init)
 }
 
 impl<'a, 'r> ParseIter<'a, 'r> {
