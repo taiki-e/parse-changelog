@@ -43,6 +43,7 @@ jobs:
   miri:
     uses: taiki-e/github-actions/.github/workflows/miri.yml@main
     with:
+      event_name: ${{ github.event_name }}
       # NB: sync with env.EXCLUDE
       args: --exclude parse-changelog-internal-codegen
       # We cannot use -Zmiri-symbolic-alignment-check due to memchr 2.6.0 bug https://github.com/taiki-e/parse-changelog/commit/376d961a5a8adb79c95bd3b6f7188d138981156f
