@@ -7,7 +7,7 @@ pub(crate) mod cli;
 
 use std::{
     env,
-    io::Write,
+    io::Write as _,
     path::Path,
     process::{Command, Stdio},
     str,

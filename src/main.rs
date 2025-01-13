@@ -4,13 +4,13 @@
 
 use std::{
     fs,
-    io::{self, Read, Write},
+    io::{self, Read as _, Write as _},
 };
 
 use anyhow::{bail, Context as _, Result};
 use lexopt::{
     Arg::{Long, Short, Value},
-    ValueExt,
+    ValueExt as _,
 };
 use parse_changelog::Parser;
 
@@ -217,7 +217,7 @@ fn try_main() -> Result<()> {
 mod tests {
     use std::{
         env,
-        io::Write,
+        io::Write as _,
         path::Path,
         process::{Command, Stdio},
     };

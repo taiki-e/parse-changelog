@@ -12,7 +12,7 @@ use std::{
 
 use fs_err as fs;
 use proc_macro2::Literal;
-use quote::{format_ident, quote, ToTokens};
+use quote::{format_ident, quote, ToTokens as _};
 use syn::visit_mut::{self, VisitMut};
 
 use crate::file::*;
@@ -29,7 +29,7 @@ fn gen_serde_impl() {
     let workspace_root = &workspace_root();
 
     let mut tokens = quote! {
-        use serde::ser::{Serialize, SerializeStruct, Serializer};
+        use serde::ser::{Serialize, SerializeStruct as _, Serializer};
     };
 
     let mut visited_types = HashSet::new();
