@@ -16,6 +16,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 - Accept non-UTF-8 changelog path.
 
+- Remove dependency on `anyhow` (previously used in CLI (`default` feature)).
+
 - Diagnostic improvements.
 
 ## [0.6.10] - 2024-10-26

@@ -8,12 +8,19 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use anyhow::{bail, Context as _, Result};
 use lexopt::{
     Arg::{Long, Short, Value},
     ValueExt as _,
 };
 use parse_changelog::Parser;
+
+type Result<T, E = Box<dyn std::error::Error + Send + Sync>> = std::result::Result<T, E>;
+
+macro_rules! bail {
+    ($($tt:tt)*) => {
+        return Err(format!($($tt)*).into())
+    };
+}
 
 static USAGE: &str = "parse-changelog
 
@@ -133,7 +140,7 @@ impl Args {
 
 fn main() {
     if let Err(e) = try_main() {
-        eprintln!("error: {e:#}");
+        eprintln!("error: {e}");
         std::process::exit(1)
     }
 }
@@ -151,11 +158,13 @@ fn try_main() -> Result<()> {
 
     let text = if args.path.as_os_str() == "-" {
         let mut buf = String::with_capacity(128);
-        io::stdin().read_to_string(&mut buf).context("failed to read from standard input")?;
+        io::stdin()
+            .read_to_string(&mut buf)
+            .map_err(|e| format!("failed to read from standard input: {e}"))?;
         buf
     } else {
         fs::read_to_string(&args.path)
-            .with_context(|| format!("failed to read from file `{}`", args.path.display()))?
+            .map_err(|e| format!("failed to read from file `{}`: {e}", args.path.display()))?
     };
 
     let changelog = match parser.parse(&text) {
@@ -187,7 +196,7 @@ fn try_main() -> Result<()> {
         if entry_key == &"Unreleased" {
             changelog
                 .get_index(1)
-                .with_context(|| {
+                .ok_or_else(|| {
                     format!(
                         "not found release; to get 'Unreleased' section specify release \
                          explicitly: `parse-changelog {} Unreleased`",
