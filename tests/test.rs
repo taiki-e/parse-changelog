@@ -341,12 +341,17 @@ fn cargo() {
 // Regression tests for bugs caught by fuzzing.
 #[test]
 fn fuzz() {
-    let tests =
-        &[("1115.8.8 '9.\n-\n\u{c}\"----\u{19}\u{1f}<!--.4\n## 444.444.4\r\r \u{b}---->", Some(1))];
+    let tests: &[(&str, Result<usize, &str>)] =
+        &[("1115.8.8 '9.\n-\n\u{c}\"----\u{19}\u{1f}<!--.4\n## 444.444.4\r\r \u{b}---->", Ok(1))];
     for &(test, expected_len) in tests {
         let res = parse(test);
-        if let Some(expected_len) = expected_len {
-            assert_eq!(res.unwrap().len(), expected_len);
+        match expected_len {
+            Ok(expected_len) => {
+                assert_eq!(res.unwrap().len(), expected_len);
+            }
+            Err(s) => {
+                assert_eq!(res.unwrap_err().to_string(), s);
+            }
         }
     }
 }
