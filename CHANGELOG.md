@@ -12,6 +12,12 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+### CLI
+
+- Accept non-UTF-8 changelog path.
+
+- Diagnostic improvements.
+
 ## [0.6.10] - 2024-10-26
 
 - Relax minimal version of `serde` (supported via optional feature) to 1.0.0.
@@ -20,7 +26,7 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 - Performance improvements. ([#37](https://github.com/taiki-e/parse-changelog/pull/37))
 
-- Remove dependency on `serde_derive` (previously used in `serde` feature and CLI).
+- Remove dependency on `serde_derive` (previously used in `serde` feature and CLI (`default` feature)).
 
 - Documentation improvements.
 

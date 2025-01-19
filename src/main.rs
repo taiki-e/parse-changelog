@@ -5,6 +5,7 @@
 use std::{
     fs,
     io::{self, Read as _, Write as _},
+    path::{Path, PathBuf},
 };
 
 use anyhow::{bail, Context as _, Result};
@@ -38,7 +39,7 @@ OPTIONS:
 ";
 
 struct Args {
-    path: String,
+    path: PathBuf,
     release: Option<String>,
     title: bool,
     title_no_link: bool,
@@ -107,7 +108,7 @@ impl Args {
                     println!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
                     std::process::exit(0);
                 }
-                Value(val) if path.is_none() => path = Some(val.parse()?),
+                Value(val) if path.is_none() => path = Some(val.into()),
                 Value(val) if release.is_none() => release = Some(val.parse()?),
                 _ => return Err(arg.unexpected().into()),
             }
@@ -121,9 +122,9 @@ impl Args {
         Ok(Self { path, release, title, title_no_link, json, version_format, prefix_format })
     }
 
-    fn path_for_msg(&self) -> &str {
-        if self.path == "-" {
-            "changelog"
+    fn path_for_msg(&self) -> &Path {
+        if self.path.as_os_str() == "-" {
+            Path::new("changelog (standard input)")
         } else {
             &self.path
         }
@@ -148,19 +149,20 @@ fn try_main() -> Result<()> {
         parser.prefix_format(prefix_format)?;
     }
 
-    let text = if args.path == "-" {
+    let text = if args.path.as_os_str() == "-" {
         let mut buf = String::with_capacity(128);
-        io::stdin().read_to_string(&mut buf).context("failed to read standard input")?;
+        io::stdin().read_to_string(&mut buf).context("failed to read from standard input")?;
         buf
     } else {
-        fs::read_to_string(&args.path).with_context(|| format!("failed to read {}", args.path))?
+        fs::read_to_string(&args.path)
+            .with_context(|| format!("failed to read from file `{}`", args.path.display()))?
     };
 
     let changelog = match parser.parse(&text) {
         Ok(changelog) => changelog,
         Err(e) => {
             if e.is_parse() {
-                bail!("{e} in {}", args.path_for_msg());
+                bail!("{e} in {}", args.path_for_msg().display());
             }
             return Err(e.into());
         }
@@ -178,7 +180,7 @@ fn try_main() -> Result<()> {
         if let Some(release) = changelog.get(version) {
             release
         } else {
-            bail!("not found release note for '{version}' in {}", args.path_for_msg());
+            bail!("not found release note for '{version}' in {}", args.path_for_msg().display());
         }
     } else {
         let (entry_key, entry_value) = changelog.first().unwrap(); // unwrap is okay as Parser::parse returns an error if changelog is empty.
@@ -189,7 +191,7 @@ fn try_main() -> Result<()> {
                     format!(
                         "not found release; to get 'Unreleased' section specify release \
                          explicitly: `parse-changelog {} Unreleased`",
-                        args.path
+                        args.path.display()
                     )
                 })?
                 .1
