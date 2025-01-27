@@ -2,9 +2,27 @@
 
 mod auxiliary;
 
-use parse_changelog::{parse, parse_iter, Parser};
+use std::mem;
+
+use parse_changelog::*;
 
 use self::auxiliary::{assert_diff, trim};
+
+// Test the size of public types. This is not intended to keep a specific size and
+// is intended to be used only as a help in optimization.
+#[test]
+#[cfg_attr(any(not(target_pointer_width = "64"), miri), ignore)] // We set -Z randomize-layout for Miri.
+fn size() {
+    assert_eq!(mem::size_of::<Error>(), 32);
+    assert_eq!(mem::size_of::<Changelog<'_>>(), 72);
+    assert_eq!(mem::size_of::<Release<'_>>(), 48);
+    assert_eq!(mem::size_of::<Parser>(), 64);
+    if cfg!(target_arch = "aarch64") {
+        assert_eq!(mem::size_of::<ParseIter<'_, '_>>(), 432);
+    } else {
+        assert_eq!(mem::size_of::<ParseIter<'_, '_>>(), 736);
+    }
+}
 
 #[test]
 fn success() {
