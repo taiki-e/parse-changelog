@@ -13,7 +13,7 @@ use self::auxiliary::{assert_diff, trim};
 #[test]
 #[cfg_attr(any(not(target_pointer_width = "64"), miri), ignore)] // We set -Z randomize-layout for Miri.
 fn size() {
-    assert_eq!(mem::size_of::<Error>(), 32);
+    assert_eq!(mem::size_of::<Error>(), 24);
     assert_eq!(mem::size_of::<Changelog<'_>>(), 72);
     assert_eq!(mem::size_of::<Release<'_>>(), 48);
     assert_eq!(mem::size_of::<Parser>(), 64);

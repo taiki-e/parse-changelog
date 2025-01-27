@@ -26,9 +26,9 @@ pub(crate) enum ErrorKind {
     /// that accepted by the parser.
     ///
     /// This error only occurs during configuring the parser.
-    Format(String),
+    Format(Box<str>),
     /// An error that occurred during parsing changelog.
-    Parse(String),
+    Parse(Box<str>),
 }
 
 impl Error {
@@ -37,11 +37,11 @@ impl Error {
     }
 
     pub(crate) fn format(e: impl Into<String>) -> Self {
-        Self(ErrorKind::Format(e.into()))
+        Self(ErrorKind::Format(e.into().into_boxed_str()))
     }
 
     pub(crate) fn parse(e: impl Into<String>) -> Self {
-        Self(ErrorKind::Parse(e.into()))
+        Self(ErrorKind::Parse(e.into().into_boxed_str()))
     }
 
     /// Returns `true` if this error is that occurred during configuring the parser.
