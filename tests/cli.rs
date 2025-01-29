@@ -5,10 +5,13 @@
 
 mod auxiliary;
 
+use std::{env, path::Path};
+
+use fs_err as fs;
 use indexmap::IndexMap;
 use serde_derive::Deserialize;
 
-use self::auxiliary::cli::*;
+use self::auxiliary::{cli::*, *};
 
 #[test]
 fn failures() {
@@ -111,4 +114,41 @@ fn json() {
 #[test]
 fn version() {
     parse_changelog(["--version"]).assert_success().stdout_contains(env!("CARGO_PKG_VERSION"));
+}
+
+#[test]
+fn update_readme() {
+    let new = &*parse_changelog(["--help"]).assert_success().stdout;
+    let path = &Path::new(env!("CARGO_MANIFEST_DIR")).join("README.md");
+    let base = fs::read_to_string(path).unwrap();
+    let mut out = String::with_capacity(base.capacity());
+    let mut lines = base.lines();
+    let mut start = false;
+    let mut end = false;
+    while let Some(line) = lines.next() {
+        out.push_str(line);
+        out.push('\n');
+        if line == "<!-- readme-long-help:start -->" {
+            start = true;
+            out.push_str("```console\n");
+            out.push_str("$ parse-changelog --help\n");
+            out.push_str(new);
+            for line in &mut lines {
+                if line == "<!-- readme-long-help:end -->" {
+                    out.push_str("```\n");
+                    out.push_str(line);
+                    out.push('\n');
+                    end = true;
+                    break;
+                }
+            }
+        }
+    }
+    if start && end {
+        assert_diff(path, out);
+    } else if start {
+        panic!("missing `<!-- readme-long-help:end -->` comment in README.md");
+    } else {
+        panic!("missing `<!-- readme-long-help:start -->` comment in README.md");
+    }
 }
