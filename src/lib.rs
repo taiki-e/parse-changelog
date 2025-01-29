@@ -198,7 +198,7 @@ const _README: () = ();
 mod tests;
 
 #[cfg(test)]
-#[path = "gen/assert_impl.rs"]
+#[path = "gen/tests/assert_impl.rs"]
 mod assert_impl;
 #[cfg(feature = "serde")]
 #[cfg_attr(docsrs, doc(cfg(feature = "serde")))]

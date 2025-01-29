@@ -103,7 +103,7 @@ fn gen_assert_impl() {
     const NOT_REF_UNWIND_SAFE: &[&str] = &[];
 
     let workspace_root = &workspace_root();
-    let out_dir = &workspace_root.join("src/gen");
+    let out_dir = &workspace_root.join("src/gen/tests");
     fs::create_dir_all(out_dir).unwrap();
 
     let files: BTreeSet<String> = git_ls_files(&workspace_root.join("src"), &["*.rs"])
