@@ -6,6 +6,7 @@ use std::{
     fs,
     io::{self, Read as _, Write as _},
     path::{Path, PathBuf},
+    process::ExitCode,
 };
 
 use lexopt::{
@@ -56,7 +57,7 @@ struct Args {
 }
 
 impl Args {
-    fn parse() -> Result<Self> {
+    fn parse() -> Result<Option<Self>> {
         fn format_arg(arg: &lexopt::Arg<'_>) -> String {
             match arg {
                 Long(flag) => format!("--{flag}"),
@@ -109,11 +110,11 @@ impl Args {
                 Long("prefix-format" | "prefix") => parse_opt!(prefix_format),
                 Short('h') | Long("help") => {
                     print!("{USAGE}");
-                    std::process::exit(0);
+                    return Ok(None);
                 }
                 Short('V') | Long("version") => {
                     println!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
-                    std::process::exit(0);
+                    return Ok(None);
                 }
                 Value(val) if path.is_none() => path = Some(val.into()),
                 Value(val) if release.is_none() => release = Some(val.parse()?),
@@ -126,7 +127,7 @@ impl Args {
             conflicts("--title", "--title-no-link")?;
         }
 
-        Ok(Self { path, release, title, title_no_link, json, version_format, prefix_format })
+        Ok(Some(Self { path, release, title, title_no_link, json, version_format, prefix_format }))
     }
 
     fn path_for_msg(&self) -> &Path {
@@ -138,15 +139,17 @@ impl Args {
     }
 }
 
-fn main() {
+fn main() -> ExitCode {
     if let Err(e) = try_main() {
         eprintln!("error: {e}");
-        std::process::exit(1)
+        ExitCode::FAILURE
+    } else {
+        ExitCode::SUCCESS
     }
 }
 
 fn try_main() -> Result<()> {
-    let args = Args::parse()?;
+    let Some(args) = Args::parse()? else { return Ok(()) };
 
     let mut parser = Parser::new();
     if let Some(version_format) = &args.version_format {
