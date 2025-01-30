@@ -619,7 +619,7 @@ impl<'a> Iterator for ParseIter<'a, '_> {
                     break;
                 }
                 continue;
-            };
+            }
 
             cur_release.version = version;
             cur_release.title = heading.text;
