@@ -54,8 +54,13 @@ fn test_unlink() {
     assert_eq!(unlink("[1.0.0]"), ("1.0.0", ""));
     assert_eq!(unlink("[1.0.0](link)"), ("1.0.0", ""));
     assert_eq!(unlink("[1.0.0]()"), ("1.0.0", ""));
+    assert_eq!(unlink("[1.0.0]("), ("1.0.0", "("));
     assert_eq!(unlink("[1.0.0][link]"), ("1.0.0", ""));
     assert_eq!(unlink("[1.0.0][]"), ("1.0.0", ""));
+    assert_eq!(unlink("[1.0.0]["), ("1.0.0", "["));
+
+    // no-op
+    assert_eq!(unlink("1.0.0"), ("1.0.0", ""));
 
     // Link without trailing ']': e.g., [1.0.0 2022-01-01]
     assert_eq!(unlink("[1.0.0"), ("1.0.0", ""));
@@ -75,10 +80,24 @@ fn test_unlink() {
 fn test_full_unlink() {
     assert_eq!(full_unlink("[1.0.0]"), "1.0.0");
     assert_eq!(full_unlink("[1.0.0]()"), "1.0.0");
+    assert_eq!(full_unlink("[1.0.0]("), "1.0.0(");
     assert_eq!(full_unlink("[1.0.0](link)"), "1.0.0");
     assert_eq!(full_unlink("[1.0.0][]"), "1.0.0");
+    assert_eq!(full_unlink("[1.0.0]["), "1.0.0"); // TODO
     assert_eq!(full_unlink("[1.0.0][link]"), "1.0.0");
     assert_eq!(full_unlink("[1.0.0][link1][a](link2)"), "1.0.0a");
     assert_eq!(full_unlink("[1.0.0][link1][a][link2]"), "1.0.0a");
     assert_eq!(full_unlink("v [1.0.0][link1][a](link2) [b][link3] [c] (d)"), "v 1.0.0a b c (d)");
+
+    // no-op
+    assert_eq!(full_unlink("1.0.0"), "1.0.0");
+
+    // Link without trailing ']': e.g., [1.0.0 2022-01-01]
+    assert_eq!(full_unlink("[1.0.0"), "1.0.0"); // TODO
+    assert_eq!(full_unlink("[1.0.0(a)"), "1.0.0(a)"); // TODO
+
+    // Link without leading '[': e.g., [Version 1.0.0]
+    assert_eq!(full_unlink("1.0.0]"), "1.0.0]");
+    assert_eq!(full_unlink("1.0.0](link)"), "1.0.0](link)");
+    assert_eq!(full_unlink("1.0.0][link]"), "1.0.0]link");
 }

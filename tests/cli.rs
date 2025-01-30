@@ -14,35 +14,6 @@ use serde_derive::Deserialize;
 use self::auxiliary::{cli::*, *};
 
 #[test]
-fn failures() {
-    parse_changelog([] as [&str; 0])
-        .assert_failure()
-        .stderr_contains("no changelog path specified");
-
-    parse_changelog(["tests/fixtures/pin-project.md", "0.0.0", "0.0.1"])
-        .assert_failure()
-        .stderr_contains(r#"unexpected argument "0.0.1""#);
-
-    parse_changelog(["tests/fixtures/pin-project.md", "0.0.0", "--title", "--title-no-link"])
-        .assert_failure()
-        .stderr_contains("--title may not be used together with --title-no-link");
-
-    parse_changelog(["tests/fixtures/pin-project.md", "0.0.0", "--title", "--title"])
-        .assert_failure()
-        .stderr_contains(
-            "the argument '--title' was provided more than once, but cannot be used multiple times",
-        );
-
-    parse_changelog(["tests/fixtures/pin-project.md", "0.0.0"])
-        .assert_failure()
-        .stderr_contains("not found release note for '0.0.0' in tests/fixtures/pin-project.md");
-
-    parse_changelog(["tests/fixtures/cargo.md", "1.50", "--prefix", "Cargo "])
-        .assert_failure()
-        .stderr_contains("not found release note for '1.50' in tests/fixtures/cargo.md");
-}
-
-#[test]
 fn success() {
     parse_changelog(["tests/fixtures/pin-project.md", "1.0.0"])
         .assert_success()
@@ -72,6 +43,46 @@ fn success() {
     ])
     .assert_success()
     .stdout_eq(include_str!("fixtures/cargo-1.50.md"));
+}
+
+#[test]
+fn failure() {
+    parse_changelog([] as [&str; 0])
+        .assert_failure()
+        .stderr_contains("no changelog path specified");
+
+    parse_changelog(["tests/fixtures/pin-project.md", "0.0.0", "0.0.1"])
+        .assert_failure()
+        .stderr_contains(r#"unexpected argument "0.0.1""#);
+
+    parse_changelog(["tests/fixtures/pin-project.md", "0.0.0", "--title", "--title-no-link"])
+        .assert_failure()
+        .stderr_contains("--title may not be used together with --title-no-link");
+
+    // multiple arguments
+    for flag in &[
+        "-t",
+        "--title",
+        "--title-no-link",
+        "--json",
+        "--version-format=version",
+        "--prefix-format=v",
+    ] {
+        parse_changelog(["tests/fixtures/pin-project.md", "0.0.0", flag, flag])
+            .assert_failure()
+            .stderr_contains(&format!(
+                "the argument '{}' was provided more than once, but cannot be used multiple times",
+                flag.split('=').next().unwrap()
+            ));
+    }
+
+    parse_changelog(["tests/fixtures/pin-project.md", "0.0.0"])
+        .assert_failure()
+        .stderr_contains("not found release note for '0.0.0' in tests/fixtures/pin-project.md");
+
+    parse_changelog(["tests/fixtures/cargo.md", "1.50", "--prefix", "Cargo "])
+        .assert_failure()
+        .stderr_contains("not found release note for '1.50' in tests/fixtures/cargo.md");
 }
 
 type ChangelogOwned = IndexMap<String, ReleaseOwned>;
