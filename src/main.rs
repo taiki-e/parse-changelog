@@ -169,12 +169,7 @@ fn try_main() -> Result<()> {
 
     let changelog = match parser.parse(&text) {
         Ok(changelog) => changelog,
-        Err(e) => {
-            if e.is_parse() {
-                bail!("{e} in {}", args.path_for_msg().display());
-            }
-            return Err(e.into());
-        }
+        Err(e) => bail!("{e} in {}", args.path_for_msg().display()),
     };
 
     if args.json {
