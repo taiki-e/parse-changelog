@@ -24,6 +24,7 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [1.1.5] - 2024-03-05
 
+<!-- markdownlint-disable -->
 - Suppress `unused_qualifications` lint in generated code.
 
 ## [1.1.4] - 2024-01-25

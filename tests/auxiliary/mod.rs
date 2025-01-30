@@ -2,9 +2,6 @@
 
 #![allow(dead_code, unused_macros)]
 
-#[cfg(feature = "default")]
-pub(crate) mod cli;
-
 use std::{
     env,
     io::Write as _,

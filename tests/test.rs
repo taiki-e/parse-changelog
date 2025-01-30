@@ -327,19 +327,19 @@ fn pin_project() {
 fn rust() {
     let text = include_str!("fixtures/rust.md");
     let map = parse(text).unwrap();
-    assert_eq!(map.len(), 116);
+    assert_eq!(map.len(), 117);
     assert_diff("tests/fixtures/rust-1.46.0.md", map["1.46.0"].notes);
     let vec: Vec<_> = parse_iter(text).collect();
     assert_eq!(vec.len(), map.len());
-    assert_eq!(vec[46], map["1.46.0"]);
+    assert_eq!(vec[47], map["1.46.0"]);
 
     let text = include_str!("fixtures/rust-atx.md");
     let map = parse(text).unwrap();
-    assert_eq!(map.len(), 116);
+    assert_eq!(map.len(), 117);
     assert_diff("tests/fixtures/rust-1.46.0-atx.md", map["1.46.0"].notes);
     let vec: Vec<_> = parse_iter(text).collect();
     assert_eq!(vec.len(), map.len());
-    assert_eq!(vec[46], map["1.46.0"]);
+    assert_eq!(vec[47], map["1.46.0"]);
 }
 #[test]
 #[cfg_attr(miri, ignore)] // Miri is too slow

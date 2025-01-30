@@ -5,26 +5,45 @@
 
 mod auxiliary;
 
-use std::{env, path::Path};
+use std::{env, ffi::OsStr, path::Path, process::Command};
 
 use fs_err as fs;
 use indexmap::IndexMap;
 use serde_derive::Deserialize;
+use test_helper::cli::{ChildExt as _, CommandExt as _};
 
-use self::auxiliary::{cli::*, *};
+use self::auxiliary::*;
+
+fn parse_changelog<O: AsRef<OsStr>>(args: impl AsRef<[O]>) -> Command {
+    let mut cmd = Command::new(env!("CARGO_BIN_EXE_parse-changelog"));
+    cmd.current_dir(env!("CARGO_MANIFEST_DIR"));
+    cmd.args(args.as_ref());
+    cmd
+}
 
 #[test]
 fn success() {
+    parse_changelog(["tests/fixtures/pin-project.md"])
+        .assert_success()
+        .stdout_eq(include_str!("fixtures/pin-project-latest.md"));
     parse_changelog(["tests/fixtures/pin-project.md", "1.0.0"])
         .assert_success()
         .stdout_eq(include_str!("fixtures/pin-project-1.0.0.md"));
+    parse_changelog(["tests/fixtures/pin-project.md", "Unreleased"]).assert_success().stdout_eq("");
     parse_changelog(["tests/fixtures/pin-project.md", "1.0.0", "--title"])
         .assert_success()
         .stdout_eq("[1.0.0] - 2020-10-13");
     parse_changelog(["tests/fixtures/pin-project.md", "1.0.0", "--title-no-link"])
         .assert_success()
         .stdout_eq("1.0.0 - 2020-10-13");
+    parse_changelog(["-", "1.0.0"])
+        .spawn_with_stdin(include_bytes!("fixtures/pin-project.md"))
+        .assert_success()
+        .stdout_eq(include_str!("fixtures/pin-project-1.0.0.md"));
 
+    parse_changelog(["tests/fixtures/rust.md"])
+        .assert_success()
+        .stdout_eq(include_str!("fixtures/rust-latest.md"));
     parse_changelog(["tests/fixtures/rust.md", "1.46.0"])
         .assert_success()
         .stdout_eq(include_str!("fixtures/rust-1.46.0.md"));
@@ -70,7 +89,7 @@ fn failure() {
     ] {
         parse_changelog(["tests/fixtures/pin-project.md", "0.0.0", flag, flag])
             .assert_failure()
-            .stderr_contains(&format!(
+            .stderr_contains(format!(
                 "the argument '{}' was provided more than once, but cannot be used multiple times",
                 flag.split('=').next().unwrap()
             ));
@@ -79,10 +98,38 @@ fn failure() {
     parse_changelog(["tests/fixtures/pin-project.md", "0.0.0"])
         .assert_failure()
         .stderr_contains("not found release note for '0.0.0' in tests/fixtures/pin-project.md");
+    parse_changelog(["-", "0.0.0"])
+        .spawn_with_stdin(include_bytes!("fixtures/pin-project.md"))
+        .assert_failure()
+        .stderr_contains("not found release note for '0.0.0' in changelog (standard input)");
 
     parse_changelog(["tests/fixtures/cargo.md", "1.50", "--prefix", "Cargo "])
         .assert_failure()
         .stderr_contains("not found release note for '1.50' in tests/fixtures/cargo.md");
+
+    parse_changelog(["-"])
+        .spawn_with_stdin("\n")
+        .assert_failure()
+        .stderr_contains("error: no release note was found in changelog (standard input)");
+
+    parse_changelog(["tests/fixtures/pin-project.md", "1.0.0", "--version-format=\\"])
+        .assert_failure()
+        .stderr_contains("error: regex parse error");
+    parse_changelog(["tests/fixtures/pin-project.md", "1.0.0", "--prefix-format=\\"])
+        .assert_failure()
+        .stderr_contains("error: regex parse error");
+
+    parse_changelog(["-"])
+        .spawn_with_stdin("# Unreleased\n")
+        .assert_failure()
+        .stderr_contains("error: not found release; to get 'Unreleased' section specify release explicitly: `parse-changelog - Unreleased`");
+
+    parse_changelog(["-"])
+        .spawn_with_stdin([b'f', b'o', 0x80, b'o'])
+        .assert_failure()
+        .stderr_contains(
+            "error: failed to read from standard input: stream did not contain valid UTF-8",
+        );
 }
 
 type ChangelogOwned = IndexMap<String, ReleaseOwned>;
@@ -102,11 +149,11 @@ fn json() {
 
     let text = parse_changelog(["tests/fixtures/rust.md", "--json"]).assert_success().stdout;
     let changelog: ChangelogOwned = serde_json::from_str(&text).unwrap();
-    assert_eq!(changelog.len(), 116);
+    assert_eq!(changelog.len(), 117);
 
     let text = parse_changelog(["tests/fixtures/rust-atx.md", "--json"]).assert_success().stdout;
     let changelog: ChangelogOwned = serde_json::from_str(&text).unwrap();
-    assert_eq!(changelog.len(), 116);
+    assert_eq!(changelog.len(), 117);
 
     let text = parse_changelog([
         "tests/fixtures/cargo.md",

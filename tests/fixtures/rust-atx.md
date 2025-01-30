@@ -9,7 +9,7 @@ Copyright & License:
 - https://github.com/rust-lang/rust/blob/1.80.0/LICENSE-MIT
 -->
 <!-- markdownlint-disable -->
-# Version 1.80 (2024-07-25)
+# Version 1.80.0 (2024-07-25)
 
 <a id="1.80-Language"></a>
 
