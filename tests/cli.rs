@@ -3,16 +3,15 @@
 #![cfg(feature = "default")]
 #![cfg(not(miri))] // Miri doesn't support pipe2 (inside std::process::Command::output)
 
-mod auxiliary;
-
 use std::{env, ffi::OsStr, path::Path, process::Command};
 
 use fs_err as fs;
 use indexmap::IndexMap;
 use serde_derive::Deserialize;
-use test_helper::cli::{ChildExt as _, CommandExt as _};
-
-use self::auxiliary::*;
+use test_helper::{
+    cli::{ChildExt as _, CommandExt as _},
+    git::assert_diff,
+};
 
 fn parse_changelog<O: AsRef<OsStr>>(args: impl AsRef<[O]>) -> Command {
     let mut cmd = Command::new(env!("CARGO_BIN_EXE_parse-changelog"));
@@ -170,8 +169,17 @@ fn json() {
 }
 
 #[test]
+fn help() {
+    let short = parse_changelog(["-h"]).assert_success();
+    let long = parse_changelog(["--help"]).assert_success();
+    assert_eq!(short.stdout, long.stdout);
+}
+
+#[test]
 fn version() {
-    parse_changelog(["--version"]).assert_success().stdout_contains(env!("CARGO_PKG_VERSION"));
+    let expected = &format!("parse-changelog {}", env!("CARGO_PKG_VERSION"));
+    parse_changelog(["-V"]).assert_success().stdout_eq(expected);
+    parse_changelog(["--version"]).assert_success().stdout_eq(expected);
 }
 
 #[test]

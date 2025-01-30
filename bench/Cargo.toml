@@ -5,7 +5,7 @@ edition = "2021"
 [dev-dependencies]
 parse-changelog = { path = "..", default-features = false }
 
-criterion = { default-features = false, git = "https://github.com/taiki-e/criterion.rs.git", branch = "dev" } # reduce deps
+criterion = { default-features = false, git = "https://github.com/taiki-e/criterion.rs.git", rev = "8617cd7" } # reduce deps
 fs-err = "3"
 
 [[bench]]

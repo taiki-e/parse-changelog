@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-mod auxiliary;
+use std::{mem, path::Path};
 
-use std::mem;
-
+use fs_err as fs;
 use parse_changelog::*;
+use test_helper::git::assert_diff;
 
-use self::auxiliary::{assert_diff, trim};
+fn fixtures_dir() -> &'static Path {
+    Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures"))
+}
 
 // Test the size of public types. This is not intended to keep a specific size and
 // is intended to be used only as a help in optimization.
@@ -26,6 +28,19 @@ fn size() {
 
 #[test]
 fn success() {
+    fn trim(s: &str) -> &str {
+        let mut cnt = 0;
+        while s[cnt..].starts_with(' ') {
+            cnt += 1;
+        }
+        // Indents less than 4 are ignored.
+        if cnt < 4 {
+            s[cnt..].trim_end()
+        } else {
+            s.trim_end()
+        }
+    }
+
     let changelogs = [
         // Atx-style 1
         "
@@ -312,31 +327,31 @@ fn link() {
 #[test]
 #[cfg_attr(miri, ignore)] // Miri is too slow
 fn pin_project() {
-    let text = include_str!("fixtures/pin-project.md");
+    let text = &fs::read_to_string(fixtures_dir().join("pin-project.md")).unwrap();
     let changelog = parse(text).unwrap();
     assert_eq!(changelog.len(), 82);
-    assert_diff("tests/fixtures/pin-project-1.0.0.md", changelog["1.0.0"].notes);
+    assert_diff(fixtures_dir().join("pin-project-1.0.0.md"), changelog["1.0.0"].notes);
 
     // empty prefix format
     let changelog = Parser::new().prefix_format("").unwrap().parse(text).unwrap();
     assert_eq!(changelog.len(), 82);
-    assert_diff("tests/fixtures/pin-project-1.0.0.md", changelog["1.0.0"].notes);
+    assert_diff(fixtures_dir().join("pin-project-1.0.0.md"), changelog["1.0.0"].notes);
 }
 #[test]
 #[cfg_attr(miri, ignore)] // Miri is too slow
 fn rust() {
-    let text = include_str!("fixtures/rust.md");
+    let text = &fs::read_to_string(fixtures_dir().join("rust.md")).unwrap();
     let map = parse(text).unwrap();
     assert_eq!(map.len(), 117);
-    assert_diff("tests/fixtures/rust-1.46.0.md", map["1.46.0"].notes);
+    assert_diff(fixtures_dir().join("rust-1.46.0.md"), map["1.46.0"].notes);
     let vec: Vec<_> = parse_iter(text).collect();
     assert_eq!(vec.len(), map.len());
     assert_eq!(vec[47], map["1.46.0"]);
 
-    let text = include_str!("fixtures/rust-atx.md");
+    let text = &fs::read_to_string(fixtures_dir().join("rust-atx.md")).unwrap();
     let map = parse(text).unwrap();
     assert_eq!(map.len(), 117);
-    assert_diff("tests/fixtures/rust-1.46.0-atx.md", map["1.46.0"].notes);
+    assert_diff(fixtures_dir().join("rust-1.46.0-atx.md"), map["1.46.0"].notes);
     let vec: Vec<_> = parse_iter(text).collect();
     assert_eq!(vec.len(), map.len());
     assert_eq!(vec[47], map["1.46.0"]);
@@ -344,16 +359,17 @@ fn rust() {
 #[test]
 #[cfg_attr(miri, ignore)] // Miri is too slow
 fn cargo() {
+    let text = &fs::read_to_string(fixtures_dir().join("cargo.md")).unwrap();
     let changelog = Parser::new()
         .prefix_format("Cargo ")
         .unwrap()
         .version_format(r"^[0-9]+\.[0-9]+(\.[0-9])?$")
         .unwrap()
-        .parse(include_str!("fixtures/cargo.md"))
+        .parse(text)
         .unwrap();
     assert_eq!(changelog.len(), 54);
-    assert_diff("tests/fixtures/cargo-1.50.md", changelog["1.50"].notes);
-    assert_diff("tests/fixtures/cargo-1.77.1.md", changelog["1.77.1"].notes);
+    assert_diff(fixtures_dir().join("cargo-1.50.md"), changelog["1.50"].notes);
+    assert_diff(fixtures_dir().join("cargo-1.77.1.md"), changelog["1.77.1"].notes);
 }
 
 // Regression tests for bugs caught by fuzzing.
