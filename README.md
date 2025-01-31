@@ -115,9 +115,10 @@ To use this crate as a library, add this to your `Cargo.toml`:
 parse-changelog = { version = "0.6", default-features = false }
 ```
 
-Note: When using this crate as a library, we recommend disabling the default
-features because the default features enable CLI-related dependencies and the
-library part of this crate does not use them.
+> [!NOTE]
+> When using this crate as a library, we recommend disabling the default
+> features because the default features enable CLI-related dependencies and the
+> library part of this crate does not use them.
 
 ## Usage (CLI)
 
@@ -328,7 +329,8 @@ This is parsed by using the following regular expression:
 ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$|^Unreleased$
 ```
 
-**Note:** To get the 'Unreleased' section in the CLI, you need to explicitly specify 'Unreleased' as the version.
+> [!NOTE]
+> To get the 'Unreleased' section in the CLI, you need to explicitly specify 'Unreleased' as the version.
 
 To customize the version format, use the [`Parser::version_format`] method (library) or `--version-format` option (CLI).
 
