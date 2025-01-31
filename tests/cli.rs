@@ -3,15 +3,11 @@
 #![cfg(feature = "default")]
 #![cfg(not(miri))] // Miri doesn't support pipe2 (inside std::process::Command::output)
 
-use std::{env, ffi::OsStr, path::Path, process::Command};
+use std::{ffi::OsStr, path::Path, process::Command};
 
-use fs_err as fs;
 use indexmap::IndexMap;
 use serde_derive::Deserialize;
-use test_helper::{
-    cli::{ChildExt as _, CommandExt as _},
-    git::assert_diff,
-};
+use test_helper::cli::{ChildExt as _, CommandExt as _};
 
 fn parse_changelog<O: AsRef<OsStr>>(args: impl AsRef<[O]>) -> Command {
     let mut cmd = Command::new(env!("CARGO_BIN_EXE_parse-changelog"));
@@ -184,37 +180,8 @@ fn version() {
 
 #[test]
 fn update_readme() {
-    let new = &*parse_changelog(["--help"]).assert_success().stdout;
-    let path = &Path::new(env!("CARGO_MANIFEST_DIR")).join("README.md");
-    let base = fs::read_to_string(path).unwrap();
-    let mut out = String::with_capacity(base.capacity());
-    let mut lines = base.lines();
-    let mut start = false;
-    let mut end = false;
-    while let Some(line) = lines.next() {
-        out.push_str(line);
-        out.push('\n');
-        if line == "<!-- readme-long-help:start -->" {
-            start = true;
-            out.push_str("```console\n");
-            out.push_str("$ parse-changelog --help\n");
-            out.push_str(new);
-            for line in &mut lines {
-                if line == "<!-- readme-long-help:end -->" {
-                    out.push_str("```\n");
-                    out.push_str(line);
-                    out.push('\n');
-                    end = true;
-                    break;
-                }
-            }
-        }
-    }
-    if start && end {
-        assert_diff(path, out);
-    } else if start {
-        panic!("missing `<!-- readme-long-help:end -->` comment in README.md");
-    } else {
-        panic!("missing `<!-- readme-long-help:start -->` comment in README.md");
-    }
+    let new = parse_changelog(["--help"]).assert_success().stdout;
+    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("README.md");
+    let command = "parse-changelog --help";
+    test_helper::doc::sync_command_output_to_markdown(path, "readme-long-help", command, new);
 }
