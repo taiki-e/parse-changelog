@@ -6,5 +6,4 @@ honggfuzz
 indexmap
 lexopt
 libfuzzer
-memchr
 prettyplease

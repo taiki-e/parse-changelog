@@ -2,9 +2,7 @@ acvf
 binstall
 hfuzz
 keepachangelog
-libunwind
 makedeb
 memmem
 setext
-unparse
 unsuffixed
