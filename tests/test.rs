@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-use std::{mem, path::Path};
+use std::path::Path;
 
 use fs_err as fs;
 use parse_changelog::*;
@@ -8,22 +8,6 @@ use test_helper::git::assert_diff;
 
 fn fixtures_dir() -> &'static Path {
     Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures"))
-}
-
-// Test the size of public types. This is not intended to keep a specific size and
-// is intended to be used only as a help in optimization.
-#[test]
-#[cfg_attr(any(not(target_pointer_width = "64"), miri, careful), ignore)] // We set -Z randomize-layout for Miri/cargo-careful.
-fn size() {
-    assert_eq!(mem::size_of::<Error>(), 24);
-    assert_eq!(mem::size_of::<Changelog<'_>>(), 72);
-    assert_eq!(mem::size_of::<Release<'_>>(), 48);
-    assert_eq!(mem::size_of::<Parser>(), 64);
-    if cfg!(target_arch = "aarch64") {
-        assert_eq!(mem::size_of::<ParseIter<'_, '_>>(), 432);
-    } else {
-        assert_eq!(mem::size_of::<ParseIter<'_, '_>>(), 736);
-    }
 }
 
 #[test]

@@ -204,6 +204,9 @@ mod assert_impl;
 #[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
 #[path = "gen/serde.rs"]
 mod serde_impl;
+#[cfg(test)]
+#[path = "gen/tests/track_size.rs"]
+mod track_size;
 
 mod error;
 
