@@ -5,4 +5,5 @@ keepachangelog
 makedeb
 memmem
 setext
+thrpt
 unsuffixed
