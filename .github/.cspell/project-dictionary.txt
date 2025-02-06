@@ -2,7 +2,6 @@ acvf
 binstall
 hfuzz
 keepachangelog
-makedeb
 memmem
 setext
 thrpt

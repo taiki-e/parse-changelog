@@ -155,28 +155,6 @@ cargo binstall parse-changelog
 ```
 
 <!-- omit in toc -->
-#### Via MPR (Debian/Ubuntu)
-
-You can install [parse-changelog from the MPR](https://mpr.makedeb.org/packages/parse-changelog):
-
-```sh
-git clone 'https://mpr.makedeb.org/parse-changelog'
-cd parse-changelog/
-makedeb -si
-```
-
-<!-- omit in toc -->
-##### Via Prebuilt-MPR
-
-You can also install parse-changelog from the Prebuilt-MPR, which provides automatic upgrades directly via APT. First [set up the Prebuilt-MPR on your system](https://docs.makedeb.org/prebuilt-mpr/getting-started), and then run the following:
-
-```sh
-sudo apt install parse-changelog
-```
-
-Note: The MPR/Prebuilt-MPR packages are maintained by the community, not the maintainer of parse-changelog.
-
-<!-- omit in toc -->
 #### On GitHub Actions
 
 You can use [taiki-e/install-action](https://github.com/taiki-e/install-action) to install prebuilt binaries on Linux, macOS, and Windows.
