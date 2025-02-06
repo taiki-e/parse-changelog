@@ -164,6 +164,11 @@ This makes the installation faster and may avoid the impact of [problems caused 
 - uses: taiki-e/install-action@parse-changelog
 ```
 
+<!-- omit in toc -->
+#### Via other package managers
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/parse-changelog.svg?columns=4)](https://repology.org/project/parse-changelog/versions)
+
 ## Usage (Library)
 
 <!-- tidy:sync-markdown-to-rustdoc:start:src/lib.rs -->
