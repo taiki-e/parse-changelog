@@ -8,18 +8,97 @@
 
 Simple changelog parser, written in Rust.
 
-- [Installation](#installation)
-  - [CLI](#cli)
-  - [Library](#library)
 - [Usage (CLI)](#usage-cli)
+  - [Installation](#installation)
 - [Usage (Library)](#usage-library)
 - [Supported Format](#supported-format)
 - [Related Projects](#related-projects)
 - [License](#license)
 
-## Installation
+## Usage (CLI)
 
-### CLI
+`parse-changelog` command parses changelog and outputs a release note for the
+specified version.
+
+<details>
+<summary>Complete list of options (click to show)</summary>
+
+<!-- readme-long-help:start -->
+```console
+$ parse-changelog --help
+parse-changelog
+
+Parse a changelog and output a release note for the specified version.
+
+USAGE:
+    parse-changelog [OPTIONS] <PATH> [VERSION]
+
+ARGS:
+    <PATH>       Path to the changelog file (use '-' for standard input)
+    [VERSION]    Specify version (by default, select the latest release)
+
+OPTIONS:
+    -t, --title                       Output title instead of a note
+        --title-no-link               Similar to --title, but remove links from title
+        --json                        Output JSON representation of all releases in changelog
+        --version-format <PATTERN>    Specify version format
+        --prefix-format <PATTERN>     Specify prefix format [aliases: prefix]
+    -h, --help                        Print help information
+    -V, --version                     Print version information
+```
+<!-- readme-long-help:end -->
+
+</details>
+
+<!-- omit in toc -->
+### Example: Get Rust's release notes
+
+Get the release note for version 1.46.0 from [Rust's release notes](https://github.com/rust-lang/rust/blob/master/RELEASES.md):
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md \
+  | parse-changelog - 1.46.0
+```
+
+[*output of the above command.*](tests/fixtures/rust-1.46.0.md)
+
+<!-- omit in toc -->
+### Example: Get Cargo's changelog
+
+In [Cargo's changelog](https://github.com/rust-lang/cargo/blob/master/CHANGELOG.md),
+the title starts with "Cargo ", and the patch version is omitted if zero. This is a
+format `parse-changelog` don't support by default, so use `--prefix` and
+`--version-format` to specify a custom format. For example:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/rust-lang/cargo/master/CHANGELOG.md \
+  | parse-changelog --prefix 'Cargo ' --version-format '^[0-9]+\.[0-9]+(\.[0-9])?$' - 1.50
+```
+
+[*output of the above command.*](tests/fixtures/cargo-1.50.md)
+
+`--prefix` is the same as [`Parser::prefix_format`] and `--version-format` is
+the same as [`Parser::version_format`]. See documentation of those methods for
+more information.
+
+<!-- omit in toc -->
+### Example: Create a new GitHub release from changelog
+
+With [GitHub CLI](https://cli.github.com/manual/gh_release_create):
+
+```sh
+tag=...
+version=...
+
+# Get notes for $version from CHANGELOG.md.
+notes=$(parse-changelog CHANGELOG.md "$version")
+# Create a new GitHub release with GitHub CLI.
+gh release create "$tag" --title "$version" --notes "$notes"
+```
+
+See also [create-gh-release-action].
+
+### Installation
 
 <!-- omit in toc -->
 #### From source
@@ -35,13 +114,14 @@ You can download prebuilt binaries from the [Release page](https://github.com/ta
 Prebuilt binaries are available for macOS, Linux (gnu and musl), Windows (static executable), FreeBSD, and illumos.
 
 <details>
-<summary>Example of script to download parse-changelog</summary>
+<summary>Example of script to install from the Release page (click to show)</summary>
 
 ```sh
 # Get host target
 host=$(rustc -vV | grep '^host:' | cut -d' ' -f2)
 # Download binary and install to $HOME/.cargo/bin
-curl --proto '=https' --tlsv1.2 -fsSL https://github.com/taiki-e/parse-changelog/releases/latest/download/parse-changelog-$host.tar.gz | tar xzf - -C "$HOME/.cargo/bin"
+curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/taiki-e/parse-changelog/releases/latest/download/parse-changelog-$host.tar.gz" \
+  | tar xzf - -C "$HOME/.cargo/bin"
 ```
 
 </details>
@@ -106,7 +186,7 @@ This makes the installation faster and may avoid the impact of [problems caused 
 - uses: taiki-e/install-action@parse-changelog
 ```
 
-### Library
+## Usage (Library)
 
 To use this crate as a library, add this to your `Cargo.toml`:
 
@@ -116,96 +196,11 @@ parse-changelog = { version = "0.6", default-features = false }
 ```
 
 > [!NOTE]
-> When using this crate as a library, we recommend disabling the default
-> features because the default features enable CLI-related dependencies and the
-> library part of this crate does not use them.
-
-## Usage (CLI)
-
-`parse-changelog` command parses changelog and returns a release note for the
-specified version.
-
-<details>
-<summary>Click to show a complete list of options</summary>
-
-<!-- readme-long-help:start -->
-```console
-$ parse-changelog --help
-parse-changelog
-
-Simple changelog parser, written in Rust.
-
-Parses changelog and returns a release note for the specified version.
-
-USAGE:
-    parse-changelog [OPTIONS] <PATH> [VERSION]
-
-ARGS:
-    <PATH>       Path to the changelog file (use '-' for standard input)
-    [VERSION]    Specify version (by default, select the latest release)
-
-OPTIONS:
-    -t, --title                       Returns title instead of notes
-        --title-no-link               Similar to --title, but remove links from title
-        --json                        Returns JSON representation of all releases in changelog
-        --version-format <PATTERN>    Specify version format
-        --prefix-format <PATTERN>     Specify prefix format [aliases: prefix]
-    -h, --help                        Print help information
-    -V, --version                     Print version information
-```
-<!-- readme-long-help:end -->
-
-</details>
+> We recommend disabling default features because they enable CLI-related
+> dependencies which the library part does not use.
 
 <!-- omit in toc -->
-### Example: Get Rust's release notes
-
-Get the release note for version 1.46.0 from [Rust's release notes](https://github.com/rust-lang/rust/blob/master/RELEASES.md):
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md \
-  | parse-changelog - 1.46.0
-```
-
-[*output of the above command.*](tests/fixtures/rust-1.46.0.md)
-
-<!-- omit in toc -->
-### Example: Get Cargo's changelog
-
-In [Cargo's changelog](https://github.com/rust-lang/cargo/blob/master/CHANGELOG.md),
-the title starts with "Cargo ", and the patch version is omitted if zero. This is a
-format `parse-changelog` don't support by default, so use `--prefix` and
-`--version-format` to specify a custom format. For example:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/rust-lang/cargo/master/CHANGELOG.md \
-  | parse-changelog --prefix 'Cargo ' --version-format '^[0-9]+\.[0-9]+(\.[0-9])?$' - 1.50
-```
-
-[*output of the above command.*](tests/fixtures/cargo-1.50.md)
-
-`--prefix` is the same as [`Parser::prefix_format`] and `--version-format` is
-the same as [`Parser::version_format`]. See documentation of those methods for
-more information.
-
-<!-- omit in toc -->
-### Example: Create a new GitHub release from changelog
-
-With [GitHub CLI](https://cli.github.com/manual/gh_release_create):
-
-```sh
-tag=...
-version=...
-
-# Get notes for $version from CHANGELOG.md.
-notes=$(parse-changelog CHANGELOG.md "$version")
-# Create a new GitHub release with GitHub CLI.
-gh release create "$tag" --title "$version" --notes "$notes"
-```
-
-See also [create-gh-release-action].
-
-## Usage (Library)
+### Examples
 
 ```rust
 let changelog = "\
@@ -244,6 +239,11 @@ assert_eq!(
 
 See [documentation](https://docs.rs/parse-changelog) for more information on
 `parse-changelog` as a library.
+
+<!-- omit in toc -->
+### Optional features
+
+- **`serde`** — Implements [`serde::Serialize`] trait for parse-changelog types.
 
 ## Supported Format
 
@@ -346,7 +346,7 @@ You can freely include characters after the version.
 
 ## Related Projects
 
-- [create-gh-release-action]: GitHub Action for creating GitHub Releases based on changelog. (Using this crate for changelog parsing.)
+- [create-gh-release-action]: GitHub Action for creating GitHub Releases based on changelog. This action uses this crate for changelog parsing.
 
 [`Parser::prefix_format`]: https://docs.rs/parse-changelog/latest/parse_changelog/struct.Parser.html#method.prefix_format
 [`Parser::version_format`]: https://docs.rs/parse-changelog/latest/parse_changelog/struct.Parser.html#method.version_format
