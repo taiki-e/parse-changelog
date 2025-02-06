@@ -3,9 +3,32 @@
 /*!
 Simple changelog parser, written in Rust.
 
-# Examples
+### Usage
 
-```rust
+<!-- Note: Document from sync-markdown-to-rustdoc:start through sync-markdown-to-rustdoc:end
+     is synchronized from README.md. Any changes to that range are not preserved. -->
+<!-- tidy:sync-markdown-to-rustdoc:start -->
+
+To use this crate as a library, add this to your `Cargo.toml`:
+
+```toml
+[dependencies]
+parse-changelog = { version = "0.6", default-features = false }
+```
+
+<div class="rustdoc-alert rustdoc-alert-note">
+
+> **ⓘ Note**
+>
+> We recommend disabling default features because they enable CLI-related
+> dependencies which the library part does not use.
+
+</div>
+
+<!-- omit in toc -->
+### Examples
+
+```
 let changelog = "\
 ## 0.1.2 - 2020-03-01
 
@@ -40,39 +63,20 @@ assert_eq!(
 );
 ```
 
-The key of the map returned does not include prefixes such as
-"v", "Version ", etc.
+<!-- omit in toc -->
+### Optional features
 
-```rust
-let changelog_a = "\
-## Version 0.1.0 - 2020-01-01
-Initial release
-";
-let changelog_b = "\
-## v0.1.0 - 2020-02-01
-Initial release
-";
+- **`serde`** — Implements [`serde::Serialize`] trait for parse-changelog types.
 
-let changelog_a = parse_changelog::parse(changelog_a).unwrap();
-let changelog_b = parse_changelog::parse(changelog_b).unwrap();
-// Not `changelog_a["Version 0.1.0"]`
-assert_eq!(changelog_a["0.1.0"].version, "0.1.0");
-assert_eq!(changelog_a["0.1.0"].title, "Version 0.1.0 - 2020-01-01");
-assert_eq!(changelog_a["0.1.0"].notes, "Initial release");
-// Not `changelog_b["v0.1.0"]`
-assert_eq!(changelog_b["0.1.0"].version, "0.1.0");
-assert_eq!(changelog_b["0.1.0"].title, "v0.1.0 - 2020-02-01");
-assert_eq!(changelog_b["0.1.0"].notes, "Initial release");
-```
-
-# Supported Format
+## Supported Format
 
 By default, this crate is intended to support markdown-based changelogs
 that have the title of each release starts with the version format based on
 [Semantic Versioning][semver]. (e.g., [Keep a Changelog][keepachangelog]'s
 changelog format.)
 
-## Headings
+<!-- omit in toc -->
+### Headings
 
 The heading for each release must be Atx-style (1-6 `#`) or
 Setext-style (`=` or `-` in a line under text), and the heading levels
@@ -100,7 +104,8 @@ Setext-style headings:
 -----
 ```
 
-## Titles
+<!-- omit in toc -->
+### Titles
 
 The title of each release must start with a text or a link text (text with
 `[` and `]`) that starts with a valid [version format](#versions) or
@@ -116,7 +121,8 @@ description...
 description...
 ```
 
-### Prefixes
+<!-- omit in toc -->
+#### Prefixes
 
 You can include characters before the version as prefix.
 
@@ -128,9 +134,10 @@ You can include characters before the version as prefix.
 By default only "v", "Version ", "Release ", and "" (no prefix) are
 allowed as prefixes.
 
-To customize the prefix format, use the [`Parser::prefix_format`] method.
+To customize the prefix format, use the [`Parser::prefix_format`] method (library) or `--prefix-format` option (CLI).
 
-### Versions
+<!-- omit in toc -->
+#### Versions
 
 ```text
 ## v0.1.0 -- 2020-01-01
@@ -145,11 +152,18 @@ This is parsed by using the following regular expression:
 ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$|^Unreleased$
 ```
 
-**Note:** To get the 'Unreleased' section in the CLI, you need to explicitly specify 'Unreleased' as the version.
+<div class="rustdoc-alert rustdoc-alert-note">
 
-To customize the version format, use the [`Parser::version_format`] method.
+> **ⓘ Note**
+>
+> To get the 'Unreleased' section in the CLI, you need to explicitly specify 'Unreleased' as the version.
 
-### Suffixes
+</div>
+
+To customize the version format, use the [`Parser::version_format`] method (library) or `--version-format` option (CLI).
+
+<!-- omit in toc -->
+#### Suffixes
 
 You can freely include characters after the version.
 
@@ -158,13 +172,17 @@ You can freely include characters after the version.
        ^^^^^^^^^^^^^
 ```
 
-# Optional features
+## Related Projects
 
-- **`serde`** — Implements [`serde::Serialize`] trait for parse-changelog types.
+- [create-gh-release-action]: GitHub Action for creating GitHub Releases based on changelog. This action uses this crate for changelog parsing.
 
-[`serde::Serialize`]: https://docs.rs/serde/latest/serde/trait.Serialize.html
+[`Parser::prefix_format`]: https://docs.rs/parse-changelog/latest/parse_changelog/struct.Parser.html#method.prefix_format
+[`Parser::version_format`]: https://docs.rs/parse-changelog/latest/parse_changelog/struct.Parser.html#method.version_format
+[create-gh-release-action]: https://github.com/taiki-e/create-gh-release-action
 [keepachangelog]: https://keepachangelog.com
 [semver]: https://semver.org
+
+<!-- tidy:sync-markdown-to-rustdoc:end -->
 */
 
 #![doc(test(
@@ -189,10 +207,6 @@ You can freely include characters after the version.
 )]
 // docs.rs only (cfg is enabled by docs.rs, not build script)
 #![cfg_attr(docsrs, feature(doc_cfg))]
-
-#[cfg(doctest)]
-#[doc = include_str!("../README.md")]
-const _README: () = ();
 
 #[cfg(test)]
 mod tests;
@@ -238,8 +252,8 @@ pub type Changelog<'a> = IndexMap<&'a str, Release<'a>>;
 /// This function uses the default version and prefix format. If you want to use
 /// another format, consider using the [`Parser`] type instead.
 ///
-/// See crate level documentation for changelog and version format supported
-/// by default.
+/// See the [crate-level documentation](crate) for changelog and version
+/// format supported by default.
 ///
 /// # Errors
 ///
@@ -263,8 +277,8 @@ pub fn parse(text: &str) -> Result<Changelog<'_>> {
 /// This function uses the default version and prefix format. If you want to use
 /// another format, consider using the [`Parser`] type instead.
 ///
-/// See crate level documentation for changelog and version format supported
-/// by default.
+/// See the [crate-level documentation](crate) for changelog and version
+/// format supported by default.
 pub fn parse_iter(text: &str) -> ParseIter<'_, 'static> {
     ParseIter::new(text, None, None)
 }
@@ -414,8 +428,8 @@ impl Parser {
 
     /// Parses release notes from the given `text`.
     ///
-    /// See crate level documentation for changelog and version format supported
-    /// by default.
+    /// See the [crate-level documentation](crate) for changelog and version
+    /// format supported by default.
     ///
     /// # Errors
     ///
@@ -451,8 +465,8 @@ impl Parser {
     /// Unlike [`parse`] method, the returned iterator doesn't error on
     /// duplicate release notes or empty changelog.
     ///
-    /// See crate level documentation for changelog and version format supported
-    /// by default.
+    /// See the [crate-level documentation](crate) for changelog and version
+    /// format supported by default.
     ///
     /// [`parse`]: Self::parse
     pub fn parse_iter<'a, 'r>(&'r self, text: &'a str) -> ParseIter<'a, 'r> {

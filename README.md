@@ -188,6 +188,8 @@ This makes the installation faster and may avoid the impact of [problems caused 
 
 ## Usage (Library)
 
+<!-- tidy:sync-markdown-to-rustdoc:start:src/lib.rs -->
+
 To use this crate as a library, add this to your `Cargo.toml`:
 
 ```toml
@@ -237,8 +239,12 @@ assert_eq!(
 );
 ```
 
+<!-- tidy:sync-markdown-to-rustdoc:ignore:start -->
+
 See [documentation](https://docs.rs/parse-changelog) for more information on
 `parse-changelog` as a library.
+
+<!-- tidy:sync-markdown-to-rustdoc:ignore:end -->
 
 <!-- omit in toc -->
 ### Optional features
@@ -353,6 +359,8 @@ You can freely include characters after the version.
 [create-gh-release-action]: https://github.com/taiki-e/create-gh-release-action
 [keepachangelog]: https://keepachangelog.com
 [semver]: https://semver.org
+
+<!-- tidy:sync-markdown-to-rustdoc:end -->
 
 ## License
 
