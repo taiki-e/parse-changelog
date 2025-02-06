@@ -12,6 +12,10 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Reduce size of `Error` type.
+
+- Documentation improvements.
+
 ## [0.6.11] - 2025-01-19
 
 ### CLI
