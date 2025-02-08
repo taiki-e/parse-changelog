@@ -24,6 +24,21 @@ doc = false
 [workspace]
 resolver = "2"
 
+# This table is shared by projects under github.com/taiki-e.
+# Expect for unexpected_cfgs.check-cfg, it is not intended for manual editing.
+[lints.rust]
+deprecated_safe = "warn"
+improper_ctypes = "warn"
+improper_ctypes_definitions = "warn"
+non_ascii_idents = "warn"
+rust_2018_idioms = "warn"
+single_use_lifetimes = "warn"
+unexpected_cfgs = { level = "warn", check-cfg = [
+] }
+# unnameable_types = "warn"
+# unreachable_pub = "warn"
+unsafe_op_in_unsafe_fn = "warn"
+
 [profile.release]
 debug = true
 debug-assertions = true
