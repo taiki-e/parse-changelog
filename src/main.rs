@@ -4,7 +4,7 @@
 
 use std::{
     fs,
-    io::{self, Read as _, Write as _},
+    io::{self, BufWriter, Read as _, Write as _},
     path::{Path, PathBuf},
     process::ExitCode,
 };
@@ -174,8 +174,7 @@ fn try_main() -> Result<()> {
     };
 
     if args.json {
-        let stdout = io::stdout();
-        let mut stdout = stdout.lock();
+        let mut stdout = BufWriter::new(io::stdout().lock()); // Buffered because it is written many times.
         serde_json::to_writer(&mut stdout, &changelog)?;
         stdout.flush()?;
         return Ok(());
@@ -211,8 +210,7 @@ fn try_main() -> Result<()> {
     } else {
         release.notes.into()
     };
-    let stdout = io::stdout();
-    let mut stdout = stdout.lock();
+    let mut stdout = io::stdout().lock(); // Not buffered because it is written only a few times.
     stdout.write_all(text.as_bytes())?;
     stdout.write_all(b"\n")?;
     stdout.flush()?;
