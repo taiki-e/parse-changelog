@@ -86,13 +86,20 @@ jobs:
         working-directory: fuzz
       # On scheduled job, run fuzzer $FUZZ_MAX_TOTAL_TIME seconds per target.
       # TODO: This is currently skipped for libfuzzer due to https://github.com/rust-fuzz/cargo-fuzz/issues/270.
-      # TODO: Honggfuzz
+      # TODO: Honggfuzz: https://github.com/taiki-e/parse-changelog/blob/a7c8a9a801fec6083abb8f821d7bfe988f29455b/.github/workflows/fuzz.yml
       - name: Cache AFL++ output
         uses: actions/cache@v4
         with:
           path: fuzz/out
           key: afl-out-${{ github.run_id }}
           restore-keys: afl-out-
+        if: github.event_name == 'schedule'
+      - name: Cache Honggfuzz output
+        uses: actions/cache@v4
+        with:
+          path: fuzz/hfuzz_workspace
+          key: honggfuzz-out-${{ github.run_id }}
+          restore-keys: honggfuzz-out-
         if: github.event_name == 'schedule'
       - name: Fuzzing with AFL++
         run: |
@@ -105,6 +112,22 @@ jobs:
             if [[ -d "out/${target}/default/crashes" ]] || [[ -d "out/${target}/default/hangs" ]]; then
               exit 1
             fi
+          done
+        working-directory: fuzz
+        if: github.event_name == 'schedule'
+      - name: Fuzzing with Honggfuzz
+        run: |
+          # shellcheck disable=SC2010
+          for target in $(ls | grep -E '\.rs$' | sed -E 's/\.rs$//'); do
+            HFUZZ_RUN_ARGS="--exit_upon_crash --run_time ${FUZZ_MAX_TOTAL_TIME}" \
+              HFUZZ_BUILD_ARGS="--features honggfuzz" \
+              RUSTFLAGS="${RUSTFLAGS:-} -Z sanitizer=address" \
+              cargo hfuzz run "${target}"
+            # rmdir -- "out/${target}/default/crashes" 2>/dev/null || true
+            # rmdir -- "out/${target}/default/hangs" 2>/dev/null || true
+            # if [[ -d "out/${target}/default/crashes" ]] || [[ -d "out/${target}/default/hangs" ]]; then
+            #   exit 1
+            # fi
           done
         working-directory: fuzz
         if: github.event_name == 'schedule'

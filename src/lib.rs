@@ -208,6 +208,9 @@ You can freely include characters after the version.
 // docs.rs only (cfg is enabled by docs.rs, not build script)
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
+// TODO: markdown is too complex! https://johnmacfarlane.net/beyond-markdown.html
+// TODO: collect links https://github.com/taiki-e/parse-changelog/issues/34 / https://github.com/CycloneDX/cyclonedx-rust-cargo/pull/559#issuecomment-2127877311
+
 #[cfg(test)]
 mod tests;
 

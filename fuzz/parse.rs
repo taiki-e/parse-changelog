@@ -24,6 +24,18 @@ HFUZZ_RUN_ARGS="${HFUZZ_RUN_ARGS:-} --exit_upon_crash" \
     RUSTFLAGS="${RUSTFLAGS:-} -Z sanitizer=address" \
     cargo hfuzz run parse
 ```
+
+Run with AFL++ + cargo-llvm-cov:
+
+```sh
+cd fuzz
+source <(cargo llvm-cov show-env --export-prefix)
+cargo llvm-cov clean --workspace
+cargo afl build --release --features afl
+AFL_FUZZER_LOOPCOUNT=20 \
+    cargo afl fuzz -c - -i seeds/parse -o out/parse target/release/parse
+cargo llvm-cov report --release --open
+```
 */
 
 #![cfg_attr(feature = "libfuzzer", no_main)]
@@ -53,5 +65,8 @@ fn main() {
 
 fn run(bytes: &[u8]) {
     let Ok(text) = std::str::from_utf8(bytes) else { return };
-    let _result = parse(text);
+    let Ok(changelog) = parse(text) else { return };
+    for release in changelog.values() {
+        let _ = release.title_no_link();
+    }
 }

@@ -155,6 +155,18 @@ cargo binstall parse-changelog
 ```
 
 <!-- omit in toc -->
+#### Via apk (Alpine Linux)
+
+You can install parse-changelog from the [testing repository](https://pkgs.alpinelinux.org/packages?name=parse-changelog):
+
+```sh
+# Note: if your /etc/apk/repositories doesn't have testing repository, then you need to run:
+# echo 'https://dl-cdn.alpinelinux.org/alpine/edge/testing' >>/etc/apk/repositories
+
+apk add parse-changelog
+```
+
+<!-- omit in toc -->
 #### On GitHub Actions
 
 You can use [taiki-e/install-action](https://github.com/taiki-e/install-action) to install prebuilt binaries on Linux, macOS, and Windows.

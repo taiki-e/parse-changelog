@@ -9,6 +9,8 @@ use indexmap::IndexMap;
 use serde_derive::Deserialize;
 use test_helper::cli::{ChildExt as _, CommandExt as _};
 
+// TODO: fs::read_to_string instead of include_str!
+
 fn parse_changelog<O: AsRef<OsStr>>(args: impl AsRef<[O]>) -> Command {
     let mut cmd = Command::new(env!("CARGO_BIN_EXE_parse-changelog"));
     cmd.current_dir(env!("CARGO_MANIFEST_DIR"));
