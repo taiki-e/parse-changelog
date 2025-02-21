@@ -52,6 +52,6 @@ fn main() {
 }
 
 fn run(bytes: &[u8]) {
-    let Ok(text) = std::str::from_utf8(bytes) else { return };
+    let Ok(text) = str::from_utf8(bytes) else { return };
     let _result = parse(text);
 }
