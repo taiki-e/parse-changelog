@@ -186,9 +186,9 @@ Found 9 outliers among 100 measurements (9.00%)
 
 use std::{hint::black_box, path::PathBuf};
 
-use criterion::{criterion_group, criterion_main, Criterion, Throughput};
+use criterion::{Criterion, Throughput, criterion_group, criterion_main};
 use fs_err as fs;
-use parse_changelog::{parse, parse_iter, Parser};
+use parse_changelog::{Parser, parse, parse_iter};
 
 fn fixtures_dir() -> PathBuf {
     let mut dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));

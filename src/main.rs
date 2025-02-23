@@ -67,7 +67,9 @@ impl Args {
         #[inline(never)]
         fn multi_arg(flag: &lexopt::Arg<'_>) -> Result<()> {
             let flag = &format_arg(flag);
-            bail!("the argument '{flag}' was provided more than once, but cannot be used multiple times");
+            bail!(
+                "the argument '{flag}' was provided more than once, but cannot be used multiple times"
+            );
         }
         #[cold]
         #[inline(never)]

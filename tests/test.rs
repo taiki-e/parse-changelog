@@ -18,11 +18,7 @@ fn success() {
             cnt += 1;
         }
         // Indents less than 4 are ignored.
-        if cnt < 4 {
-            s[cnt..].trim_end()
-        } else {
-            s.trim_end()
-        }
+        if cnt < 4 { s[cnt..].trim_end() } else { s.trim_end() }
     }
 
     let changelogs = [
