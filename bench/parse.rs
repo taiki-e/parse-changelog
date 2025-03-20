@@ -13,13 +13,13 @@ Just for reference purposes, leave results of local benchmarks.
   - regex 1.11.1
 
 
-## Apple M1 Pro (MacBook Pro 2021, macOS 15.2)
+## Apple M4 Pro (MacBook Pro 2024/11, macOS 15.3.1)
 
 ```console
 $ sysctl machdep.cpu.brand_string
-machdep.cpu.brand_string: Apple M1 Pro
+machdep.cpu.brand_string: Apple M4 Pro
 
-$ rustc -vV
+$ rustc +nightly-2025-02-01 -vV
 rustc 1.86.0-nightly (854f22563 2025-01-31)
 binary: rustc
 commit-hash: 854f22563c8daf92709fae18ee6aed52953835cd
@@ -28,7 +28,71 @@ host: aarch64-apple-darwin
 release: 1.86.0-nightly
 LLVM version: 19.1.7
 
-$ cargo bench -p bench
+$ cargo +nightly-2025-02-01 bench -p bench
+<cargo log omitted>
+
+parse_changelog_atx/parse
+                        time:   [284.76 µs 285.65 µs 286.53 µs]
+                        thrpt:  [2.3391 GiB/s 2.3463 GiB/s 2.3537 GiB/s]
+Found 2 outliers among 100 measurements (2.00%)
+  1 (1.00%) high mild
+  1 (1.00%) high severe
+parse_changelog_atx/parse_custom
+                        time:   [285.00 µs 285.88 µs 286.79 µs]
+                        thrpt:  [2.3370 GiB/s 2.3444 GiB/s 2.3517 GiB/s]
+Found 2 outliers among 100 measurements (2.00%)
+  1 (1.00%) high mild
+  1 (1.00%) high severe
+parse_changelog_atx/parse_iter
+                        time:   [284.10 µs 284.82 µs 285.57 µs]
+                        thrpt:  [2.3470 GiB/s 2.3532 GiB/s 2.3592 GiB/s]
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high severe
+parse_changelog_atx/parse_iter_first
+                        time:   [3.0999 µs 3.1134 µs 3.1276 µs]
+                        thrpt:  [214.29 GiB/s 215.27 GiB/s 216.21 GiB/s]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+
+parse_changelog_setext/parse
+                        time:   [309.72 µs 310.52 µs 311.36 µs]
+                        thrpt:  [2.1774 GiB/s 2.1834 GiB/s 2.1889 GiB/s]
+Found 3 outliers among 100 measurements (3.00%)
+  1 (1.00%) low mild
+  2 (2.00%) high severe
+parse_changelog_setext/parse_custom
+                        time:   [312.72 µs 313.54 µs 314.43 µs]
+                        thrpt:  [2.1562 GiB/s 2.1623 GiB/s 2.1679 GiB/s]
+parse_changelog_setext/parse_iter
+                        time:   [308.46 µs 309.13 µs 309.86 µs]
+                        thrpt:  [2.1880 GiB/s 2.1932 GiB/s 2.1979 GiB/s]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high severe
+parse_changelog_setext/parse_iter_first
+                        time:   [3.3954 µs 3.4172 µs 3.4416 µs]
+                        thrpt:  [196.99 GiB/s 198.40 GiB/s 199.67 GiB/s]
+Found 5 outliers among 100 measurements (5.00%)
+  5 (5.00%) high mild
+
+```
+
+
+## Apple M1 Pro (MacBook Pro 2021, macOS 15.2)
+
+```console
+$ sysctl machdep.cpu.brand_string
+machdep.cpu.brand_string: Apple M1 Pro
+
+$ rustc +nightly-2025-02-01 -vV
+rustc 1.86.0-nightly (854f22563 2025-01-31)
+binary: rustc
+commit-hash: 854f22563c8daf92709fae18ee6aed52953835cd
+commit-date: 2025-01-31
+host: aarch64-apple-darwin
+release: 1.86.0-nightly
+LLVM version: 19.1.7
+
+$ cargo +nightly-2025-02-01 bench -p bench
 <cargo log omitted>
 
 Benchmarking parse_changelog_atx/parse: Collecting 100 samples in estimated 5.8152 s (10k ite
@@ -97,7 +161,7 @@ Found 3 outliers among 100 measurements (3.00%)
 $ sysctl machdep.cpu.brand_string
 machdep.cpu.brand_string: Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz
 
-$ rustc -vV
+$ rustc +nightly-2025-02-01 -vV
 rustc 1.86.0-nightly (854f22563 2025-01-31)
 binary: rustc
 commit-hash: 854f22563c8daf92709fae18ee6aed52953835cd
@@ -106,7 +170,7 @@ host: x86_64-apple-darwin
 release: 1.86.0-nightly
 LLVM version: 19.1.7
 
-$ cargo bench -p bench
+$ cargo +nightly-2025-02-01 bench -p bench
 <cargo log omitted>
 
 Benchmarking parse_changelog_atx/parse: Warming up for 3.0000 s
