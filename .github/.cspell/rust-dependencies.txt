@@ -7,3 +7,4 @@ indexmap
 lexopt
 libfuzzer
 prettyplease
+rustversion
