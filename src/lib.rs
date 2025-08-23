@@ -739,7 +739,7 @@ enum HeadingStyle {
     /// Atx-style headings use 1-6 `#` characters at the start of the line,
     /// corresponding to header levels 1-6.
     Atx,
-    /// Setext-style headings are “underlined” using equal signs `=` (for
+    /// Setext-style headings are "underlined" using equal signs `=` (for
     /// first-level headings) and dashes `-` (for second-level headings).
     Setext,
 }
