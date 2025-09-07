@@ -12,6 +12,10 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+### CLI
+
+- Distribute prebuilt binaries for powerpc64le/riscv64gc/s390x Linux.
+
 ## [0.6.12] - 2025-02-06
 
 - Reduce size of `Error` type.
