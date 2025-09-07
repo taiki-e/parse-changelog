@@ -16,6 +16,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 - Distribute prebuilt binaries for powerpc64le/riscv64gc/s390x Linux.
 
+- Improve performance for `--json` option.
+
 ## [0.6.12] - 2025-02-06
 
 - Reduce size of `Error` type.
