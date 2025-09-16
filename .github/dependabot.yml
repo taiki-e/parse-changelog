@@ -9,6 +9,8 @@ updates:
       interval: daily
     commit-message:
       prefix: ''
+    ignore:
+      - dependency-name: afl
     labels: []
   - package-ecosystem: github-actions
     directory: /
