@@ -66,7 +66,7 @@ assert_eq!(
 <!-- omit in toc -->
 ### Optional features
 
-- **`serde`** — Implements [`serde::Serialize`] trait for parse-changelog types.
+- **`serde`** — Implements [`serde::Serialize`](https://docs.rs/serde/latest/serde/trait.Serialize.html) trait for parse-changelog types.
 
 ## Supported Format
 

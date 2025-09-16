@@ -4,7 +4,7 @@
 // It is not intended for manual editing.
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
-use serde::ser::{Serialize, SerializeStruct as _, Serializer};
+use serde_core::ser::{Serialize, SerializeStruct as _, Serializer};
 impl Serialize for crate::Release<'_> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where

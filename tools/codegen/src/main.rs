@@ -26,7 +26,7 @@ fn gen_serde_impl() {
     let workspace_root = &workspace_root();
 
     let mut tokens = quote! {
-        use serde::ser::{Serialize, SerializeStruct as _, Serializer};
+        use serde_core::ser::{Serialize, SerializeStruct as _, Serializer};
     };
 
     let mut visited_types = HashSet::new();
