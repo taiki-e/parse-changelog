@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.6.14] - 2025-09-20
+
 - Switch `serde` feature to depend on `serde_core` to improve compile time when `derive` feature of `serde` is enabled.
 
 ## [0.6.13] - 2025-09-07
@@ -240,7 +242,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.6.13...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.6.14...HEAD
+[0.6.14]: https://github.com/taiki-e/parse-changelog/compare/v0.6.13...v0.6.14
 [0.6.13]: https://github.com/taiki-e/parse-changelog/compare/v0.6.12...v0.6.13
 [0.6.12]: https://github.com/taiki-e/parse-changelog/compare/v0.6.11...v0.6.12
 [0.6.11]: https://github.com/taiki-e/parse-changelog/compare/v0.6.10...v0.6.11
