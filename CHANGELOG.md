@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Switch `serde` feature to depend on `serde_core` to improve compile time when `derive` feature of `serde` is enabled.
+
 ## [0.6.13] - 2025-09-07
 
 ### CLI
