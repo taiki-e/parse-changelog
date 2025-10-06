@@ -230,8 +230,8 @@ use indexmap::IndexMap;
 use memchr::memmem;
 use regex::Regex;
 
-pub use crate::error::Error;
-use crate::error::Result;
+pub use self::error::Error;
+use self::error::Result;
 
 /// A changelog.
 ///
