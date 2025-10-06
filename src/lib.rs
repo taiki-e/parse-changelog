@@ -215,7 +215,6 @@ mod tests;
 #[path = "gen/tests/assert_impl.rs"]
 mod assert_impl;
 #[cfg(feature = "serde")]
-#[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
 #[path = "gen/serde.rs"]
 mod serde_impl;
 #[cfg(test)]
