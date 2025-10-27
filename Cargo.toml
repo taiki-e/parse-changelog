@@ -2,7 +2,8 @@
 name = "parse-changelog"
 version = "0.6.14" #publish:version
 edition = "2021"
-rust-version = "1.70" # For OnceLock
+# NB: Sync with msrv badge in README.md
+rust-version = "1.82" # For indexmap
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/taiki-e/parse-changelog"
 keywords = ["changelog", "parser"]
