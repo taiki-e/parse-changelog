@@ -118,7 +118,7 @@ jobs:
         working-directory: fuzz
         if: failure() && github.event_name == 'schedule'
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: fuzz-artifacts
           path: afl-artifacts.tar.gz
