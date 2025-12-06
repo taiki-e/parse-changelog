@@ -32,6 +32,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  fuzz:
+    uses: taiki-e/github-actions/.github/workflows/fuzz.yml@main
   miri:
     uses: taiki-e/github-actions/.github/workflows/miri.yml@main
     with:
@@ -57,67 +59,3 @@ jobs:
       pull-requests: write # for gh pr edit --add-assignee
       repository-projects: read # for gh pr edit --add-assignee
     secrets: inherit
-
-  fuzz:
-    env:
-      FUZZ_MAX_TOTAL_TIME: 60 # 1 minute
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: taiki-e/checkout-action@v1
-      - uses: taiki-e/github-actions/install-rust@nightly
-      - run: sudo apt-get -o Acquire::Retries=10 -qq update && sudo apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends binutils-dev libunwind8-dev
-      - uses: taiki-e/cache-cargo-install-action@v2
-        with:
-          tool: cargo-fuzz
-      # We cannot use cache for cargo-afl because afl.rs requires the cargo-afl binary and afl library to be built with the same compiler version.
-      - run: cargo install cargo-afl --debug --locked
-      - uses: taiki-e/cache-cargo-install-action@v2
-        with:
-          # TODO: Pass --no-default-features
-          tool: honggfuzz
-      - run: cargo fuzz build --features libfuzzer
-      - run: cargo afl build --release --features afl
-        working-directory: fuzz
-      - run: |
-          HFUZZ_BUILD_ARGS="--features honggfuzz" \
-            RUSTFLAGS="${RUSTFLAGS:-} -Z sanitizer=address" \
-            cargo hfuzz build
-        working-directory: fuzz
-      # On scheduled job, run fuzzer $FUZZ_MAX_TOTAL_TIME seconds per target.
-      # TODO: This is currently skipped for libfuzzer due to https://github.com/rust-fuzz/cargo-fuzz/issues/270.
-      # TODO: Honggfuzz
-      - name: Cache AFL++ output
-        uses: actions/cache@v4
-        with:
-          path: fuzz/out
-          key: afl-out-${{ github.run_id }}
-          restore-keys: afl-out-
-        if: github.event_name == 'schedule'
-      - name: Fuzzing with AFL++
-        run: |
-          sudo tee -- /proc/sys/kernel/core_pattern >/dev/null <<<core
-          # shellcheck disable=SC2010
-          for target in $(ls | grep -E '\.rs$' | sed -E 's/\.rs$//'); do
-            cargo afl fuzz -i "seeds/${target}" -o "out/${target}" -V "${FUZZ_MAX_TOTAL_TIME}" "target/release/${target}"
-            rmdir -- "out/${target}/default/crashes" 2>/dev/null || true
-            rmdir -- "out/${target}/default/hangs" 2>/dev/null || true
-            if [[ -d "out/${target}/default/crashes" ]] || [[ -d "out/${target}/default/hangs" ]]; then
-              exit 1
-            fi
-          done
-        working-directory: fuzz
-        if: github.event_name == 'schedule'
-      - name: Archive artifacts
-        run: |
-          if [[ -d out ]]; then
-            tar acvf ../afl-artifacts.tar.gz out
-          fi
-        working-directory: fuzz
-        if: failure() && github.event_name == 'schedule'
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v5
-        with:
-          name: fuzz-artifacts
-          path: afl-artifacts.tar.gz
-        if: failure() && github.event_name == 'schedule'
