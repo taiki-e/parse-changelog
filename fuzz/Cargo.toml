@@ -12,7 +12,7 @@ libfuzzer = ["dep:libfuzzer-sys"]
 parse-changelog = { path = "..", default-features = false }
 
 libfuzzer-sys = { version = "0.4", optional = true }
-afl = { version = "=0.15.20", optional = true }
+afl = { version = "0.15", optional = true }
 honggfuzz = { version = "0.5", optional = true, default-features = false }
 
 [[bin]]

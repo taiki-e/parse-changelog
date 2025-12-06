@@ -73,7 +73,7 @@ jobs:
         with:
           tool: cargo-fuzz
       # We cannot use cache for cargo-afl because afl.rs requires the cargo-afl binary and afl library to be built with the same compiler version.
-      - run: cargo install cargo-afl@0.15.20 --debug --locked
+      - run: cargo install cargo-afl --debug --locked
       - uses: taiki-e/cache-cargo-install-action@v2
         with:
           # TODO: Pass --no-default-features
