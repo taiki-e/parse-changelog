@@ -16,8 +16,8 @@ build.include-dependencies = true
 build.include-workspace = false # covered by tools/tidy.sh
 build.include-archives = true
 build.allow-build-scripts = [
-    { name = "serde_json" },
     { name = "serde_core" },
+    { name = "serde_json" },
 ]
 build.bypass = [
 ]
