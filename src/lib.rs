@@ -751,7 +751,7 @@ fn heading<'a>(line: &'a str, lines: &mut Lines<'a>) -> Option<Heading<'a>> {
             level += 1;
         }
         // https://pandoc.org/try/?params=%7B%22text%22%3A%22%23%23%23%23%23%23%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23%23%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23+%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23%5Ct%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23+a%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23%5Cta%5Cn%3D%3D%3D%5Cn%5Cn%23%23%23%23%23%23+b%5Cn%5Cn%22%2C%22to%22%3A%22html5%22%2C%22from%22%3A%22commonmark%22%2C%22standalone%22%3Afalse%2C%22embed-resources%22%3Afalse%2C%22table-of-contents%22%3Afalse%2C%22number-sections%22%3Afalse%2C%22citeproc%22%3Afalse%2C%22html-math-method%22%3A%22plain%22%2C%22wrap%22%3A%22auto%22%2C%22highlight-style%22%3Anull%2C%22files%22%3A%7B%7D%2C%22template%22%3Anull%7D
-        if level < 7 && line.as_bytes().get(level).map_or(true, |&b| matches!(b, b' ' | b'\t')) {
+        if level < 7 && line.as_bytes().get(level).is_none_or(|&b| matches!(b, b' ' | b'\t')) {
             return Some(Heading {
                 text: line.get(level + 1..).map(str::trim).unwrap_or_default(),
                 #[allow(clippy::cast_possible_truncation)] // false positive: level is < 7: https://github.com/rust-lang/rust-clippy/issues/7486
