@@ -18,6 +18,7 @@ build.include-archives = true
 build.allow-build-scripts = [
     { name = "serde_core" },
     { name = "serde_json" },
+    { name = "zmij" }, # via serde_json
 ]
 build.bypass = [
 ]
