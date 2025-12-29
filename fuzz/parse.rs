@@ -24,21 +24,40 @@ HFUZZ_RUN_ARGS="${HFUZZ_RUN_ARGS:-} --exit_upon_crash" \
     RUSTFLAGS="${RUSTFLAGS:-} -Z sanitizer=address" \
     cargo hfuzz run parse
 ```
+
+Run with LibAFL:
+
+```sh
+cargo fuzz run --release --features libafl parse
+```
 */
 
-#![cfg_attr(feature = "libfuzzer", no_main)]
+#![cfg_attr(any(feature = "libfuzzer", feature = "libafl"), no_main)]
 
 use parse_changelog::parse;
 
-#[cfg(any(
-    not(any(feature = "libfuzzer", feature = "afl", feature = "honggfuzz")),
-    all(feature = "libfuzzer", feature = "afl"),
-    all(feature = "libfuzzer", feature = "honggfuzz"),
-    all(feature = "afl", feature = "honggfuzz"),
-))]
-compile_error!("exactly one of 'libfuzzer' or 'afl' or 'honggfuzz' feature must be enabled");
-
+#[cfg(not(any(
+    feature = "libfuzzer",
+    feature = "libafl",
+    feature = "afl",
+    feature = "honggfuzz",
+)))]
+compile_error!(
+    "exactly one of 'libfuzzer' or 'libafl' or 'afl' or 'honggfuzz' feature must be enabled"
+);
 #[cfg(feature = "libfuzzer")]
+const _FUZZER_SELECTED: () = ();
+#[cfg(feature = "libafl")]
+const _FUZZER_SELECTED: () = ();
+#[cfg(feature = "afl")]
+const _FUZZER_SELECTED: () = ();
+#[cfg(feature = "honggfuzz")]
+const _FUZZER_SELECTED: () = ();
+
+#[cfg(feature = "libafl")]
+extern crate libafl_libfuzzer as libfuzzer_sys;
+
+#[cfg(any(feature = "libfuzzer", feature = "libafl"))]
 libfuzzer_sys::fuzz_target!(|bytes| run(bytes));
 #[cfg(feature = "afl")]
 fn main() {

@@ -1,6 +1,7 @@
 binstall
 hfuzz
 keepachangelog
+libafl
 memmem
 setext
 thrpt
