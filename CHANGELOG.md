@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Enable [release immutability](https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/immutable-releases).
+
 ## [0.6.14] - 2025-09-20
 
 - Switch `serde` feature to depend on `serde_core` to improve compile time when `derive` feature of `serde` is enabled.
