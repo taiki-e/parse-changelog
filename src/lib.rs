@@ -202,11 +202,13 @@ You can freely include characters after the version.
     clippy::exhaustive_structs,
     clippy::impl_trait_in_params,
     // clippy::missing_inline_in_public_items,
-    // clippy::std_instead_of_alloc,
+    clippy::std_instead_of_alloc,
     clippy::std_instead_of_core,
 )]
 // docs.rs only (cfg is enabled by docs.rs, not build script)
 #![cfg_attr(docsrs, feature(doc_cfg))]
+
+extern crate alloc;
 
 #[cfg(test)]
 mod tests;
@@ -223,8 +225,9 @@ mod track_size;
 
 mod error;
 
+use alloc::borrow::Cow;
 use core::mem;
-use std::{borrow::Cow, sync::OnceLock};
+use std::sync::OnceLock;
 
 use indexmap::IndexMap;
 use memchr::memmem;
