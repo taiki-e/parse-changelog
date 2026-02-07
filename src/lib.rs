@@ -185,6 +185,7 @@ You can freely include characters after the version.
 <!-- tidy:sync-markdown-to-rustdoc:end -->
 */
 
+#![no_std]
 #![doc(test(
     no_crate_inject,
     attr(allow(
@@ -211,6 +212,7 @@ You can freely include characters after the version.
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 extern crate alloc;
+extern crate std;
 
 #[cfg(test)]
 mod tests;
@@ -227,7 +229,7 @@ mod track_size;
 
 mod error;
 
-use alloc::borrow::Cow;
+use alloc::{borrow::Cow, format, string::String};
 use core::mem;
 use std::sync::OnceLock;
 
