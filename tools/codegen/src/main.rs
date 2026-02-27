@@ -2,16 +2,16 @@
 
 #![allow(clippy::needless_pass_by_value, clippy::wildcard_imports)]
 
-#[macro_use]
-mod file;
-
 use std::{collections::HashSet, path::Path};
 
 use fs_err as fs;
 use proc_macro2::Literal;
 use quote::{format_ident, quote};
+use test_helper::{bin_name, codegen::file, function_name};
 
-use crate::file::*;
+fn workspace_root() -> &'static Path {
+    Path::new(env!("CARGO_MANIFEST_DIR").strip_suffix("tools/codegen").unwrap())
+}
 
 fn main() {
     gen_serde_impl();
@@ -23,7 +23,7 @@ fn gen_serde_impl() {
     const FILES: &[&str] = &["src/lib.rs"];
     const EXCLUDE: &[&str] = &["Parser", "ParseIter"];
 
-    let workspace_root = &workspace_root();
+    let workspace_root = workspace_root();
 
     let mut tokens = quote! {
         use serde_core::ser::{Serialize, SerializeStruct as _, Serializer};
@@ -88,12 +88,19 @@ fn gen_serde_impl() {
         assert!(visited_types.contains(t), "unknown type `{t}` specified in EXCLUDE constant");
     }
 
-    write(function_name!(), workspace_root.join("src/gen/serde.rs"), tokens).unwrap();
+    file::write(
+        function_name!(),
+        bin_name!(),
+        workspace_root,
+        workspace_root.join("src/gen/serde.rs"),
+        tokens,
+    );
 }
 
 fn gen_assert_impl() {
+    let workspace_root = workspace_root();
     let (path, out) = test_helper::codegen::gen_assert_impl(
-        &workspace_root(),
+        workspace_root,
         test_helper::codegen::AssertImplConfig {
             exclude: &[],
             not_send: &[],
@@ -103,15 +110,16 @@ fn gen_assert_impl() {
             not_ref_unwind_safe: &[],
         },
     );
-    write(function_name!(), path, out).unwrap();
+    file::write(function_name!(), bin_name!(), workspace_root, path, out);
 }
 
 fn gen_track_size() {
+    let workspace_root = workspace_root();
     let (path, out) = test_helper::codegen::gen_track_size(
-        &workspace_root(),
+        workspace_root,
         test_helper::codegen::TrackSizeConfig {
             exclude: &["ParseIter"], // size different between AArch64 and x86_64
         },
     );
-    write(function_name!(), path, out).unwrap();
+    file::write(function_name!(), bin_name!(), workspace_root, path, out);
 }
