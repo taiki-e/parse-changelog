@@ -1,6 +1,7 @@
 binstall
 hfuzz
 keepachangelog
+LOOPCOUNT
 memmem
 setext
 thrpt

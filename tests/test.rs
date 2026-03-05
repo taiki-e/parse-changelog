@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-use std::path::Path;
+use std::{error::Error as _, path::Path};
 
 use fs_err as fs;
 use parse_changelog::*;
@@ -120,7 +120,9 @@ fn failure() {
         "0.1.0\n--?\n",
     ];
     for changelog in &changelogs {
-        assert!(parse(changelog).unwrap_err().is_parse());
+        let e = parse(changelog).unwrap_err();
+        assert!(e.is_parse());
+        assert!(!e.is_format());
     }
 
     assert!(Parser::new().prefix_format("").is_ok());
@@ -128,9 +130,25 @@ fn failure() {
     assert!(Parser::new().prefix_format("\t\n").is_ok());
     assert!(Parser::new().prefix_format(r"\/").is_ok());
 
-    assert!(Parser::new().version_format("").unwrap_err().is_format());
-    assert!(Parser::new().version_format("  ").unwrap_err().is_format());
-    assert!(Parser::new().version_format("\t\n").unwrap_err().is_format());
+    let e = Parser::new().version_format("").unwrap_err();
+    assert!(e.is_format());
+    assert_eq!(e.to_string(), "empty or whitespace version format");
+    assert!(!e.is_parse());
+    assert!(e.source().is_none());
+    let e = Parser::new().version_format("  ").unwrap_err();
+    assert!(e.is_format());
+    assert_eq!(e.to_string(), "empty or whitespace version format");
+    assert!(!e.is_parse());
+    assert!(e.source().is_none());
+    let e = Parser::new().version_format("\t\n").unwrap_err();
+    assert!(e.is_format());
+    assert_eq!(e.to_string(), "empty or whitespace version format");
+    assert!(!e.is_parse());
+    assert!(e.source().is_none());
+    let e = Parser::new().version_format("\\").unwrap_err();
+    assert!(e.is_format());
+    assert!(!e.is_parse());
+    assert!(e.source().is_some());
     assert!(Parser::new().version_format(r"\/").is_ok());
 }
 
@@ -138,12 +156,44 @@ fn failure() {
 fn multiple_heading() {
     let changelogs = ["## 0.1.0\n## 0.1.0\n", "## 0.1.0\n## 0.1.0\n## 0.0.0\n"];
     for changelog in &changelogs {
-        assert!(parse(changelog).unwrap_err().is_parse());
+        let e = parse(changelog).unwrap_err();
+        assert!(e.is_parse());
+        assert!(!e.is_format());
     }
 
-    let changelogs = ["## 0.1.0\n##0.1.0\n", "##0.1.0\n## 0.1.0\n##0.0.0\n"];
+    let changelogs =
+        ["## 0.1.0\n##0.1.0\n", "##0.1.0\n## 0.1.0\n##0.0.0\n", "##0.1.0\n## 0.1.0\n## other"];
     for changelog in &changelogs {
-        assert_eq!(parse(changelog).unwrap().len(), 1);
+        let changelog = parse(changelog).unwrap();
+        assert_eq!(changelog.len(), 1);
+        assert_eq!(changelog[0].title, "0.1.0");
+    }
+}
+
+#[test]
+fn multiple_level() {
+    let changelogs = [
+        ("### 0.2.0\na\n## 0.1.0\nb\n", "a"),
+        ("## 0.2.0\na\n### 0.1.0\nb\n", "a\n### 0.1.0\nb"),
+        ("## 0.2.0\na\n### 0.1.0", "a\n### 0.1.0"),
+        ("## 0.2.0\na\n# 0.1.0", "a"),
+        ("## 0.2.0\na\n## other\n# 0.1.0", "a"),
+        ("## 0.2.0\na\n## other\n# 0.1.0\n", "a"),
+    ];
+    for &(changelog, notes) in &changelogs {
+        let changelog = parse(changelog).unwrap();
+        assert_eq!(changelog.len(), 1);
+        assert_eq!(changelog[0].title, "0.2.0");
+        assert_eq!(changelog[0].notes, notes);
+    }
+    let changelogs = [("## 0.2.0\na\n## other\n# 0.1.0\n## 0.1.0", "a")];
+    for &(changelog, notes) in &changelogs {
+        let changelog = parse(changelog).unwrap();
+        assert_eq!(changelog.len(), 2);
+        assert_eq!(changelog[0].title, "0.2.0");
+        assert_eq!(changelog[0].notes, notes);
+        assert_eq!(changelog[1].title, "0.1.0");
+        assert_eq!(changelog[1].notes, "");
     }
 }
 
@@ -156,7 +206,9 @@ fn atx_heading() {
     }
 
     let changelog = &format!("{} 0.1.0", "#".repeat(7));
-    assert!(parse(changelog).unwrap_err().is_parse());
+    let e = parse(changelog).unwrap_err();
+    assert!(e.is_parse());
+    assert!(!e.is_format());
 }
 
 #[test]
@@ -225,14 +277,16 @@ fn comment() {
 # 0.2.0 -->
 # 0.1.0
 <!--
-# 0.1.0 --> <!--
-# 0.1.0 -->
+# 0.1.0 <!-- -->
+a
+# 0.0.1 -->
 # 0.0.0
 ";
     let changelog = parse(changelog).unwrap();
-    assert_eq!(changelog.len(), 3);
+    assert_eq!(changelog.len(), 4);
     assert_eq!(changelog["0.2.0"].notes, "<!--\n# 0.2.0 --> <!--\n# 0.2.0 -->");
-    assert_eq!(changelog["0.1.0"].notes, "<!--\n# 0.1.0 --> <!--\n# 0.1.0 -->");
+    assert_eq!(changelog["0.1.0"].notes, "<!--\n# 0.1.0 <!-- -->\na");
+    assert_eq!(changelog["0.0.1"].notes, "");
     assert_eq!(changelog["0.0.0"].notes, "");
 }
 

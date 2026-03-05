@@ -5,25 +5,30 @@
 
 use std::{ffi::OsStr, path::Path, process::Command};
 
+use fs_err as fs;
 use indexmap::IndexMap;
 use serde_derive::Deserialize;
 use test_helper::cli::{ChildExt as _, CommandExt as _};
 
+fn workspace_root() -> &'static Path {
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+}
+
 fn parse_changelog<O: AsRef<OsStr>>(args: impl AsRef<[O]>) -> Command {
     let mut cmd = Command::new(env!("CARGO_BIN_EXE_parse-changelog"));
-    cmd.current_dir(env!("CARGO_MANIFEST_DIR"));
+    cmd.current_dir(workspace_root());
     cmd.args(args.as_ref());
     cmd
 }
 
 #[test]
 fn success() {
-    parse_changelog(["tests/fixtures/pin-project.md"])
-        .assert_success()
-        .stdout_eq(include_str!("fixtures/pin-project-latest.md"));
-    parse_changelog(["tests/fixtures/pin-project.md", "1.0.0"])
-        .assert_success()
-        .stdout_eq(include_str!("fixtures/pin-project-1.0.0.md"));
+    parse_changelog(["tests/fixtures/pin-project.md"]).assert_success().stdout_eq(
+        fs::read_to_string(workspace_root().join("tests/fixtures/pin-project-latest.md")).unwrap(),
+    );
+    parse_changelog(["tests/fixtures/pin-project.md", "1.0.0"]).assert_success().stdout_eq(
+        fs::read_to_string(workspace_root().join("tests/fixtures/pin-project-1.0.0.md")).unwrap(),
+    );
     parse_changelog(["tests/fixtures/pin-project.md", "Unreleased"]).assert_success().stdout_eq("");
     parse_changelog(["tests/fixtures/pin-project.md", "1.0.0", "--title"])
         .assert_success()
@@ -34,18 +39,21 @@ fn success() {
     parse_changelog(["-", "1.0.0"])
         .spawn_with_stdin(include_bytes!("fixtures/pin-project.md"))
         .assert_success()
-        .stdout_eq(include_str!("fixtures/pin-project-1.0.0.md"));
+        .stdout_eq(
+            fs::read_to_string(workspace_root().join("tests/fixtures/pin-project-1.0.0.md"))
+                .unwrap(),
+        );
 
-    parse_changelog(["tests/fixtures/rust.md"])
-        .assert_success()
-        .stdout_eq(include_str!("fixtures/rust-latest.md"));
-    parse_changelog(["tests/fixtures/rust.md", "1.46.0"])
-        .assert_success()
-        .stdout_eq(include_str!("fixtures/rust-1.46.0.md"));
+    parse_changelog(["tests/fixtures/rust.md"]).assert_success().stdout_eq(
+        fs::read_to_string(workspace_root().join("tests/fixtures/rust-latest.md")).unwrap(),
+    );
+    parse_changelog(["tests/fixtures/rust.md", "1.46.0"]).assert_success().stdout_eq(
+        fs::read_to_string(workspace_root().join("tests/fixtures/rust-1.46.0.md")).unwrap(),
+    );
 
-    parse_changelog(["tests/fixtures/rust-atx.md", "1.46.0"])
-        .assert_success()
-        .stdout_eq(include_str!("fixtures/rust-1.46.0-atx.md"));
+    parse_changelog(["tests/fixtures/rust-atx.md", "1.46.0"]).assert_success().stdout_eq(
+        fs::read_to_string(workspace_root().join("tests/fixtures/rust-1.46.0-atx.md")).unwrap(),
+    );
 
     parse_changelog([
         "tests/fixtures/cargo.md",
@@ -56,7 +64,7 @@ fn success() {
         r"^[0-9]+\.[0-9]+(\.[0-9])?$",
     ])
     .assert_success()
-    .stdout_eq(include_str!("fixtures/cargo-1.50.md"));
+    .stdout_eq(fs::read_to_string(workspace_root().join("tests/fixtures/cargo-1.50.md")).unwrap());
 }
 
 #[test]
@@ -65,6 +73,10 @@ fn failure() {
         .assert_failure()
         .stderr_contains("no changelog path specified");
 
+    parse_changelog(["tests/fixtures/non-exist"])
+        .assert_failure()
+        .stderr_contains("failed to read from file");
+
     parse_changelog(["tests/fixtures/pin-project.md", "0.0.0", "0.0.1"])
         .assert_failure()
         .stderr_contains(r#"unexpected argument "0.0.1""#);
@@ -72,6 +84,13 @@ fn failure() {
     parse_changelog(["tests/fixtures/pin-project.md", "0.0.0", "--title", "--title-no-link"])
         .assert_failure()
         .stderr_contains("--title may not be used together with --title-no-link");
+
+    parse_changelog(["tests/fixtures/pin-project.md", "--non-exist"])
+        .assert_failure()
+        .stderr_contains("invalid option '--non-exist'");
+    parse_changelog(["tests/fixtures/pin-project.md", "-n"])
+        .assert_failure()
+        .stderr_contains("invalid option '-n'");
 
     // multiple arguments
     for flag in &[
