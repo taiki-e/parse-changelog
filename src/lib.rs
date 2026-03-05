@@ -670,10 +670,8 @@ impl<'a> Iterator for ParseIter<'a, '_> {
 
         if !cur_release.version.is_empty() {
             if let Some(release_note_start) = release_note_start {
-                if let Some(nodes) = self.lines.text.get(release_note_start..) {
-                    // Remove trailing newlines.
-                    cur_release.notes = nodes.trim_end();
-                }
+                // Remove trailing newlines.
+                cur_release.notes = self.lines.text[release_note_start..].trim_end();
             }
             return Some(cur_release);
         }
