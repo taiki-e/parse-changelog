@@ -125,7 +125,7 @@ curl --proto '=https' --tlsv1.2 -fsSL -o parse-changelog.tar.gz "https://github.
 # Verify release attestations.
 gh release -R https://github.com/taiki-e/parse-changelog verify-asset parse-changelog.tar.gz
 # Verify artifact attestations.
-gh attestation verify --owner taiki-e parse-changelog.tar.gz
+gh attestation verify --repo taiki-e/parse-changelog --signer-workflow taiki-e/github-actions/.github/workflows/rust-release.yml parse-changelog.tar.gz
 # Install to $CARGO_HOME/bin (or $HOME/.cargo/bin if CARGO_HOME is unset).
 tar xf parse-changelog.tar.gz -C "${CARGO_HOME:-"$HOME/.cargo"}"/bin
 # Remove archive.
