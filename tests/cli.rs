@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 #![cfg(feature = "default")]
-#![cfg(not(miri))] // Miri doesn't support pipe2 (inside std::process::Command::output)
+#![cfg(not(miri))] // Miri doesn't support std::process::Command: https://github.com/rust-lang/miri/issues/3374
 
 use std::{ffi::OsStr, path::Path, process::Command};
 
