@@ -1,21 +1,23 @@
 version: 2
 updates:
-  - package-ecosystem: cargo # zizmor: ignore[dependabot-cooldown] # Unless dependencies are pinned/locked, the effect is limited.
+  - package-ecosystem: cargo
     directories:
       - /
       # crates with [workspace] table are not recognized by the above 'directory: /'
       - /fuzz
     schedule:
-      interval: daily
+      interval: weekly
+    cooldown:
+      default-days: 14 # Note: Unless dependencies are pinned/locked, the effect is limited.
     commit-message:
       prefix: ''
     labels: []
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: daily
+      interval: weekly
     cooldown:
-      default-days: 7
+      default-days: 14
     commit-message:
       prefix: ''
     labels: []
