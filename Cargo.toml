@@ -3,7 +3,7 @@ name = "parse-changelog"
 version = "0.6.16" #publish:version
 edition = "2021"
 # NB: Sync with msrv badge in README.md
-rust-version = "1.82" # For indexmap
+rust-version = "1.85" # For indexmap
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/taiki-e/parse-changelog"
 keywords = ["changelog", "parser"]
