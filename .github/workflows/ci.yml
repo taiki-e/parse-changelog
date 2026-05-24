@@ -12,50 +12,21 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:
 
-env:
-  CARGO_INCREMENTAL: 0
-  CARGO_NET_GIT_FETCH_WITH_CLI: true
-  CARGO_NET_RETRY: 10
-  CARGO_TERM_COLOR: always
-  RUST_BACKTRACE: 1
-  RUSTDOCFLAGS: -D warnings
-  RUSTFLAGS: -D warnings
-  RUSTUP_MAX_RETRIES: 10
-
-defaults:
-  run:
-    shell: bash --noprofile --norc -CeEuxo pipefail {0}
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
 jobs:
-  fuzz:
-    uses: taiki-e/github-actions/.github/workflows/fuzz.yml@68753a4331ec78cb842512fd16ae32da0c066e31 # main
-  miri:
-    uses: taiki-e/github-actions/.github/workflows/miri.yml@68753a4331ec78cb842512fd16ae32da0c066e31 # main
-    with:
-      # NB: sync with test job's --exclude option
-      args: --exclude parse-changelog-internal-codegen
-      # We cannot use -Zmiri-symbolic-alignment-check due to memchr 2.6.0 - 2.8.0 bug https://github.com/taiki-e/parse-changelog/commit/376d961a5a8adb79c95bd3b6f7188d138981156f
-      miriflags: -Zmiri-strict-provenance -Zmiri-disable-isolation
-  msrv:
-    uses: taiki-e/github-actions/.github/workflows/msrv.yml@68753a4331ec78cb842512fd16ae32da0c066e31 # main
-  release-dry-run:
-    uses: taiki-e/github-actions/.github/workflows/release-dry-run.yml@68753a4331ec78cb842512fd16ae32da0c066e31 # main
+  tidy:
+    uses: taiki-e/github-actions/.github/workflows/tidy.yml@1bb80ca038216cd1fb7b6ca6d76240b3772963ab # main
+    permissions:
+      security-events: write # for github/codeql-action/*
   test:
-    uses: taiki-e/github-actions/.github/workflows/test.yml@68753a4331ec78cb842512fd16ae32da0c066e31 # main
+    needs: tidy
+    uses: taiki-e/github-actions/.github/workflows/rust-test.yml@1bb80ca038216cd1fb7b6ca6d76240b3772963ab # main
     with:
-      # NB: sync with miri job's --exclude option
       test-args: --exclude parse-changelog-internal-codegen
       build-args: --lib
       no-std: false
-  tidy:
-    uses: taiki-e/github-actions/.github/workflows/tidy.yml@68753a4331ec78cb842512fd16ae32da0c066e31 # main
-    permissions:
-      contents: write # for creating branch for pr
-      pull-requests: write # unused (used in `codegen-automerge: true` case)
-      security-events: write # for github/codeql-action/*
-    secrets:
-      PR_TOKEN_APP_PRIVATE_KEY: ${{ secrets.PR_TOKEN_APP_PRIVATE_KEY }}
+      # We cannot use -Zmiri-symbolic-alignment-check due to memchr 2.6.0 - 2.8.0 bug https://github.com/taiki-e/parse-changelog/commit/376d961a5a8adb79c95bd3b6f7188d138981156f
+      miriflags: -Zmiri-strict-provenance -Zmiri-disable-isolation
