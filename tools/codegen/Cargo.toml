@@ -7,7 +7,7 @@ fs-err = "3"
 proc-macro2 = { version = "1", default-features = false }
 quote = { version = "1", default-features = false }
 syn = { version = "2", default-features = false, features = ["parsing", "printing", "full"] }
-test-helper = { features = ["codegen"], git = "https://github.com/taiki-e/test-helper.git", rev = "c78a65c" }
+test-helper = { features = ["codegen"], git = "https://github.com/taiki-e/test-helper.git", rev = "82e3b012a49fb16587e165986674290ef682a5b0" }
 
 [lints]
 workspace = true
