@@ -12,6 +12,10 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Support code block using four or more \`.
+
+- Support code block using ~.
+
 ## [0.6.16] - 2026-03-20
 
 - Publish [artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations).

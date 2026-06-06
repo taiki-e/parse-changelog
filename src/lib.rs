@@ -575,8 +575,8 @@ impl<'a> Iterator for ParseIter<'a, '_> {
     type Item = Release<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // If `true`, we are in a code block ("```").
-        let mut on_code_block = false;
+        // If `true`, we are in a code block (``` or ~~~).
+        let mut on_code_block: Option<&[u8]> = None;
         // TODO: nested case?
         // If `true`, we are in a comment (`<!--` and `-->`).
         let mut on_comment = false;
@@ -584,15 +584,32 @@ impl<'a> Iterator for ParseIter<'a, '_> {
         let mut cur_release = Release { version: "", title: "", notes: "" };
 
         while let Some((line, line_start, line_end)) = self.lines.peek() {
-            let heading =
-                if on_code_block || on_comment { None } else { heading(line, &mut self.lines) };
+            let heading = if on_code_block.is_some() || on_comment {
+                None
+            } else {
+                heading(line, &mut self.lines)
+            };
             if heading.is_none() {
                 self.lines.next();
-                if trim_start(line).starts_with("```") {
-                    on_code_block = !on_code_block;
+                if let Some(fence) = on_code_block {
+                    let line = trim_start(line).as_bytes();
+                    if line.starts_with(fence) {
+                        on_code_block = None;
+                    }
+                } else {
+                    let line = trim_start(line).as_bytes();
+                    if let Some(&b @ (b'`' | b'~')) = line.first() {
+                        let mut len = 1;
+                        while line.get(len) == Some(&b) {
+                            len += 1;
+                        }
+                        if len >= 3 {
+                            on_code_block = Some(&line[..len]);
+                        }
+                    }
                 }
 
-                if !on_code_block {
+                if on_code_block.is_none() {
                     self.handle_comment(&mut on_comment, line);
                 }
 

@@ -213,20 +213,52 @@ fn atx_heading() {
 
 #[test]
 fn code_block() {
+    for fence in ["```", "```", "~~~", "~~~~"] {
+        let changelog = format!(
+            "\
+# 0.2.0
+{fence}
+# 0.2.0
+{fence}
+# 0.1.0
+{fence}
+# 0.1.0
+{fence}
+"
+        );
+        let changelog = parse(&changelog).unwrap();
+        assert_eq!(changelog.len(), 2);
+        assert_eq!(changelog["0.2.0"].notes, format!("{fence}\n# 0.2.0\n{fence}"));
+        assert_eq!(changelog["0.1.0"].notes, format!("{fence}\n# 0.1.0\n{fence}"));
+    }
+
+    // https://pandoc.org/try/?params=%7B%22text%22%3A%22%60%60%60%5Cn%60%60%60%60%5Cna%5Cn%60%60%60%60%5Cn%60%60%60%5Cn%60%60%60%5Cn%7E%7E%7E%7E%5Cna%5Cn%7E%7E%7E%7E%5Cn%60%60%60%22%2C%22to%22%3A%22html5%22%2C%22from%22%3A%22commonmark%22%2C%22standalone%22%3Afalse%2C%22embed-resources%22%3Afalse%2C%22table-of-contents%22%3Afalse%2C%22number-sections%22%3Afalse%2C%22citeproc%22%3Afalse%2C%22html-math-method%22%3A%22plain%22%2C%22wrap%22%3A%22auto%22%2C%22highlight-style%22%3Anull%2C%22files%22%3A%7B%7D%2C%22template%22%3Anull%7D
     let changelog = "\
 # 0.2.0
 ```
 # 0.2.0
-```
+````
+# 0.1.0
+````
 # 0.1.0
 ```
 # 0.1.0
 ```
+# 0.1.0
+~~~~
+# 0.1.0
+~~~~
+# 0.1.0
+```
+# 0.1.0
 ";
     let changelog = parse(changelog).unwrap();
     assert_eq!(changelog.len(), 2);
-    assert_eq!(changelog["0.2.0"].notes, "```\n# 0.2.0\n```");
-    assert_eq!(changelog["0.1.0"].notes, "```\n# 0.1.0\n```");
+    assert_eq!(changelog["0.2.0"].notes, "```\n# 0.2.0\n````");
+    assert_eq!(
+        changelog["0.1.0"].notes,
+        "````\n# 0.1.0\n```\n# 0.1.0\n```\n# 0.1.0\n~~~~\n# 0.1.0\n~~~~\n# 0.1.0\n```\n# 0.1.0"
+    );
 
     let changelog = "\
 # 0.2.0
