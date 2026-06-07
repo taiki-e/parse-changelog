@@ -325,6 +325,7 @@ a
     assert_eq!(changelog["0.1.0"].notes, "<!--\n# 0.1.0 <!-- -->\na");
     assert_eq!(changelog["0.0.2"].title, "0.0.2 -->");
     assert_eq!(changelog["0.0.2"].notes, "");
+    // TODO: option like title_no_link to remove comment from title
     assert_eq!(changelog["0.0.1"].title, "0.0.1 <!-- -->");
     assert_eq!(changelog["0.0.1"].notes, "");
     // https://pandoc.org/try/?params=%7B%22text%22%3A%22%23+0.0.0+%3C%21--%5Cna%5Cn--%3E%22%2C%22to%22%3A%22html5%22%2C%22from%22%3A%22commonmark%22%2C%22standalone%22%3Afalse%2C%22embed-resources%22%3Afalse%2C%22table-of-contents%22%3Afalse%2C%22number-sections%22%3Afalse%2C%22citeproc%22%3Afalse%2C%22html-math-method%22%3A%22plain%22%2C%22wrap%22%3A%22auto%22%2C%22highlight-style%22%3Anull%2C%22files%22%3A%7B%7D%2C%22template%22%3Anull%7D
@@ -345,8 +346,8 @@ fn link() {
 # [0.3.1 2022-01-01][link]
 # [0.3.0 2022-01-01](link)
 # [0.2.2] 2022-01-01
-# [0.2.1][link] 2022-01-01
-# [0.2.0](link) 2022-01-01
+# [0.2.1][link] [2022-01-01](link2)
+# [0.2.0](link) 2022-[01-01][link2]
 # [0.1.2]
 # [0.1.1][link]
 # [0.1.0](link)
@@ -384,10 +385,10 @@ fn link() {
     assert_eq!(changelog["0.2.2"].title, "[0.2.2] 2022-01-01");
     assert_eq!(changelog["0.2.2"].title_no_link(), "0.2.2 2022-01-01");
     assert_eq!(changelog["0.2.1"].version, "0.2.1");
-    assert_eq!(changelog["0.2.1"].title, "[0.2.1][link] 2022-01-01");
+    assert_eq!(changelog["0.2.1"].title, "[0.2.1][link] [2022-01-01](link2)");
     assert_eq!(changelog["0.2.1"].title_no_link(), "0.2.1 2022-01-01");
     assert_eq!(changelog["0.2.0"].version, "0.2.0");
-    assert_eq!(changelog["0.2.0"].title, "[0.2.0](link) 2022-01-01");
+    assert_eq!(changelog["0.2.0"].title, "[0.2.0](link) 2022-[01-01][link2]");
     assert_eq!(changelog["0.2.0"].title_no_link(), "0.2.0 2022-01-01");
     assert_eq!(changelog["0.1.2"].version, "0.1.2");
     assert_eq!(changelog["0.1.2"].title, "[0.1.2]");
