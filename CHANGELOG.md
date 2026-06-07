@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.6.17] - 2026-06-07
+
 - Support code block using four or more \`.
 
 - Support code block using ~.
@@ -254,7 +256,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.6.16...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.6.17...HEAD
+[0.6.17]: https://github.com/taiki-e/parse-changelog/compare/v0.6.16...v0.6.17
 [0.6.16]: https://github.com/taiki-e/parse-changelog/compare/v0.6.15...v0.6.16
 [0.6.15]: https://github.com/taiki-e/parse-changelog/compare/v0.6.14...v0.6.15
 [0.6.14]: https://github.com/taiki-e/parse-changelog/compare/v0.6.13...v0.6.14
