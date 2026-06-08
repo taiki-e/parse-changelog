@@ -594,7 +594,17 @@ impl<'a> Iterator for ParseIter<'a, '_> {
                 if let Some(fence) = on_code_block {
                     let line = trim_start(line).as_bytes();
                     if line.starts_with(fence) {
-                        on_code_block = None;
+                        let b = fence[0];
+                        let mut pos = fence.len();
+                        while line.get(pos) == Some(&b) {
+                            pos += 1;
+                        }
+                        while matches!(line.get(pos), Some(b' ' | b'\t')) {
+                            pos += 1;
+                        }
+                        if line[pos..].is_empty() {
+                            on_code_block = None;
+                        }
                     }
                 } else if !on_comment {
                     let line = trim_start(line).as_bytes();
