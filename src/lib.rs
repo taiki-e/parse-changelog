@@ -536,8 +536,9 @@ impl<'a, 'r> ParseIter<'a, 'r> {
         cur_release
     }
 
-    fn handle_comment(&self, on_comment: &mut bool, line: &'a str) {
-        let mut line = Some(line.as_bytes());
+    fn handle_comment(&self, on_comment: &mut bool, is_inline_comment: &mut bool, line: &'a [u8]) {
+        let mut first = true;
+        let mut line = Some(line);
         while let Some(l) = line {
             let Some(pos) = memchr::memchr(b'-', l) else { break };
             match l.get(pos + 1) {
@@ -547,6 +548,7 @@ impl<'a, 'r> ParseIter<'a, 'r> {
                 Some(&b'-') => {}
                 Some(_) => {
                     line = l.get(pos + 2..);
+                    first = false;
                     continue;
                 }
                 None => break,
@@ -556,8 +558,12 @@ impl<'a, 'r> ParseIter<'a, 'r> {
                     // <!--
                     // ^    open
                     //   ^  pos
-                    *on_comment = true;
+                    if !*on_comment {
+                        *on_comment = true;
+                        *is_inline_comment = !first || open != 0;
+                    }
                     line = l.get(pos + 2..);
+                    first = false;
                     continue;
                 }
             }
@@ -568,6 +574,7 @@ impl<'a, 'r> ParseIter<'a, 'r> {
                     // ^   pos
                     *on_comment = false;
                     line = l.get(close + 1..);
+                    first = false;
                     continue;
                 }
             }
@@ -582,22 +589,24 @@ impl<'a> Iterator for ParseIter<'a, '_> {
     fn next(&mut self) -> Option<Self::Item> {
         // If `true`, we are in a code block (``` or ~~~).
         let mut on_code_block: Option<&[u8]> = None;
-        // TODO: nested case?
         // If `true`, we are in a comment (`<!--` and `-->`).
         let mut on_comment = false;
+        // If `true`, we are in an inline comment (`... <!--`).
+        let mut is_inline_comment = false;
         let mut release_note_start = None;
         let mut cur_release = Release { version: "", title: "", notes: "" };
 
         while let Some((line, line_start, line_end)) = self.lines.peek() {
-            let heading = if on_code_block.is_some() || on_comment {
+            let line = trim_start(line);
+            let heading = if on_code_block.is_some() || on_comment && !is_inline_comment {
                 None
             } else {
                 heading(line, &mut self.lines)
             };
-            if heading.is_none() {
+            let Some(heading) = heading else {
+                let line = line.as_bytes();
                 self.lines.next();
                 if let Some(fence) = on_code_block {
-                    let line = trim_start(line).as_bytes();
                     if line.starts_with(fence) {
                         let b = fence[0];
                         let mut pos = fence.len();
@@ -611,21 +620,21 @@ impl<'a> Iterator for ParseIter<'a, '_> {
                             on_code_block = None;
                         }
                     }
-                } else if !on_comment {
-                    let line = trim_start(line).as_bytes();
-                    if let Some(&b @ (b'`' | b'~')) = line.first() {
-                        let mut len = 1;
-                        while line.get(len) == Some(&b) {
-                            len += 1;
-                        }
-                        if len >= 3 && (b != b'`' || !line[len..].contains(&b'`')) {
-                            on_code_block = Some(&line[..len]);
+                } else {
+                    if !on_comment {
+                        if let Some(&b @ (b'`' | b'~')) = line.first() {
+                            let mut len = 1;
+                            while line.get(len) == Some(&b) {
+                                len += 1;
+                            }
+                            if len >= 3 && (b != b'`' || !line[len..].contains(&b'`')) {
+                                on_code_block = Some(&line[..len]);
+                            }
                         }
                     }
-                }
-
-                if on_code_block.is_none() {
-                    self.handle_comment(&mut on_comment, line);
+                    if on_code_block.is_none() {
+                        self.handle_comment(&mut on_comment, &mut is_inline_comment, line);
+                    }
                 }
 
                 // Non-heading lines are always considered part of the current
@@ -635,8 +644,8 @@ impl<'a> Iterator for ParseIter<'a, '_> {
                     break;
                 }
                 continue;
-            }
-            let heading = heading.unwrap();
+            };
+            on_comment = false;
             if let Some(release_level) = self.level {
                 if heading.level > release_level {
                     // Consider sections that have lower heading levels than
@@ -781,7 +790,6 @@ enum HeadingStyle {
 }
 
 fn heading<'a>(line: &'a str, lines: &mut Lines<'a>) -> Option<Heading<'a>> {
-    let line = trim_start(line);
     if line.as_bytes().first() == Some(&b'#') {
         let mut level = 1;
         while level <= 7 && line.as_bytes().get(level) == Some(&b'#') {
