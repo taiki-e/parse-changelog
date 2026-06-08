@@ -234,7 +234,6 @@ use core::mem;
 use std::sync::OnceLock;
 
 use indexmap::IndexMap;
-use memchr::memmem;
 use regex::Regex;
 
 pub use self::error::Error;
@@ -488,15 +487,10 @@ impl Parser {
 pub struct ParseIter<'a, 'r> {
     version_format: &'r Regex,
     prefix_format: &'r Regex,
-    find_open: memmem::Finder<'static>,
-    find_close: memmem::Finder<'static>,
     lines: Lines<'a>,
     /// The heading level of release sections. 1-6
     level: Option<u8>,
 }
-
-const OPEN: &[u8] = b"<!--";
-const CLOSE: &[u8] = b"-->";
 
 fn default_prefix_format() -> &'static Regex {
     static DEFAULT_PREFIX_FORMAT: OnceLock<Regex> = OnceLock::new();
@@ -523,8 +517,6 @@ impl<'a, 'r> ParseIter<'a, 'r> {
         Self {
             version_format: version_format.unwrap_or_else(|| default_version_format()),
             prefix_format: prefix_format.unwrap_or_else(|| default_prefix_format()),
-            find_open: memmem::Finder::new(OPEN),
-            find_close: memmem::Finder::new(CLOSE),
             lines: Lines::new(text),
             level: None,
         }
@@ -545,28 +537,41 @@ impl<'a, 'r> ParseIter<'a, 'r> {
     }
 
     fn handle_comment(&self, on_comment: &mut bool, line: &'a str) {
-        let mut line = Some(line);
+        let mut line = Some(line.as_bytes());
         while let Some(l) = line {
-            match (self.find_open.find(l.as_bytes()), self.find_close.find(l.as_bytes())) {
-                (None, None) => {}
-                // <!-- ...
-                (Some(_), None) => *on_comment = true,
-                // ... -->
-                (None, Some(_)) => *on_comment = false,
-                (Some(open), Some(close)) => {
-                    if open < close {
-                        // <!-- ... -->
-                        *on_comment = false;
-                        line = l.get(close + CLOSE.len()..);
-                    } else {
-                        // --> ... <!--
-                        *on_comment = true;
-                        line = l.get(open + OPEN.len()..);
-                    }
+            let Some(pos) = memchr::memchr(b'-', l) else { break };
+            match l.get(pos + 1) {
+                // --
+                // ^   pos
+                //  ^  pos + 1
+                Some(&b'-') => {}
+                Some(_) => {
+                    line = l.get(pos + 2..);
+                    continue;
+                }
+                None => break,
+            }
+            if let Some(open) = pos.checked_sub(2) {
+                if l.get(open) == Some(&b'<') && l.get(open + 1) == Some(&b'!') {
+                    // <!--
+                    // ^    open
+                    //   ^  pos
+                    *on_comment = true;
+                    line = l.get(pos + 2..);
                     continue;
                 }
             }
-            break;
+            if let Some(close) = pos.checked_add(2) {
+                if l.get(close) == Some(&b'>') {
+                    // -->
+                    //   ^ close
+                    // ^   pos
+                    *on_comment = false;
+                    line = l.get(close + 1..);
+                    continue;
+                }
+            }
+            line = l.get(pos + 2..);
         }
     }
 }
