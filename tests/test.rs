@@ -261,6 +261,19 @@ fn code_block() {
     );
 
     let changelog = "\
+## 0.2.0
+a
+<!--
+```
+-->
+## 0.1.0
+";
+    let changelog = parse(changelog).unwrap();
+    assert_eq!(changelog.len(), 2);
+    assert_eq!(changelog["0.2.0"].notes, "a\n<!--\n```\n-->");
+    assert_eq!(changelog["0.1.0"].notes, "");
+
+    let changelog = "\
 # 0.2.0
     # 0.2.0
 # 0.1.0

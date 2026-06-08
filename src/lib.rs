@@ -596,7 +596,7 @@ impl<'a> Iterator for ParseIter<'a, '_> {
                     if line.starts_with(fence) {
                         on_code_block = None;
                     }
-                } else {
+                } else if !on_comment {
                     let line = trim_start(line).as_bytes();
                     if let Some(&b @ (b'`' | b'~')) = line.first() {
                         let mut len = 1;
