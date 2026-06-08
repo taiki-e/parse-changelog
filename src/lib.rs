@@ -607,16 +607,9 @@ impl<'a> Iterator for ParseIter<'a, '_> {
                 let line = line.as_bytes();
                 self.lines.next();
                 if let Some(fence) = on_code_block {
-                    if line.starts_with(fence) {
+                    if let Some(rest) = line.strip_prefix(fence) {
                         let b = fence[0];
-                        let mut pos = fence.len();
-                        while line.get(pos) == Some(&b) {
-                            pos += 1;
-                        }
-                        while matches!(line.get(pos), Some(b' ' | b'\t')) {
-                            pos += 1;
-                        }
-                        if line[pos..].is_empty() {
+                        if all_allow_end_spaces(rest, b) {
                             on_code_block = None;
                         }
                     }
@@ -806,32 +799,21 @@ fn heading<'a>(line: &'a str, lines: &mut Lines<'a>) -> Option<Heading<'a>> {
         }
     }
     if let Some((next, ..)) = lines.peek2() {
-        let next = trim_start(next);
-        match next.as_bytes().first() {
-            Some(b'=') => {
-                if next[1..].trim_end().as_bytes().iter().all(|&b| b == b'=') {
-                    return Some(Heading {
-                        text: line.trim_end(),
-                        level: 1,
-                        style: HeadingStyle::Setext,
-                    });
-                }
+        let next = trim_start_bytes(next.as_bytes());
+        if let Some((&b @ (b'=' | b'-'), next)) = next.split_first() {
+            if all_allow_end_spaces(next, b) {
+                return Some(Heading {
+                    text: line.trim_end(),
+                    level: if b == b'=' { 1 } else { 2 },
+                    style: HeadingStyle::Setext,
+                });
             }
-            Some(b'-') => {
-                if next[1..].trim_end().as_bytes().iter().all(|&b| b == b'-') {
-                    return Some(Heading {
-                        text: line.trim_end(),
-                        level: 2,
-                        style: HeadingStyle::Setext,
-                    });
-                }
-            }
-            _ => {}
         }
     }
     None
 }
 
+#[inline]
 fn trim_start(s: &str) -> &str {
     let mut count = 0;
     while s.as_bytes().get(count) == Some(&b' ') {
@@ -842,6 +824,32 @@ fn trim_start(s: &str) -> &str {
     }
     // Indents less than 4 are ignored.
     &s[count..]
+}
+#[inline]
+fn trim_start_bytes(s: &[u8]) -> &[u8] {
+    let mut count = 0;
+    while s.get(count) == Some(&b' ') {
+        count += 1;
+        if count == 4 {
+            return s;
+        }
+    }
+    // Indents less than 4 are ignored.
+    &s[count..]
+}
+
+#[inline]
+fn all_allow_end_spaces(mut s: &[u8], b: u8) -> bool {
+    while let Some((&b_, s_next)) = s.split_first() {
+        if b_ != b {
+            break;
+        }
+        s = s_next;
+    }
+    while let Some((b' ' | b'\t' | b'\r', s_next)) = s.split_first() {
+        s = s_next;
+    }
+    s.is_empty()
 }
 
 fn extract_version_from_title<'a>(mut text: &'a str, prefix_format: &Regex) -> (&'a str, &'a str) {
