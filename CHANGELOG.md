@@ -14,7 +14,7 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 - Fix handling of code block inside comment.
 
-- Fix bug in code block ending handling.
+- Fix bug in code block ending/starting handling.
 
 ## [0.6.17] - 2026-06-07
 

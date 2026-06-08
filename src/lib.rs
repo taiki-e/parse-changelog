@@ -613,7 +613,7 @@ impl<'a> Iterator for ParseIter<'a, '_> {
                         while line.get(len) == Some(&b) {
                             len += 1;
                         }
-                        if len >= 3 {
+                        if len >= 3 && (b != b'`' || !line[len..].contains(&b'`')) {
                             on_code_block = Some(&line[..len]);
                         }
                     }
