@@ -535,52 +535,6 @@ impl<'a, 'r> ParseIter<'a, 'r> {
         }
         cur_release
     }
-
-    fn handle_comment(&self, on_comment: &mut bool, is_inline_comment: &mut bool, line: &'a [u8]) {
-        let mut first = true;
-        let mut line = Some(line);
-        while let Some(l) = line {
-            let Some(pos) = memchr::memchr(b'-', l) else { break };
-            match l.get(pos + 1) {
-                // --
-                // ^   pos
-                //  ^  pos + 1
-                Some(&b'-') => {}
-                Some(_) => {
-                    line = l.get(pos + 2..);
-                    first = false;
-                    continue;
-                }
-                None => break,
-            }
-            if let Some(open) = pos.checked_sub(2) {
-                if l.get(open) == Some(&b'<') && l.get(open + 1) == Some(&b'!') {
-                    // <!--
-                    // ^    open
-                    //   ^  pos
-                    if !*on_comment {
-                        *on_comment = true;
-                        *is_inline_comment = !first || open != 0;
-                    }
-                    line = l.get(pos + 2..);
-                    first = false;
-                    continue;
-                }
-            }
-            if let Some(close) = pos.checked_add(2) {
-                if l.get(close) == Some(&b'>') {
-                    // -->
-                    //   ^ close
-                    // ^   pos
-                    *on_comment = false;
-                    line = l.get(close + 1..);
-                    first = false;
-                    continue;
-                }
-            }
-            line = l.get(pos + 2..);
-        }
-    }
 }
 
 impl<'a> Iterator for ParseIter<'a, '_> {
@@ -626,7 +580,7 @@ impl<'a> Iterator for ParseIter<'a, '_> {
                         }
                     }
                     if on_code_block.is_none() {
-                        self.handle_comment(&mut on_comment, &mut is_inline_comment, line);
+                        handle_comment(&mut on_comment, &mut is_inline_comment, line);
                     }
                 }
 
@@ -811,6 +765,52 @@ fn heading<'a>(line: &'a str, lines: &mut Lines<'a>) -> Option<Heading<'a>> {
         }
     }
     None
+}
+
+fn handle_comment(on_comment: &mut bool, is_inline_comment: &mut bool, line: &[u8]) {
+    let mut first = true;
+    let mut line = Some(line);
+    while let Some(l) = line {
+        let Some(pos) = memchr::memchr(b'-', l) else { break };
+        match l.get(pos + 1) {
+            // --
+            // ^   pos
+            //  ^  pos + 1
+            Some(&b'-') => {}
+            Some(_) => {
+                line = l.get(pos + 2..);
+                first = false;
+                continue;
+            }
+            None => break,
+        }
+        if let Some(open) = pos.checked_sub(2) {
+            if l.get(open) == Some(&b'<') && l.get(open + 1) == Some(&b'!') {
+                // <!--
+                // ^    open
+                //   ^  pos
+                if !*on_comment {
+                    *on_comment = true;
+                    *is_inline_comment = !first || open != 0;
+                }
+                line = l.get(pos + 2..);
+                first = false;
+                continue;
+            }
+        }
+        if let Some(close) = pos.checked_add(2) {
+            if l.get(close) == Some(&b'>') {
+                // -->
+                //   ^ close
+                // ^   pos
+                *on_comment = false;
+                line = l.get(close + 1..);
+                first = false;
+                continue;
+            }
+        }
+        line = l.get(pos + 2..);
+    }
 }
 
 #[inline]
