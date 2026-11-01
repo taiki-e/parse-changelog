@@ -20,6 +20,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 - Performance improvements.
 
+- Distribute prebuilt binary for AArch64 FreeBSD (tier 2 since Rust 1.98).
+
 ## [0.6.17] - 2026-06-07
 
 - Support code block using four or more \`.
