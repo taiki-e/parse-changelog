@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.6.18] - 2026-11-01
+
 - Fix handling of code block inside comment.
 
 - Fix bug in code block ending/starting handling.
@@ -266,7 +268,8 @@ No public API changes from 0.2.1.
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.6.17...HEAD
+[Unreleased]: https://github.com/taiki-e/parse-changelog/compare/v0.6.18...HEAD
+[0.6.18]: https://github.com/taiki-e/parse-changelog/compare/v0.6.17...v0.6.18
 [0.6.17]: https://github.com/taiki-e/parse-changelog/compare/v0.6.16...v0.6.17
 [0.6.16]: https://github.com/taiki-e/parse-changelog/compare/v0.6.15...v0.6.16
 [0.6.15]: https://github.com/taiki-e/parse-changelog/compare/v0.6.14...v0.6.15
