@@ -5,9 +5,16 @@
 use std::{collections::HashSet, path::Path};
 
 use fs_err as fs;
-use proc_macro2::Literal;
-use quote::{format_ident, quote};
-use test_helper::{bin_name, codegen::file, function_name};
+use test_helper::{
+    bin_name,
+    codegen::{
+        file,
+        proc_macro2::Literal,
+        quote::{format_ident, quote},
+        syn,
+    },
+    function_name,
+};
 
 fn workspace_root() -> &'static Path {
     Path::new(env!("CARGO_MANIFEST_DIR").strip_suffix("tools/codegen").unwrap())

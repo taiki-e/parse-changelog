@@ -4,9 +4,6 @@ edition = "2021"
 
 [dependencies]
 fs-err = "3"
-proc-macro2 = { version = "1", default-features = false }
-quote = { version = "1", default-features = false }
-syn = { version = "2", default-features = false, features = ["parsing", "printing", "full"] }
 test-helper = { features = ["codegen"], git = "https://github.com/taiki-e/test-helper.git", rev = "b931ac1a34794aede5b019c613e50157a35a7ec4" }
 
 [lints]
