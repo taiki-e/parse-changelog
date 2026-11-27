@@ -4,41 +4,18 @@
 // It is not intended for manual editing.
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
-#![allow(
-    dead_code,
-    unused_macros,
-    clippy::std_instead_of_alloc,
-    clippy::std_instead_of_core,
-)]
-fn assert_send<T: ?Sized + Send>() {}
-fn assert_sync<T: ?Sized + Sync>() {}
-fn assert_unpin<T: ?Sized + Unpin>() {}
-fn assert_unwind_safe<T: ?Sized + std::panic::UnwindSafe>() {}
-fn assert_ref_unwind_safe<T: ?Sized + std::panic::RefUnwindSafe>() {}
-const _: fn() = || {
-    assert_send::<crate::error::Error>();
-    assert_sync::<crate::error::Error>();
-    assert_unpin::<crate::error::Error>();
-    assert_unwind_safe::<crate::error::Error>();
-    assert_ref_unwind_safe::<crate::error::Error>();
-    assert_send::<crate::Changelog<'_>>();
-    assert_sync::<crate::Changelog<'_>>();
-    assert_unpin::<crate::Changelog<'_>>();
-    assert_unwind_safe::<crate::Changelog<'_>>();
-    assert_ref_unwind_safe::<crate::Changelog<'_>>();
-    assert_send::<crate::Release<'_>>();
-    assert_sync::<crate::Release<'_>>();
-    assert_unpin::<crate::Release<'_>>();
-    assert_unwind_safe::<crate::Release<'_>>();
-    assert_ref_unwind_safe::<crate::Release<'_>>();
-    assert_send::<crate::Parser>();
-    assert_sync::<crate::Parser>();
-    assert_unpin::<crate::Parser>();
-    assert_unwind_safe::<crate::Parser>();
-    assert_ref_unwind_safe::<crate::Parser>();
-    assert_send::<crate::ParseIter<'_, '_>>();
-    assert_sync::<crate::ParseIter<'_, '_>>();
-    assert_unpin::<crate::ParseIter<'_, '_>>();
-    assert_unwind_safe::<crate::ParseIter<'_, '_>>();
-    assert_ref_unwind_safe::<crate::ParseIter<'_, '_>>();
-};
+test_helper::assert_value!(
+    crate ::error::Error : Send & Sync & Unpin & UnwindSafe & RefUnwindSafe
+);
+test_helper::assert_value!(
+    crate ::Changelog < '_ > : Send & Sync & Unpin & UnwindSafe & RefUnwindSafe
+);
+test_helper::assert_value!(
+    crate ::Release < '_ > : Send & Sync & Unpin & UnwindSafe & RefUnwindSafe
+);
+test_helper::assert_value!(
+    crate ::Parser : Send & Sync & Unpin & UnwindSafe & RefUnwindSafe
+);
+test_helper::assert_value!(
+    crate ::ParseIter < '_, '_ > : Send & Sync & Unpin & UnwindSafe & RefUnwindSafe
+);

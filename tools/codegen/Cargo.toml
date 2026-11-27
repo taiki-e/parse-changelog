@@ -4,7 +4,7 @@ edition = "2021"
 
 [dependencies]
 fs-err = "3"
-test-helper = { features = ["codegen"], git = "https://github.com/taiki-e/test-helper.git", rev = "b931ac1a34794aede5b019c613e50157a35a7ec4" }
+taiki-e-test-helper = { version = "0.1", features = ["codegen"] }
 
 [lints]
 workspace = true

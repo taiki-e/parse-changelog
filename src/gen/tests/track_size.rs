@@ -8,7 +8,7 @@
 use std::{fmt::Write as _, path::Path, string::String};
 fn write_size<T>(out: &mut String) {
     let _ = writeln!(
-        out, "{}: {}", std::any::type_name::<T> (), std::mem::size_of::<T> ()
+        out, "{}: {}", std::any::type_name:: < T > (), std::mem::size_of:: < T > ()
     );
 }
 /// Test the size of public types. This is not intended to keep a specific size and is intended to
@@ -17,13 +17,12 @@ fn write_size<T>(out: &mut String) {
 /// Ignore non-64-bit targets due to usize/ptr size, ignore Miri/cargo-careful as we set
 /// -Z randomize-layout for them, and ignore old rustc as any::type_name output and size
 /// optimization may differ between compiler versions.
-#[rustversion::attr(
-    nightly,
-    cfg_attr(any(not(target_pointer_width = "64"), miri, careful), ignore)
-)]
-#[rustversion::attr(not(nightly), ignore)]
+#[cfg_attr(any(not(target_pointer_width = "64"), miri, careful), ignore)]
 #[test]
 fn track_size() {
+    if !build_context::RUSTC_NIGHTLY {
+        return;
+    }
     let mut out = String::new();
     write_size::<crate::error::Error>(&mut out);
     write_size::<crate::Release<'_>>(&mut out);
